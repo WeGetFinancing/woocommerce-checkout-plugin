@@ -1,0 +1,29 @@
+{$SITE_NAME} {
+    {$SSL_CERT_PARAMS}
+
+    log {
+        output file /var/log/caddy/wp.log {
+            roll_size 20mb
+            roll_keep 1000
+            roll_keep_for 90d
+        }
+        format console
+        level error
+    }
+    @disallowed {
+        path /xmlrpc.php
+        path *.sql
+        path /wp-content/uploads/*.php
+    }
+
+    rewrite @disallowed '/index.php'
+
+    root * /var/www/html
+    php_fastcgi wp:9000
+    file_server
+    encode gzip zstd
+}
+
+{$SITE_NAME}:80 {
+    redir / https://{$SITE_NAME}/ 307
+}
