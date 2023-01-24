@@ -1,24 +1,83 @@
 <?php
 
-namespace WeGetFinancing\WCP;
+namespace WeGetFinancing\Checkout;
 
+use Exception;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use WeGetFinancing\WCP\PaymentGateway\WeGetFinancing;
-use WeGetFinancing\WCP\Wp\PluginAbstract;
-use WeGetFinancing\WCP\Wp\ViewHelper;
+use WeGetFinancing\Checkout\Wp\AddableTrait;
 
-define('WGF_PLUGIN_FOLDER', basename(plugin_dir_path(__FILE__)));
-define('WGF_PLUGIN_DIR', plugins_url('', __FILE__ ));
-define('WGF_PLUGIN_PATH', plugin_dir_path( __FILE__ ));
-define('WGF_PLUGIN_URL', plugins_url() . "/" . WGF_PLUGIN_FOLDER);
-
-class App extends PluginAbstract
+class App extends AbstractAction
 {
-    public $isConfigured = false;
+    public const ACTION_NAME = 'init';
+    public const DEFAULT_SERVICE_XML_FILE = 'services.xml';
 
-    public function __construct() {
-        parent::__construct();
+    protected ContainerInterface $container;
 
-//        $this->isConfigured = false;
+    use AddableTrait;
+
+    /**
+     * @throws Exception
+     */
+    public function __construct(string $basePath)
+    {
+        $containerBuilder = new ContainerBuilder();
+        $loader = new XmlFileLoader($containerBuilder, new FileLocator($basePath));
+        $loader->load(self::DEFAULT_SERVICE_XML_FILE);
+
+
+
+        $this->isConfigured = false;
+
+        $this->add();
+    }
+
+    public function execute(): void
+    {
+        // Add Actions
+        $this->addAction( 'admin_notices', 'isNotConfiguredAdminNotice' );
+
+        $this->addAjaxAction('saveSettings', 'saveSettingsForm');
+
+        $this->addAdminMenu();
+
+        // Add Woocommerce Stuff
+        $this->addWoocommerceCustomOrderStatus();
+        $this->addWocommerceOrderHooks();
+        $this->addWoocommercePaymentGateway();
+    }
+
+    function addAjaxAction( $action, $functionName ) {
+
+        add_action(
+            "wp_ajax_$action",
+            [ $this, "$functionName" ]
+        );
+
+        add_action(
+            'wp_ajax_nopriv_$action',
+            [ $this, "$functionName" ]
+        );
+
+    }
+
+    public function ajaxRespondJson( array $responseArray ) {
+
+        echo json_encode( $responseArray );
+
+        wp_die();
+
+    }
+
+    public function ajaxRespondString ( $str ) {
+
+        echo $str;
+
+        wp_die();
+
     }
 
     function isNotConfiguredAdminNotice() {
@@ -92,40 +151,23 @@ class App extends PluginAbstract
 
 //    public function ConfigurationPage()
 //    {
-//        echo "PAGINA CONFIGURATION";
+//        echo "CONFIGURATION PAGE";
 //    }
 
-    public function init()
+
+
+    public function addWocommercePaymentGateway()
     {
-        // Add Actions
-        $this->addAction( 'admin_notices', 'isNotConfiguredAdminNotice' );
+        $this->addAction( 'plugins_loaded', 'paymentGatewayInit' );
 
-        $this->addAjaxAction('saveSettings', 'saveSettingsForm');
-
-        $this->addAdminMenu();
-
-        // Add Woocommerce Stuff
-        $this->addWoocommerceCustomOrderStatus();
-        $this->addWocommerceOrderHooks();
-        $this->addWoocommercePaymentGateway();
-    }
-
-    public function addWoocommercePaymentGateway()
-    {
-//        $this->addAction( 'plugins_loaded', 'paymentGatewayInit' );
-
-        add_filter( 'woocommerce_payment_gateways', function( $methods ) {
-            $methods[] = WeGetFinancing::class;
-            return $methods;
-        } );
 
     }
 
     public function paymentGatewayInit() {
-//        add_filter( 'woocommerce_payment_gateways', function( $methods ) {
-//            $methods[] = WeGetFinancing::class;
-//            return $methods;
-//        } );
+        add_filter( 'woocommerce_payment_gateways', function( $methods ) {
+            $methods[] = WeGetFinancing::class;
+            return $methods;
+        } );
     }
 
     public function addWocommerceOrderHooks()

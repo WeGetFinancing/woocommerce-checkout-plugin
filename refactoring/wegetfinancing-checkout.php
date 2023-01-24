@@ -1,5 +1,4 @@
 <?php
-
 /**
  * WeGetFinancing Payment Gateway
  *
@@ -23,6 +22,8 @@
  * Update URI:        https://github.com/WeGetFinancing/magento-checkout-plugin
  */
 
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
-new \WeGetFinancing\WCP\App();
+use WeGetFinancing\Checkout\App;
+
+new App(__DIR__);

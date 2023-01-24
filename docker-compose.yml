@@ -1,10 +1,18 @@
 version: '3.3'
 services:
+  composer:
+    build:
+      dockerfile: env/composer/Dockerfile
+      context: .
+    restart: "no"
+    volumes:
+      - ./plugin:/app
+
   db:
     image: mariadb:10.7.7-focal
     container_name: db
     volumes:
-      - ./db:/var/lib/mysql
+      - db-data:/var/lib/mysql
     restart: always
     env_file:
       - .env
@@ -24,9 +32,9 @@ services:
       - WORDPRESS_DB_PASSWORD=$MYSQL_PASSWORD
       - WORDPRESS_DB_NAME=$MYSQL_DATABASE
     volumes:
-      - ./custom.ini:/usr/local/etc/php/conf.d/custom.ini
-      - ./wp:/var/www/html
-      - ./plugin:/var/www/html/wp-data/plugins/
+      - ./env/wp/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+      - ./var/wp:/var/www/html
+      - ./plugin:/var/www/html/wp-content/plugins/wegetfinancing-checkout
 
   lb:
     image: caddy:2.6.2-alpine
@@ -37,5 +45,9 @@ services:
     env_file:
       - .env
     volumes:
-      - ./wp:/var/www/html
-      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./var/wp:/var/www/html
+      - ./env/lb/Caddyfile:/etc/caddy/Caddyfile
+
+volumes:
+  db-data:
+    external: false

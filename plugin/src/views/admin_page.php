@@ -1,6 +1,6 @@
 
 <h1>
-    TEST ADMIN AREA
+    SUPER PAGINA ADMIN
 </h1>
 
 <form action="" id="settings-form">

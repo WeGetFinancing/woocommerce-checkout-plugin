@@ -1,5 +1,7 @@
 .idea
 !.gitignore
+!.gitkeep
 db
-wp
+wp/
 vendor/
+composer.lock

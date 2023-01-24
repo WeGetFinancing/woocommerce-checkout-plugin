@@ -1,8 +1,8 @@
 # WeGetFinancing Payment Checkout for WooCommerce
 
-This is a WooCommerce module which integrates WeGetFinancing payment gateway with the WordPress / WooCommerce application.
+WeGetFinancing payment gateway integration plugin for WooCommerce
 
-## Installation 
+## Development environment 
 
 Install a fresh version of WordPress:
 
@@ -11,13 +11,15 @@ Install a fresh version of WordPress:
    ```
    docker-compose down -v --remove-orphans
    ```
-3. Delete any content inside the folders "db" and "wp" but not the folders itself
+3. Delete any content inside the folders "./var/wp" but not the folders itself
    ```
-   rm -rf ./db/*
    rm -rf ./wp/*
    ```
 4. Start docker-compose
    ```
    docker-compose up -d
    ```
-
+5. Install vendor
+      ```
+   docker-compose run --rm composer install
+   ```
