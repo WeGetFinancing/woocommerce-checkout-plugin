@@ -4,6 +4,7 @@ services:
     build:
       dockerfile: env/composer/Dockerfile
       context: .
+    container_name: composer
     restart: "no"
     volumes:
       - ./plugin:/app

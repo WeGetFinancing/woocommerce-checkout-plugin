@@ -5,15 +5,13 @@ namespace WeGetFinancing\WCP\Wp;
 abstract class PluginAbstract
 {
 
-    function __construct() {
-
+    public function __construct() {
         add_action( 'init', array( $this, 'init' ) );
-
     }
 
     abstract public function init();
 
-    function addAjaxAction( $action, $functionName ) {
+    public function addAjaxAction( $action, $functionName ) {
 
         add_action(
             "wp_ajax_$action",

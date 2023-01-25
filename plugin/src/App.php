@@ -17,8 +17,21 @@ class App extends PluginAbstract
 
     public function __construct() {
         parent::__construct();
+    }
 
-//        $this->isConfigured = false;
+    public function init()
+    {
+        // Add Actions
+        $this->addAction( 'admin_notices', 'isNotConfiguredAdminNotice' );
+
+//        $this->addAjaxAction('saveSettings', 'saveSettingsForm');
+//
+        $this->addAdminMenu();
+//
+//        // Add Woocommerce Stuff
+//        $this->addWoocommerceCustomOrderStatus();
+//        $this->addWocommerceOrderHooks();
+        $this->addWoocommercePaymentGateway();
     }
 
     function isNotConfiguredAdminNotice() {
@@ -88,26 +101,6 @@ class App extends PluginAbstract
         }
 
         $this->ajaxRespondString( 'Everything Updated' );
-    }
-
-//    public function ConfigurationPage()
-//    {
-//        echo "PAGINA CONFIGURATION";
-//    }
-
-    public function init()
-    {
-        // Add Actions
-        $this->addAction( 'admin_notices', 'isNotConfiguredAdminNotice' );
-
-        $this->addAjaxAction('saveSettings', 'saveSettingsForm');
-
-        $this->addAdminMenu();
-
-        // Add Woocommerce Stuff
-        $this->addWoocommerceCustomOrderStatus();
-        $this->addWocommerceOrderHooks();
-        $this->addWoocommercePaymentGateway();
     }
 
     public function addWoocommercePaymentGateway()

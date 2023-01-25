@@ -1,6 +1,6 @@
 
 <h1>
-    SUPER PAGINA ADMIN
+    WeGetFinancing Admin Page
 </h1>
 
 <form action="" id="settings-form">
