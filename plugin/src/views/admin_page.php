@@ -50,13 +50,9 @@
         };
 
         jQuery.post(ajaxurl, data, function( response ) {
-
             console.log("RESPONSE:\n" + response);
 
             document.getElementById("responseDiv").innerHTML = response;
-
-            //location.reload();
-
         });
         //return false;
     }

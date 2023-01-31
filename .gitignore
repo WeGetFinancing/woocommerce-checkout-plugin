@@ -6,3 +6,4 @@ wp/
 vendor/
 composer.lock
 .env
+var

@@ -12,7 +12,7 @@
  * Plugin URI:        https://github.com/WeGetFinancing/magento-checkout-plugin
  * Description:       Integrate WeGetFinancing payment gateway to woocommerce
  * Version:           1.0.0
- * Requires at least: 5.2
+ * Requires at least: 5.0
  * Requires PHP:      7.4
  * Author:            Riccardo De Leo
  * Author URI:        https://github.com/WeGetFinancing

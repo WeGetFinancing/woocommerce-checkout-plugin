@@ -5,6 +5,9 @@ namespace WeGetFinancing\WCP;
 use WeGetFinancing\WCP\PaymentGateway\WeGetFinancing;
 use WeGetFinancing\WCP\Wp\PluginAbstract;
 use WeGetFinancing\WCP\Wp\ViewHelper;
+use WeGetFinancing\SDK\Client;
+use WeGetFinancing\SDK\Entity\Request\AuthRequestEntity;
+use WeGetFinancing\SDK\Entity\Request\LoanRequestEntity;
 
 define('WGF_PLUGIN_FOLDER', basename(plugin_dir_path(__FILE__)));
 define('WGF_PLUGIN_DIR', plugins_url('', __FILE__ ));
@@ -21,20 +24,98 @@ class App extends PluginAbstract
 
     public function init()
     {
-        // Add Actions
         $this->addAction( 'admin_notices', 'isNotConfiguredAdminNotice' );
+        $this->addAjaxAction('saveSettings', 'saveSettingsForm');
 
-//        $this->addAjaxAction('saveSettings', 'saveSettingsForm');
-//
+        add_action(
+            'wp_ajax_nopriv_generateWeGetFinancingFunnelAction',
+            [ $this, "generateFunnelAction" ]
+        );
+
         $this->addAdminMenu();
-//
-//        // Add Woocommerce Stuff
-//        $this->addWoocommerceCustomOrderStatus();
-//        $this->addWocommerceOrderHooks();
         $this->addWoocommercePaymentGateway();
     }
 
-    function isNotConfiguredAdminNotice() {
+    public function generateFunnelAction()
+    {
+        try {
+            $data = $_POST['data'];
+
+            $auth = AuthRequestEntity::make([
+                'username' => getenv('WEGETFINANCING_CHECKOUT_USERNAME'),
+                'password'  => getenv('WEGETFINANCING_CHECKOUT_PASSWORD'),
+                'merchantId' => getenv('WEGETFINANCING_CHECKOUT_MERCHANT_ID'),
+                'url' => getenv('WEGETFINANCING_CHECKOUT_URL')
+            ]);
+
+            $client = Client::Make($auth);
+
+            $request = LoanRequestEntity::make([
+                'first_name' => $data['billing_first_name'],
+                'last_name' => $data['billing_last_name'],
+                'shipping_amount' => 150,
+                'version' => '1.9',
+                'email' => $data['billing_email'],
+                'phone' => $data['billing_phone'],
+                'merchant_transaction_id' => '***',
+                'success_url' => '',
+                'failure_url' => '',
+                'postback_url' => '',
+                'billing_address' => [
+                    'street1' => $data['billing_address_1'] . ' ' . $data['billing_address_2'],
+                    'city' => $data['billing_city'],
+                    'state' => 'NJ',
+                    'zipcode' => $data['billing_postcode'],
+                ],
+                'shipping_address' => [
+                    'street1' => $data['billing_address_1'] . ' ' . $data['billing_address_2'],
+                    'city' => $data['billing_city'],
+                    'state' => 'NJ',
+                    'zipcode' => $data['billing_postcode'],
+                ],
+                'cart_items' => [
+                    [
+                        'sku' => 'SKU_CODE_001',
+                        'displayName' => 'Cart product 001',
+                        'unitPrice' => '1000',
+                        'quantity' => 1,
+                        'unitTax' => 21.0,
+                        'category' => 'CAT_A',
+                    ], [
+                        'sku' => 'SKU_CODE_002',
+                        'displayName' => 'Cart product 002',
+                        'unitPrice' => '500',
+                        'quantity' => 1,
+                        'unitTax' => 21.0,
+                        'category' => 'CAT_B',
+                    ],
+                ]
+            ]);
+            $response = $client->requestNewLoan($request);
+
+            if (true === $response->getIsSuccess()) {
+                return $this->ajaxRespondJson([
+                    'isSuccess' => true,
+                    'invId' => $response->getSuccess()->getInvId(),
+                    'href' => $response->getSuccess()->getHref()
+                ]);
+            }
+            return $this->ajaxRespondJson([
+                'isSuccess' => false,
+                'error' => $response->getError()->getError(),
+                'message' => $response->getError()->getMessage()
+            ]);
+        } catch (\Throwable $exception) {
+            return $this->ajaxRespondJson([
+                'isSuccess' => false,
+                'error' => $exception->getCode(),
+                'message' => $exception->getMessage()
+            ]);
+        }
+
+    }
+
+    public function isNotConfiguredAdminNotice() {
         if(!$this->isConfigured) {
             ?>
             <div class="notice notice-warning">
@@ -46,7 +127,7 @@ class App extends PluginAbstract
         }
     }
 
-    function addAdminMenu() {
+    public function addAdminMenu() {
         add_menu_page(
             'Configuration',
             'WeGetFinancing',
@@ -74,13 +155,8 @@ class App extends PluginAbstract
         ViewHelper::includeWithVariables(
             WGF_PLUGIN_PATH . 'views/admin_page.php',
             [],
-            true, // PRINT_OUTPUT
-            [
-                    '{{saveSettingsFormAction}}' => 'saveSettings',
-//                '{{formActionGetIds}}' => 'wooGetProductsIds',
-//                '{{formActionCheckProduct}}' => 'checkProduct',
-//                '{{ajaxLoaderGifUrl}}' => WGF_PLUGIN_URL . '/ajax-loader.gif',
-            ]
+            true,
+            ['{{saveSettingsFormAction}}' => 'saveSettings']
         );
     }
 
@@ -105,20 +181,11 @@ class App extends PluginAbstract
 
     public function addWoocommercePaymentGateway()
     {
-//        $this->addAction( 'plugins_loaded', 'paymentGatewayInit' );
-
         add_filter( 'woocommerce_payment_gateways', function( $methods ) {
             $methods[] = WeGetFinancing::class;
             return $methods;
         } );
 
-    }
-
-    public function paymentGatewayInit() {
-//        add_filter( 'woocommerce_payment_gateways', function( $methods ) {
-//            $methods[] = WeGetFinancing::class;
-//            return $methods;
-//        } );
     }
 
     public function addWocommerceOrderHooks()

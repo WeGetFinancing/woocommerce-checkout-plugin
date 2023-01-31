@@ -1,32 +1,48 @@
 <?php
 
-namespace WeGetFinancing\WCP\PaymentGateway;
+namespace WeGetFinancing\Checkout\PaymentGateway;
 
-class WeGetFinancing extends \WC_Payment_Gateway
+use WeGetFinancing\Checkout\ActionableInterface;
+use WeGetFinancing\Checkout\Wp\AddableTrait;
+
+class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
 {
+    use AddableTrait;
+
+    public const ACTION_NAME = 'woocommerce_update_options_payment_gateways_';
+
     public function __construct() {
         $this->id = 'wegetfinancing';
         $this->has_fields = false;
-        $this->method_title = "WeGetFinancing";
-        $this->method_descriptions = "Pay month by month";
+        $this->method_title = "WeGetFinancing Checkout";
+        $this->method_descriptions = "Offer affordable monthly payments to your existing customers while you receive the money directly into your account, in one lump sum.";
 
         // Load the settings.
         $this->init_form_fields();
         $this->init_settings();
 
         // Define user set variables
-        $this->title        = $this->get_option( 'title' );
-        $this->description  = $this->get_option( 'description' );
-        $this->is_sandbox  = $this->get_option( 'is_sandbox' );
-        $this->username  = $this->get_option( 'username' );
-        $this->password  = $this->get_option( 'password' );
-        $this->merchant_id  = $this->get_option( 'merchant_id' );
+        $this->title        = $this->get_option( 'wegetfinancing_checkout_title' );
+        $this->description  = $this->get_option( 'wegetfinancing_checkout_description' );
+        $this->is_sandbox  = $this->get_option( 'wegetfinancing_checkout_is_sandbox' );
+        $this->username  = $this->get_option( 'wegetfinancing_checkout_username' );
+        $this->password  = $this->get_option( 'wegetfinancing_checkout_password' );
+        $this->merchant_id  = $this->get_option( 'wegetfinancing_checkout_merchant_id' );
 
 
         // Actions
         add_action(
-            'woocommerce_update_options_payment_gateways_' . $this->id,
+            '' . $this->id,
             [ $this, 'process_admin_options' ]
+        );
+    }
+
+
+    public function init(): void
+    {
+        $this->addAction(
+                $this->getActionName() . $this->id,
+                self::FUNCTION_NAME
         );
     }
 

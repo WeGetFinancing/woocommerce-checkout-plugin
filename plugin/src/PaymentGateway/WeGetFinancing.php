@@ -15,12 +15,12 @@ class WeGetFinancing extends \WC_Payment_Gateway
         $this->init_settings();
 
         // Define user set variables
-        $this->title        = $this->get_option( 'title' );
-        $this->description  = $this->get_option( 'description' );
-        $this->is_sandbox  = $this->get_option( 'is_sandbox' );
-        $this->username  = $this->get_option( 'username' );
-        $this->password  = $this->get_option( 'password' );
-        $this->merchant_id  = $this->get_option( 'merchant_id' );
+        $this->title = $this->get_option( 'title' );
+        $this->description = $this->get_option( 'description' );
+        $this->is_sandbox = $this->get_option( 'is_sandbox' );
+        $this->username = $this->get_option( 'username' );
+        $this->password = $this->get_option( 'password' );
+        $this->merchant_id = $this->get_option( 'merchant_id' );
 
 
         // Actions
@@ -107,8 +107,8 @@ class WeGetFinancing extends \WC_Payment_Gateway
         <?php
     }
 
-    public function payment_fields(){
-
+    public function payment_fields()
+    {
         global $woocommerce;
 
         $order_id = $woocommerce->session->order_awaiting_payment;
@@ -119,7 +119,13 @@ class WeGetFinancing extends \WC_Payment_Gateway
             echo wpautop( wptexturize( $description ) );
         }
 
+        wp_enqueue_script(
+                'wgf-checkout-funnel',
+            'https://cdn.wegetfinancing.com/libs/1.0/getfinancing.js'
+        );
+
         ?>
+        <input type="hidden" id="wegetfinancing_checkout_order_id" value="<?php echo $order_id; ?>">
         <script>
             jQuery(document).ready(function() {
                 jQuery('form[name="checkout"] input[name="payment_method"]').eq(0).prop('checked', true).attr( 'checked', 'checked' );
@@ -148,14 +154,52 @@ class WeGetFinancing extends \WC_Payment_Gateway
 
                         jQuery('#wgf_checkout_button').click((e) => {
 
-                            // jQuery('form[name="checkout"] #place_order').click()
+                            let wgfFunnelData = {};
+                            wgfFunnelData['billing_first_name'] = jQuery('#billing_first_name').val();
+                            wgfFunnelData['billing_last_name'] = jQuery('#billing_last_name').val();
+                            wgfFunnelData['billing_address_1'] = jQuery('#billing_address_1').val();
+                            wgfFunnelData['billing_address_2'] = jQuery('#billing_address_2').val();
+                            wgfFunnelData['billing_city'] = jQuery('#billing_city').val();
+                            wgfFunnelData['billing_postcode'] = jQuery('#billing_postcode').val();
+                            wgfFunnelData['billing_email'] = jQuery('#billing_email').val();
+                            wgfFunnelData['billing_phone'] = jQuery('#billing_phone').val();
+
+                            let requestNewFunnelData = {
+                                'action': 'generateWeGetFinancingFunnelAction',
+                                'data': wgfFunnelData
+                            };
+
+                            jQuery.ajax({
+                                type: "post",
+                                dataType: "json",
+                                url: "<?php echo admin_url('admin-ajax.php'); ?>",
+                                data: requestNewFunnelData,
+                                success: function(response){
+                                    console.log("generateWeGetFinancingFunnelAction RESPONSE:\n" + response);
+
+                                    if (response.isSuccess === false) {
+                                        alert(response.error + " " + response.message)
+                                    }
+
+                                    new GetFinancing(
+                                        response.href,
+                                        function() {
+                                            jQuery('form[name="checkout"] #place_order').click()
+                                        }.bind(self),
+                                        function() {}
+                                    )
+                                },
+                                error: function(response){
+                                    console.log("generateWeGetFinancingFunnelAction ERROR RESPONSE:\n" + response);
+                                    alert("unexpected error");
+                                },
+                            });
+
 
                         })
                     }
 
                     jQuery('form[name="checkout"]').on('submit', function(e){
-                        // Process using custom gateway
-                        // Etc etc
                         e.preventDefault();
                     });
                 }else{
