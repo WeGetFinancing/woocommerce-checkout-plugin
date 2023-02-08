@@ -30,9 +30,6 @@ class WeGetFinancing extends \WC_Payment_Gateway
         );
     }
 
-    /**
-     * Initialize Gateway Settings Form Fields
-     */
     public function init_form_fields() {
 
         $this->form_fields = apply_filters( 'wc_wgf_form_fields', array(
@@ -113,8 +110,6 @@ class WeGetFinancing extends \WC_Payment_Gateway
 
         $order_id = $woocommerce->session->order_awaiting_payment;
 
-        $order = wc_get_order( $order_id );
-
         if ( $description = $this->get_description() ) {
             echo wpautop( wptexturize( $description ) );
         }
@@ -125,7 +120,7 @@ class WeGetFinancing extends \WC_Payment_Gateway
         );
 
         ?>
-        <input type="hidden" id="wegetfinancing_checkout_order_id" value="<?php echo $order_id; ?>">
+
         <script>
             jQuery(document).ready(function() {
                 jQuery('form[name="checkout"] input[name="payment_method"]').eq(0).prop('checked', true).attr( 'checked', 'checked' );
@@ -141,7 +136,6 @@ class WeGetFinancing extends \WC_Payment_Gateway
 
             function wGF_WC_Gateway(){
                 if(jQuery('form[name="checkout"] input[name="payment_method"]:checked').val() === '<?php echo $this->id; ?>'){
-                    console.log("Using my gateway");
 
                     jQuery('form[name="checkout"] #place_order').hide()
 
@@ -157,10 +151,6 @@ class WeGetFinancing extends \WC_Payment_Gateway
                             let wgfFunnelData = {};
                             wgfFunnelData['billing_first_name'] = jQuery('#billing_first_name').val();
                             wgfFunnelData['billing_last_name'] = jQuery('#billing_last_name').val();
-                            wgfFunnelData['billing_address_1'] = jQuery('#billing_address_1').val();
-                            wgfFunnelData['billing_address_2'] = jQuery('#billing_address_2').val();
-                            wgfFunnelData['billing_city'] = jQuery('#billing_city').val();
-                            wgfFunnelData['billing_postcode'] = jQuery('#billing_postcode').val();
                             wgfFunnelData['billing_email'] = jQuery('#billing_email').val();
                             wgfFunnelData['billing_phone'] = jQuery('#billing_phone').val();
 
@@ -175,23 +165,54 @@ class WeGetFinancing extends \WC_Payment_Gateway
                                 url: "<?php echo admin_url('admin-ajax.php'); ?>",
                                 data: requestNewFunnelData,
                                 success: function(response){
-                                    console.log("generateWeGetFinancingFunnelAction RESPONSE:\n" + response);
+
+                                    console.log("generateWeGetFinancingFunnelAction RESPONSE:\n" + JSON.stringify(response));
 
                                     if (response.isSuccess === false) {
-                                        alert(response.error + " " + response.message)
+                                        if ( jQuery(".woocommerce-error").length ) {
+                                            jQuery(".woocommerce-error").parent().remove();
+                                        }
+
+                                        let error_message = '<div class="woocommerce-notices-wrapper">' +
+                                            '<ul class="woocommerce-error" id="wegetfinancing-woocommerce-error">';
+
+                                        if ("message" in response) {
+                                            error_message += "<li>" + response.message + "</li>";
+                                        }
+                                        if ("violations" in response) {
+                                            jQuery.each(response.violations, function( index, violation ) {
+                                                jQuery.each(violation.messages, function( index, message ) {
+                                                    error_message += "<li>" + message + "</li>";
+                                                });
+                                                jQuery.each(violation.fields, function( index, field ) {
+                                                    jQuery("#" + field).closest( '.form-row' ).addClass( 'woocommerce-invalid' );
+                                                });
+                                            });
+                                        }
+
+                                        error_message += "</ul></div>";
+
+                                        jQuery(".entry-content > .woocommerce").prepend(error_message);
+                                    } else {
+                                        new GetFinancing(
+                                            response.href,
+                                            function() {
+                                                jQuery('form[name="checkout"] #place_order').click()
+                                            }.bind(self),
+                                            function() {}
+                                        );
+                                    }
+                                },
+                                error: function(){
+                                    if ( jQuery(".woocommerce-error").length ) {
+                                        jQuery(".woocommerce-error").parent().remove();
                                     }
 
-                                    new GetFinancing(
-                                        response.href,
-                                        function() {
-                                            jQuery('form[name="checkout"] #place_order').click()
-                                        }.bind(self),
-                                        function() {}
-                                    )
-                                },
-                                error: function(response){
-                                    console.log("generateWeGetFinancingFunnelAction ERROR RESPONSE:\n" + response);
-                                    alert("unexpected error");
+                                    jQuery(".woocommerce").prepend('<div class="woocommerce-notices-wrapper">' +
+                                        '<ul class="woocommerce-error" id="wegetfinancing-woocommerce-error">' +
+                                        '<li>Unexpected server error</li>' +
+                                        '</ul>' +
+                                        '</div>');
                                 },
                             });
 
