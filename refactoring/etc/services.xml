@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services
+        https://symfony.com/schema/dic/services/services-1.0.xsd"
+>
+    <parameters>
+        <parameter key="app.base_path">%env(resolve:WGF_CHECKOUT_BASE_PATH)%</parameter>
+
+        <parameter key="twig.template_path">>%app.base_path%/view</parameter>
+        <parameter key="twig.env_params" type="collection">
+            <parameter key="twig.cache_path">%app.base_path%/var/twig/cache</parameter>
+        </parameter>
+
+        <parameter key="app.init_list" type="collection">
+            <parameter>paymentGateway</parameter>
+        </parameter>
+    </parameters>
+
+    <services>
+        <service id="twigLoader" class="Twig\Loader\FilesystemLoader">
+            <argument>%twig.template_path%</argument>
+        </service>
+        <service id="twig" class="Twig\Environment">
+            <argument type="service" id="twigLoader"/>
+            <argument>%twig.env_params%</argument>
+        </service>
+    </services>
+</container>

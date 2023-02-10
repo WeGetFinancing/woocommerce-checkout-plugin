@@ -1,0 +1,9 @@
+.idea
+!.gitignore
+!.gitkeep
+db
+wp/
+vendor/
+composer.lock
+.env
+var
