@@ -2,14 +2,9 @@
 
 namespace WeGetFinancing\WCP;
 
-use WeGetFinancing\SDK\Exception\EntityValidationException;
 use WeGetFinancing\WCP\Ajax\Public\GenerateFunnelUrl;
 use WeGetFinancing\WCP\PaymentGateway\WeGetFinancing;
 use WeGetFinancing\WCP\Wp\PluginAbstract;
-use WeGetFinancing\WCP\Wp\ViewHelper;
-use WeGetFinancing\SDK\Client;
-use WeGetFinancing\SDK\Entity\Request\AuthRequestEntity;
-use WeGetFinancing\SDK\Entity\Request\LoanRequestEntity;
 
 define('WGF_PLUGIN_FOLDER', basename(plugin_dir_path(__FILE__)));
 define('WGF_PLUGIN_DIR', plugins_url('', __FILE__ ));
@@ -18,83 +13,14 @@ define('WGF_PLUGIN_URL', plugins_url() . "/" . WGF_PLUGIN_FOLDER);
 
 class App extends PluginAbstract
 {
-    public $isConfigured = false;
-
     public function __construct() {
         parent::__construct();
     }
 
     public function init()
     {
-        $this->addAction( 'admin_notices', 'isNotConfiguredAdminNotice' );
-        $this->addAjaxAction('saveSettings', 'saveSettingsForm');
-        $this->addAdminMenu();
         $this->addWoocommercePaymentGateway();
-        (new GenerateFunnelUrl())->init();
-    }
 
-    public function isNotConfiguredAdminNotice() {
-        if(!$this->isConfigured) {
-            ?>
-            <div class="notice notice-warning">
-                <p>
-                    <?php _e( 'Configure WeGetFinancing Before Using It', 'wegetfinancing' ); ?>
-                </p>
-            </div>
-            <?php
-        }
-    }
-
-    public function addAdminMenu() {
-        add_menu_page(
-            'Configuration',
-            'WeGetFinancing',
-            'administrator',
-            'wegetfinancing',
-            [$this, 'AdminPage']
-        );
-
-//        add_submenu_page(
-//            'wegetfinancing',
-//            'Configuration',
-//            'Configuration',
-//            'administrator',
-//            'wegetfinancing-configuration',
-//            [$this, 'ConfigurationPage']
-//        );
-    }
-
-    public function AdminPage()
-    {
-        wp_enqueue_style( 'wgf-api_bootstrap_4',
-            'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'
-        );
-
-        ViewHelper::includeWithVariables(
-            WGF_PLUGIN_PATH . 'views/admin_page.php',
-            [],
-            true,
-            ['{{saveSettingsFormAction}}' => 'saveSettings']
-        );
-    }
-
-    function saveSettingsForm() {
-        ob_start();
-
-        $data = base64_decode( $_POST['data'] );
-
-        $data = json_decode( $data, TRUE );
-
-        $output = ob_get_contents();
-        ob_end_clean();
-
-        foreach( $data as $key => $value ) {
-
-            update_option( $key, $value, true );
-
-        }
-
-        $this->ajaxRespondString( 'Everything Updated' );
     }
 
     public function addWoocommercePaymentGateway()
@@ -106,11 +32,11 @@ class App extends PluginAbstract
 
     }
 
-    public function addWocommerceOrderHooks()
+    public function addWoCommerceOrderHooks()
     {
         add_action('woocommerce_new_order', function ($order_id) {
 
-            update_post_meta($order_id, 'inv_id', 'valore');
+            update_post_meta($order_id, 'inv_id', 'value');
 
         }, 10, 1);
     }

@@ -10,6 +10,8 @@ use WeGetFinancing\WCP\Exception\GenerateFunnelUrlException;
 
 class GenerateFunnelUrl
 {
+    public const SANDBOX_URL = "https://api.sandbox.wegetfinancing.com";
+    public const URL = "https://api.wegetfinancing.com";
     public const GENERATE_FUNNEL_ERROR_TABLE = [
         'firstName' => [
             'fields' => ['billing_first_name'],
@@ -44,6 +46,26 @@ class GenerateFunnelUrl
             'message' => '<strong>Billing Email address</strong>'
         ],
     ];
+
+    protected bool $isSandbox;
+
+    protected string $username;
+
+    protected string $password;
+
+    protected string $merchantId;
+
+    public function __construct(
+        bool $isSandbox,
+        string $username,
+        string $password,
+        string $merchantId
+    ) {
+        $this->isSandbox = $isSandbox;
+        $this->username = $username;
+        $this->password = $password;
+        $this->merchantId = $merchantId;
+    }
 
     public function init()
     {
@@ -168,10 +190,10 @@ class GenerateFunnelUrl
     {
         try {
             $auth = AuthRequestEntity::make([
-                'username' => getenv('WEGETFINANCING_CHECKOUT_USERNAME'),
-                'password'  => getenv('WEGETFINANCING_CHECKOUT_PASSWORD'),
-                'merchantId' => getenv('WEGETFINANCING_CHECKOUT_MERCHANT_ID'),
-                'url' => getenv('WEGETFINANCING_CHECKOUT_URL')
+                'username' => $this->username,
+                'password'  => $this->password,
+                'merchantId' => $this->merchantId,
+                'url' => $this->isSandbox ? self::SANDBOX_URL : self::URL
             ]);
 
             return Client::Make($auth);

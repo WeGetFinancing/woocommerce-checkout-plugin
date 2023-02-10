@@ -2,92 +2,89 @@
 
 namespace WeGetFinancing\WCP\PaymentGateway;
 
+use WeGetFinancing\WCP\Ajax\Public\GenerateFunnelUrl;
+
 class WeGetFinancing extends \WC_Payment_Gateway
 {
-    public function __construct() {
-        $this->id = 'wegetfinancing';
+    const GATEWAY_ID = 'wegetfinancing';
+
+    public function __construct()
+    {
+        $this->id = self::GATEWAY_ID;
         $this->has_fields = false;
+        $this->icon = ''; // TODO: icon.
         $this->method_title = "WeGetFinancing";
-        $this->method_descriptions = "Pay month by month";
+        $this->method_description = "Boost your sales by adding WeGetFinancing to your checkout. " .
+            "Offer affordable monthly payments to your existing customers while you receive the money" .
+            " directly into your account, in one lump sum.";
+        $this->title = "WeGetFinancing";
+        $this->description = "Pay monthly, obtain instant approval with no extensive paperwork." .
+            " Get credit approval in just seconds, so you can complete your purchase immediately, hassle-free.";
 
         // Load the settings.
         $this->init_form_fields();
         $this->init_settings();
 
         // Define user set variables
-        $this->title = $this->get_option( 'title' );
-        $this->description = $this->get_option( 'description' );
-        $this->is_sandbox = $this->get_option( 'is_sandbox' );
-        $this->username = $this->get_option( 'username' );
-        $this->password = $this->get_option( 'password' );
-        $this->merchant_id = $this->get_option( 'merchant_id' );
-
+        $this->wgf_is_sandbox = $this->get_option('wgf_is_sandbox', true);
+        $this->wgf_username = $this->get_option('wgf_username');
+        $this->wgf_password = $this->get_option('wgf_password');
+        $this->wgf_merchant_id = $this->get_option('wgf_merchant_id');
 
         // Actions
         add_action(
             'woocommerce_update_options_payment_gateways_' . $this->id,
             [ $this, 'process_admin_options' ]
         );
+
+        (new GenerateFunnelUrl(
+            $this->wgf_is_sandbox,
+            $this->wgf_username,
+            $this->wgf_password,
+            $this->wgf_merchant_id
+        ))->init();
     }
 
-    public function init_form_fields() {
-
-        $this->form_fields = apply_filters( 'wc_wgf_form_fields', array(
-
-            'enabled' => array(
-                'title'   => __( 'Enable/Disable', 'wc-gateway-wgf' ),
-                'type'    => 'checkbox',
-                'label'   => __( 'Enable WeGetFinancing Payment', 'wc-gateway-wgf' ),
-                'default' => 'yes'
-            ),
-
-            'is_sandbox' => array(
-                'title'   => __( 'Enable/Disable', 'wc-gateway-wgf' ),
-                'type'    => 'checkbox',
-                'label'   => __( 'Enable Sandbox', 'wc-gateway-wgf' ),
-                'default' => 'yes'
-            ),
-
-            'title' => array(
-                'title'       => __( 'Title', 'wc-gateway-wgf' ),
-                'type'        => 'text',
-                'description' => __( 'This controls the title for the payment method the customer sees during checkout.', 'wc-gateway-wgf' ),
-                'default'     => __( 'WeGetFinancing', 'wc-gateway-wgf' ),
-                'desc_tip'    => true,
-            ),
-
-            'description' => array(
-                'title'       => __( 'Description', 'wc-gateway-wgf' ),
-                'type'        => 'textarea',
-                'description' => __( 'Pay with WeGetFinancing', 'wc-gateway-wgf' ),
-                'default'     => __( 'Pay monthly with WeGetFinancing', 'wc-gateway-wgf' ),
-                'desc_tip'    => true,
-            ),
-
-            'username' => array(
-                'title'       => __( 'Username', 'wc-gateway-wgf' ),
-                'type'        => 'text',
-                'description' => __( 'WGF Username', 'wc-gateway-wgf' ),
-                'default'     => __( '', 'wc-gateway-wgf' ),
-                'desc_tip'    => true,
-            ),
-
-            'password' => array(
-                'title'       => __( 'Password', 'wc-gateway-wgf' ),
-                'type'        => 'password',
-                'description' => __( 'WGF Password', 'wc-gateway-wgf' ),
-                'default'     => __( '', 'wc-gateway-wgf' ),
-                'desc_tip'    => true,
-            ),
-
-            'merchant_id' => array(
-                'title'       => __( 'Merchant ID', 'wc-gateway-wgf' ),
-                'type'        => 'text',
-                'description' => __( 'WGF Merchant ID', 'wc-gateway-wgf' ),
-                'default'     => __( '', 'wc-gateway-wgf' ),
-                'desc_tip'    => true,
-            ),
-        ) );
+    public function init_form_fields()
+    {
+        $this->form_fields = apply_filters(
+            'wc_wgf_form_fields',
+            [
+                'enabled' => [
+                    'title'   => __( 'Payment Method', 'wc-gateway-wgf' ),
+                    'type'    => 'checkbox',
+                    'label'   => __( 'Enable/Disable WeGetFinancing Payment Method', 'wc-gateway-wgf' ),
+                    'default' => 'yes'
+                ],
+                'wgf_is_sandbox' => [
+                    'title'   => __( 'Sandbox Environment', 'wc-gateway-wgf' ),
+                    'type'    => 'checkbox',
+                    'label'   => __( 'Enable/Disable Sandbox Environment', 'wc-gateway-wgf' ),
+                    'default' => 'yes'
+                ],
+                'wgf_username' => [
+                    'title'       => __( 'Username', 'wc-gateway-wgf' ),
+                    'type'        => 'text',
+                    'description' => __( 'WeGetFinancing Username', 'wc-gateway-wgf' ),
+                    'default'     => __( '', 'wc-gateway-wgf' ),
+                    'desc_tip'    => true,
+                ],
+                'wgf_password' => [
+                    'title'       => __( 'Password', 'wc-gateway-wgf' ),
+                    'type'        => 'password',
+                    'description' => __( 'WeGetFinancing Password', 'wc-gateway-wgf' ),
+                    'default'     => __( '', 'wc-gateway-wgf' ),
+                    'desc_tip'    => true,
+                ],
+                'wgf_merchant_id' => [
+                    'title'       => __( 'Merchant ID', 'wc-gateway-wgf' ),
+                    'type'        => 'text',
+                    'description' => __( 'WeGetFinancing Merchant ID', 'wc-gateway-wgf' ),
+                    'default'     => __( '', 'wc-gateway-wgf' ),
+                    'desc_tip'    => true,
+                ]
+            ]
+        );
     }
 
     public function admin_options() {
@@ -106,14 +103,6 @@ class WeGetFinancing extends \WC_Payment_Gateway
 
     public function payment_fields()
     {
-        global $woocommerce;
-
-        $order_id = $woocommerce->session->order_awaiting_payment;
-
-        if ( $description = $this->get_description() ) {
-            echo wpautop( wptexturize( $description ) );
-        }
-
         wp_enqueue_script(
                 'wgf-checkout-funnel',
             'https://cdn.wegetfinancing.com/libs/1.0/getfinancing.js'
@@ -165,9 +154,6 @@ class WeGetFinancing extends \WC_Payment_Gateway
                                 url: "<?php echo admin_url('admin-ajax.php'); ?>",
                                 data: requestNewFunnelData,
                                 success: function(response){
-
-                                    console.log("generateWeGetFinancingFunnelAction RESPONSE:\n" + JSON.stringify(response));
-
                                     if (response.isSuccess === false) {
                                         if ( jQuery(".woocommerce-error").length ) {
                                             jQuery(".woocommerce-error").parent().remove();
@@ -215,8 +201,6 @@ class WeGetFinancing extends \WC_Payment_Gateway
                                         '</div>');
                                 },
                             });
-
-
                         })
                     }
 
@@ -224,13 +208,8 @@ class WeGetFinancing extends \WC_Payment_Gateway
                         e.preventDefault();
                     });
                 }else{
-                    // Not using gateway
-
                     jQuery('form[name="checkout"] #place_order').show()
                     jQuery('.wgf_checkout_button').remove()
-
-                    console.log("Not using my gateway. Proceed as usual");
-
                     jQuery('form[name="checkout"]').unbind('submit');
                 }
             };
@@ -244,23 +223,19 @@ class WeGetFinancing extends \WC_Payment_Gateway
      * @param int $order_id
      * @return array
      */
-    public function process_payment( $order_id ) {
-
+    public function process_payment($order_id)
+    {
         $order = wc_get_order( $order_id );
-
         // Mark as on-hold (we're awaiting the payment)
         $order->update_status( 'on-hold', __( 'Awaiting WeGetFinancing payment', 'wc-gateway-wgf' ) );
-
         // Reduce stock levels
         $order->reduce_order_stock();
-
         // Remove cart
         WC()->cart->empty_cart();
-
         // Return thankyou redirect
-        return array(
+        return [
             'result' 	=> 'success',
-            'redirect'	=> $this->get_return_url( $order )
-        );
+            'redirect'	=> $this->get_return_url($order)
+        ];
     }
 }
