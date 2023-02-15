@@ -3,7 +3,9 @@
 namespace WeGetFinancing\WCP;
 
 use WeGetFinancing\WCP\Ajax\Public\GenerateFunnelUrl;
+use WeGetFinancing\WCP\Ajax\Public\PostbackUpdate;
 use WeGetFinancing\WCP\PaymentGateway\WeGetFinancing;
+use WeGetFinancing\WCP\PostMeta\OrderInvId;
 use WeGetFinancing\WCP\Wp\PluginAbstract;
 
 define('WGF_PLUGIN_FOLDER', basename(plugin_dir_path(__FILE__)));
@@ -20,7 +22,7 @@ class App extends PluginAbstract
     public function init()
     {
         $this->addWoocommercePaymentGateway();
-
+//        (new PostbackUpdate())->init();
     }
 
     public function addWoocommercePaymentGateway()
