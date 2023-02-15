@@ -9,20 +9,26 @@ namespace WeGetFinancing\Checkout\Wp;
  */
 trait AddableTrait
 {
-    /**
-     * Add an action to WordPress
-     *
-     * @param string $actionName
-     * @param string $functionName
-     * @return void
-     */
-    public function addAction(string $actionName, string $functionName): void
+    public function getInitName(): string
     {
-        add_action($actionName, [$this, $functionName]);
+        return self::INIT_NAME;
     }
 
-    public function getActionName(): string
+    /**
+     * Add the class as an action to WordPress
+     * @return void
+     */
+    public function addAction(): void
     {
-        return self::ACTION_NAME;
+        add_action($this->getInitName(), [$this, self::FUNCTION_NAME]);
+    }
+
+    /**
+     * Add the class as a filter to WordPress
+     * @return void
+     */
+    public function addFilter(): void
+    {
+        add_filter($this->getInitName(), [$this, self::FUNCTION_NAME]);
     }
 }

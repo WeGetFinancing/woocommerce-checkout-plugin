@@ -5,15 +5,13 @@
         https://symfony.com/schema/dic/services/services-1.0.xsd"
 >
     <parameters>
-        <parameter key="app.base_path">%env(resolve:WGF_CHECKOUT_BASE_PATH)%</parameter>
-
-        <parameter key="twig.template_path">>%app.base_path%/view</parameter>
+        <parameter key="app.base_path"/>
+        <parameter key="twig.template_path">%app.base_path%/view</parameter>
         <parameter key="twig.env_params" type="collection">
             <parameter key="twig.cache_path">%app.base_path%/var/twig/cache</parameter>
         </parameter>
-
         <parameter key="app.init_list" type="collection">
-            <parameter>paymentGateway</parameter>
+            <parameter>addPaymentGateway</parameter>
         </parameter>
     </parameters>
 
@@ -25,5 +23,8 @@
             <argument type="service" id="twigLoader"/>
             <argument>%twig.env_params%</argument>
         </service>
+
+        <service id="paymentGateway" class="WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing"/>
+        <service id="addPaymentGateway" class="WeGetFinancing\Checkout\PaymentGateway\AddWeGetFinancingPaymentMethod"/>
     </services>
 </container>
