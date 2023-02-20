@@ -40,14 +40,10 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
         $this->init_settings();
 
         // Define user set variables
-        $this->{WeGetFinancingValueObject::IS_SANDBOX_FIELD_ID} =
-            $this->get_option(WeGetFinancingValueObject::IS_SANDBOX_FIELD_ID, true);
-        $this->{WeGetFinancingValueObject::USERNAME_FIELD_ID} =
-            $this->get_option(WeGetFinancingValueObject::USERNAME_FIELD_ID);
-        $this->{WeGetFinancingValueObject::PASSWORD_FIELD_ID} =
-            $this->get_option(WeGetFinancingValueObject::PASSWORD_FIELD_ID);
-        $this->{WeGetFinancingValueObject::MERCHANT_ID_FIELD_ID} =
-            $this->get_option(WeGetFinancingValueObject::MERCHANT_ID_FIELD_ID);
+        $this->wgf_is_sandbox = $this->get_option(WeGetFinancingValueObject::IS_SANDBOX_FIELD_ID, true);
+        $this->wgf_username = $this->get_option(WeGetFinancingValueObject::USERNAME_FIELD_ID);
+        $this->wgf_password = $this->get_option(WeGetFinancingValueObject::PASSWORD_FIELD_ID);
+        $this->wgf_merchant_id = $this->get_option(WeGetFinancingValueObject::MERCHANT_ID_FIELD_ID);
     }
 
     public function getInitName(): string
