@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services
+        https://symfony.com/schema/dic/services/services-1.0.xsd"
+>
+    <parameters>
+        <parameter key="twig.template_path">%app.base_path%/view</parameter>
+        <parameter key="twig.env_params" type="collection">
+            <parameter key="twig.cache_path">%app.base_path%/var/twig/cache</parameter>
+        </parameter>
+
+        <parameter key="app.base_path"/>
+        <parameter key="app.api.version">1.9</parameter>
+        <parameter key="app.api.url.production">https://api.wegetfinancing.com</parameter>
+        <parameter key="app.api.url.sandbox">https://api.sandbox.wegetfinancing.com</parameter>
+        <parameter key="app.funnel.js">https://cdn.wegetfinancing.com/libs/1.0/getfinancing.js</parameter>
+        <parameter key="app.checkout_button.url">https://wiki.dev.wegetfinancing.com/public/brand/resources/buttons/logoCircular.svg</parameter>
+
+        <parameter key="app.init_list" type="collection">
+            <parameter>addPaymentGateway</parameter>
+            <parameter>getOrderInvIdField</parameter>
+            <parameter>printToCheckoutOrderInvIdField</parameter>
+            <parameter>saveOrUpdateOrderInvIdField</parameter>
+            <parameter>printToAdminOrderInvIdInField</parameter>
+            <parameter>generateFunnelUrl</parameter>
+            <parameter>postbackUpdate</parameter>
+        </parameter>
+    </parameters>
+
+    <services>
+        <service id="twigLoader" class="Twig\Loader\FilesystemLoader">
+            <argument>%twig.template_path%</argument>
+        </service>
+        <service id="twig" class="Twig\Environment">
+            <argument type="service" id="twigLoader"/>
+            <argument>%twig.env_params%</argument>
+        </service>
+
+        <service id="addPaymentGateway" class="WeGetFinancing\Checkout\PaymentGateway\AddWeGetFinancingPaymentMethod"/>
+        <service id="getOrderInvIdField" class="WeGetFinancing\Checkout\PostMeta\GetOrderInvIdField"/>
+        <service id="printToCheckoutOrderInvIdField" class="WeGetFinancing\Checkout\PostMeta\PrintToCheckoutOrderInvIdField">
+            <argument type="service" id="twig"/>
+        </service>
+        <service id="saveOrUpdateOrderInvIdField" class="WeGetFinancing\Checkout\PostMeta\SaveOrUpdateOrderInvIdField"/>
+        <service id="printToAdminOrderInvIdInField" class="WeGetFinancing\Checkout\PostMeta\PrintToAdminOrderInvIdInField">
+            <argument type="service" id="twig"/>
+        </service>
+        <service id="generateFunnelUrl" class="WeGetFinancing\Checkout\Ajax\Public\GenerateFunnelUrl">
+            <argument>%app.api.url.production%</argument>
+            <argument>%app.api.url.sandbox%</argument>
+        </service>
+        <service id="postbackUpdate" class="WeGetFinancing\Checkout\Ajax\Public\PostbackUpdate">
+            <argument>%app.api.version%</argument>
+        </service>
+    </services>
+</container>

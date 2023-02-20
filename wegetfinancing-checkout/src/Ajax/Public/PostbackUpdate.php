@@ -1,0 +1,189 @@
+<?php
+
+namespace WeGetFinancing\Checkout\Ajax\Public;
+
+use WeGetFinancing\Checkout\ActionableInterface;
+use WeGetFinancing\Checkout\Exception\PostbackUpdateException;
+use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
+use WeGetFinancing\Checkout\PostMeta\OrderInvIdValueObject;
+use WeGetFinancing\Checkout\Wp\AddableTrait;
+use WP_REST_Request;
+
+class PostbackUpdate implements ActionableInterface
+{
+    use AddableTrait;
+
+    public const INIT_NAME = 'rest_api_init';
+    public const FUNCTION_NAME = 'execute';
+    public const REST_PREFIX = "/?rest_route=/";
+    public const REST_NAMESPACE = 'wegetfinancing/v1';
+    public const REST_ROUTE = '/postback/';
+    public const METHOD = 'POST';
+    public const VERSION_FIELD = "version";
+    public const INV_ID_FIELD = "request_token";
+    public const UPDATES_FIELD = "updates";
+    public const STATUS_FIELD = "status";
+    public const TRANSACTION_ID_FIELD = "merchant_transaction_id";
+    public const WGF_APPROVED_STATUS = "approved";
+    public const WGF_PREAPPROVED_STATUS = "preapproved";
+    public const WGF_REJECTED_STATUS = "rejected";
+    public const WGF_REFUND_STATUS = "refund";
+    public const VALID_STATUSES = [
+        self::WGF_APPROVED_STATUS,
+        self::WGF_PREAPPROVED_STATUS,
+        self::WGF_REJECTED_STATUS,
+        self::WGF_REFUND_STATUS
+    ];
+    public const WC_PROCESSING_STATUS = "wc-processing";
+    public const WC_FAILED_STATUS = "wc-failed";
+    public const WC_REFUNDED_STATUS = "refunded";
+
+    protected string $version;
+
+    public function __construct($version)
+    {
+        $this->version = $version;
+    }
+
+    public function init(): void
+    {
+        $this->addAction();
+    }
+
+    public function execute()
+    {
+        register_rest_route(
+            self::REST_NAMESPACE,
+            self::REST_ROUTE,
+            [
+                'methods' => self::METHOD,
+                'callback' => [$this, 'action'],
+                'permission_callback' => function() {
+                    return true;
+                },
+            ]
+        );
+    }
+
+    /**
+     * @param WP_REST_Request $request
+     */
+    public function action(WP_REST_Request $request): void
+    {
+        try {
+            $array = $this->getValidArrayRequest($request);
+            $args = array(
+                'meta_key' => OrderInvIdValueObject::ORDER_META,
+                'meta_value' => $array[self::INV_ID_FIELD],
+                'post_type' => 'shop_order',
+                'post_status' => 'any',
+                'posts_per_page' => 1
+            );
+            $posts = get_posts($args);
+
+            $order = wc_get_order($posts[0]->ID);
+
+            $order->update_status($this->getStatus($array[self::UPDATES_FIELD][self::STATUS_FIELD]));
+
+            echo self::getPostbackUpdateUrl();
+            die();
+        } catch (\Throwable $exception) {
+            error_log("PostbackUpdate::action");
+            error_log($exception->getCode() . ' - ' . $exception->getMessage());
+            error_log(print_r($exception->getTraceAsString(), true));
+            echo "NO";
+            die();
+        }
+
+    }
+
+    static public function getPostbackUpdateUrl(): string
+    {
+        return get_site_url() . self::REST_PREFIX . self::REST_NAMESPACE . self::REST_ROUTE;
+    }
+
+    /**
+     * @param WP_REST_Request $request
+     * @return array
+     * @throws PostbackUpdateException
+     */
+    protected function getValidArrayRequest(WP_REST_Request $request): array
+    {
+        $body = $request->get_body();
+        if (true === empty($body)) {
+            throw new PostbackUpdateException(
+                PostbackUpdateException::EMPTY_BODY_ERROR_MESSAGE,
+                PostbackUpdateException::EMPTY_BODY_ERROR_CODE
+            );
+        }
+
+        $data = json_decode($body, true);
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            throw new PostbackUpdateException(
+                json_last_error() . " - " . json_last_error_msg(),
+                PostbackUpdateException::JSON_DECODE_ERROR_CODE
+            );
+        }
+
+        if (false === array_key_exists(self::VERSION_FIELD, $data) ||
+            true === empty($data[self::VERSION_FIELD])) {
+            throw new PostbackUpdateException(
+                PostbackUpdateException::INVALID_REQUEST_EMPTY_INV_ID_ERROR_MESSAGE,
+                PostbackUpdateException::INVALID_REQUEST_EMPTY_INV_ID_ERROR_CODE
+            );
+        }
+
+        if (false === array_key_exists(self::INV_ID_FIELD, $data) ||
+            true === empty($data[self::INV_ID_FIELD])) {
+            throw new PostbackUpdateException(
+                PostbackUpdateException::INVALID_REQUEST_EMPTY_INV_ID_ERROR_MESSAGE,
+                PostbackUpdateException::INVALID_REQUEST_EMPTY_INV_ID_ERROR_CODE
+            );
+        }
+
+        if (false === array_key_exists(self::UPDATES_FIELD, $data) ||
+            true === empty($data[self::UPDATES_FIELD])) {
+            throw new PostbackUpdateException(
+                PostbackUpdateException::INVALID_REQUEST_EMPTY_UPDATES_ERROR_MESSAGE,
+                PostbackUpdateException::INVALID_REQUEST_EMPTY_UPDATES_ERROR_CODE
+            );
+        }
+
+        if (false === array_key_exists(self::STATUS_FIELD, $data[self::UPDATES_FIELD]) ||
+            true === empty($data[self::UPDATES_FIELD][self::STATUS_FIELD])) {
+            throw new PostbackUpdateException(
+                PostbackUpdateException::INVALID_REQUEST_EMPTY_STATUS_ERROR_MESSAGE,
+                PostbackUpdateException::INVALID_REQUEST_EMPTY_STATUS_ERROR_CODE
+            );
+        }
+
+        if (false === in_array($data[self::UPDATES_FIELD][self::STATUS_FIELD], self::VALID_STATUSES)) {
+            throw new PostbackUpdateException(
+                PostbackUpdateException::INVALID_REQUEST_INVALID_STATUS_ERROR_MESSAGE . " " .
+                    $data[self::UPDATES_FIELD][self::STATUS_FIELD],
+                PostbackUpdateException::INVALID_REQUEST_INVALID_STATUS_ERROR_CODE
+            );
+        }
+
+        if (false === array_key_exists(self::TRANSACTION_ID_FIELD, $data) ||
+            true === empty($data[self::TRANSACTION_ID_FIELD])) {
+            throw new PostbackUpdateException(
+                PostbackUpdateException::INVALID_REQUEST_EMPTY_TRANSACTION_ID_ERROR_MESSAGE,
+                PostbackUpdateException::INVALID_REQUEST_EMPTY_TRANSACTION_ID_ERROR_CODE
+            );
+        }
+
+        return $data;
+    }
+
+    protected function getStatus(string $status): bool|string
+    {
+        return match ($status) {
+            self::WGF_APPROVED_STATUS => self::WC_PROCESSING_STATUS,
+            self::WGF_PREAPPROVED_STATUS => WeGetFinancingValueObject::ON_HOLD_STATUS_ID,
+            self::WGF_REJECTED_STATUS => self::WC_FAILED_STATUS,
+            self::WGF_REFUND_STATUS => self::WC_REFUNDED_STATUS,
+            default => false,
+        };
+    }
+}
