@@ -15,6 +15,7 @@ use WeGetFinancing\Checkout\Wp\AddableTrait;
 class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
 {
     use AddableTrait;
+    public const GATEWAY_ID = "wegetfinancing";
     public const INIT_NAME = 'woocommerce_update_options_payment_gateways_';
     public const FUNCTION_NAME = 'process_admin_options';
 
@@ -23,7 +24,7 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
     public function __construct()
     {
         $this->twig = $GLOBALS[App::ID][App::RENDER];
-        $this->id = App::ID;
+        $this->id = static::GATEWAY_ID;
         $this->has_fields = false;
         $this->icon = '';
         $this->method_title = translate(WeGetFinancingValueObject::METHOD_TITLE, App::DOMAIN_LOCALE);
@@ -31,19 +32,25 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
             translate(WeGetFinancingValueObject::METHOD_DESCRIPTION, App::DOMAIN_LOCALE);
         $this->title = translate(WeGetFinancingValueObject::TITLE, App::DOMAIN_LOCALE);
         $this->description = translate(WeGetFinancingValueObject::DESCRIPTION, App::DOMAIN_LOCALE);
-
-        $this->countries = ['US'];
-        $this->availability = ['US'];
-
+        $this->supports    = [
+            'products',
+            'refunds',
+        ];
         // Load the settings.
         $this->init_form_fields();
         $this->init_settings();
 
         // Define user set variables
-        $this->wgf_is_sandbox = $this->get_option(WeGetFinancingValueObject::IS_SANDBOX_FIELD_ID, true);
-        $this->wgf_username = $this->get_option(WeGetFinancingValueObject::USERNAME_FIELD_ID);
-        $this->wgf_password = $this->get_option(WeGetFinancingValueObject::PASSWORD_FIELD_ID);
-        $this->wgf_merchant_id = $this->get_option(WeGetFinancingValueObject::MERCHANT_ID_FIELD_ID);
+        $this->{WeGetFinancingValueObject::IS_SANDBOX_FIELD_ID} =
+            $this->get_option(WeGetFinancingValueObject::IS_SANDBOX_FIELD_ID, true);
+        $this->{WeGetFinancingValueObject::USERNAME_FIELD_ID} =
+            $this->get_option(WeGetFinancingValueObject::USERNAME_FIELD_ID);
+        $this->{WeGetFinancingValueObject::PASSWORD_FIELD_ID} =
+            $this->get_option(WeGetFinancingValueObject::PASSWORD_FIELD_ID);
+        $this->{WeGetFinancingValueObject::MERCHANT_ID_FIELD_ID} =
+            $this->get_option(WeGetFinancingValueObject::MERCHANT_ID_FIELD_ID);
+
+        $this->init();
     }
 
     public function getInitName(): string
