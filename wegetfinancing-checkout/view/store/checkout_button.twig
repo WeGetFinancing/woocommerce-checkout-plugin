@@ -1,0 +1,105 @@
+<div><p>{{ description }}</p></div>
+<script>
+    jQuery(document).ready(function() {
+        jQuery('form[name="checkout"] input[name="payment_method"]').eq(0).prop('checked', true).attr( 'checked', 'checked' );
+        wGF_WC_Gateway();
+    });
+
+    jQuery(document).on("change", "form[name='checkout'] input[name='payment_method']", function(){
+        if ( 0 === jQuery('form[name="checkout"] input[name="payment_method"]').filter( ':checked' ).size() ) {
+            jQuery(this).prop('checked', true).attr( 'checked', 'checked' );
+        };
+        wGF_WC_Gateway();
+    });
+
+    function wGF_WC_Gateway(){
+        const checkoutButton = jQuery('form[name="checkout"] #place_order'),
+            woocommerceError = jQuery(".woocommerce-error");
+
+        if (jQuery('form[name="checkout"] input[name="payment_method"]:checked').val() === '{{ payment_method_id }}') {
+
+            checkoutButton.hide();
+
+            if(jQuery('#wgf_checkout_button').length <= 0) {
+                checkoutButton.parent().append(`
+                            <a id="wgf_checkout_button"  class="wgf_checkout_button" href="#wgf_checkout">
+                                <img src="{{ checkout_button_image_url }}" alt="{{ checkout_button_alt }}">
+                            </a>
+                        `);
+
+                jQuery('#wgf_checkout_button').click((e) => {
+
+                    let wgfFunnelData = {};
+                    wgfFunnelData['billing_first_name'] = jQuery('#billing_first_name').val();
+                    wgfFunnelData['billing_last_name'] = jQuery('#billing_last_name').val();
+                    wgfFunnelData['billing_email'] = jQuery('#billing_email').val();
+                    wgfFunnelData['billing_phone'] = jQuery('#billing_phone').val();
+
+                    let requestNewFunnelData = {
+                        'action': '{{ ajax_action }}',
+                        'data': wgfFunnelData
+                    };
+
+                    jQuery.ajax({
+                        type: "post",
+                        dataType: "json",
+                        url: "{{ ajax_url }}",
+                        data: requestNewFunnelData,
+                        success: function(response){
+                            if (response.isSuccess === false) {
+                                if ( woocommerceError.length ) {
+                                    woocommerceError.parent().remove();
+                                }
+
+                                let error_message = '<div class="woocommerce-notices-wrapper">' +
+                                    '<ul class="woocommerce-error" id="wegetfinancing-woocommerce-error">';
+
+                                if ("message" in response) {
+                                    error_message += "<li>" + response.message + "</li>";
+                                }
+                                if ("violations" in response) {
+                                    jQuery.each(response.violations, function( index, violation ) {
+                                        jQuery.each(violation.messages, function( index, message ) {
+                                            error_message += "<li>" + message + "</li>";
+                                        });
+                                        jQuery.each(violation.fields, function( index, field ) {
+                                            jQuery("#" + field).closest( '.form-row' ).addClass( 'woocommerce-invalid' );
+                                        });
+                                    });
+                                }
+
+                                error_message += "</ul></div>";
+
+                                jQuery(".entry-content > .woocommerce").prepend(error_message);
+                            } else {
+                                jQuery('#{{ order_inv_id_field_id }}').val(response.invId);
+                                new GetFinancing(
+                                    response.href,
+                                    function() {
+                                        checkoutButton.click();
+                                    }.bind(self),
+                                    function() {}
+                                );
+                            }
+                        },
+                        error: function(){
+                            if ( woocommerceError.length ) {
+                                woocommerceError.parent().remove();
+                            }
+
+                            jQuery(".woocommerce").prepend('<div class="woocommerce-notices-wrapper">' +
+                                '<ul class="woocommerce-error" id="wegetfinancing-woocommerce-error">' +
+                                '<li>Unexpected server error</li>' +
+                                '</ul>' +
+                                '</div>');
+                        },
+                    });
+                })
+            }
+        } else {
+            jQuery('#wgf_checkout_button').remove()
+            checkoutButton.show()
+            jQuery('form[name="checkout"]').unbind('submit');
+        }
+    }
+</script>

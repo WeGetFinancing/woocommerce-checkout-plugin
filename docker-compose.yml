@@ -7,7 +7,7 @@ services:
     container_name: composer
     restart: "no"
     volumes:
-      - ./plugin:/app
+      - ./wegetfinancing-checkout:/app
 
   db:
     image: mariadb:10.7.7-focal
@@ -35,7 +35,7 @@ services:
     volumes:
       - ./env/wp/custom.ini:/usr/local/etc/php/conf.d/custom.ini
       - ./var/wp:/var/www/html
-      - ./plugin:/var/www/html/wp-content/plugins/wegetfinancing-checkout
+      - ./wegetfinancing-checkout:/var/www/html/wp-content/plugins/wegetfinancing-checkout
 
   lb:
     image: caddy:2.6.2-alpine
