@@ -9,8 +9,9 @@ use WeGetFinancing\Checkout\Exception\GetFunnelRequestException;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
-use WeGetFinancing\SDK\Client;
-use WeGetFinancing\SDK\Entity\Request\AuthRequestEntity;
+use WeGetFinancing\SDK\Client;;
+
+use WeGetFinancing\SDK\Entity\AuthEntity;
 use WeGetFinancing\SDK\Entity\Request\LoanRequestEntity;
 use WeGetFinancing\SDK\Exception\EntityValidationException;
 
@@ -78,18 +79,19 @@ class GenerateFunnelUrl implements ActionableInterface
             $client = $this->generateClient();
             $request = $this->getRequest();
             $response = $client->requestNewLoan($request);
+            $data = $response->getData();
 
             if (true === $response->getIsSuccess()) {
                 $this->ajaxRespondJson([
                     'isSuccess' => true,
-                    'invId' => $response->getSuccess()->getInvId(),
-                    'href' => $response->getSuccess()->getHref()
+                    'invId' => $data['invId'],
+                    'href' => $data['href']
                 ]);
             }
 
             error_log("GenerateFunnelUrl::execute request new loan funnel error.");
-            error_log($response->getError()->getError());
-            error_log(print_r($response->getError()->getMessage(), true));
+
+            error_log(print_r($data, true));
             $this->ajaxRespondJson([
                 'isSuccess' => false,
                 'message' => '<strong>Remote server error</strong>'
@@ -266,7 +268,7 @@ class GenerateFunnelUrl implements ActionableInterface
         try {
             $options = WeGetFinancing::getOptions();
 
-            $auth = AuthRequestEntity::make([
+            $auth = AuthEntity::make([
                 'username' => $options[WeGetFinancingValueObject::USERNAME_FIELD_ID],
                 'password'  => $options[WeGetFinancingValueObject::PASSWORD_FIELD_ID],
                 'merchantId' => $options[WeGetFinancingValueObject::MERCHANT_ID_FIELD_ID],
