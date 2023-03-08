@@ -21,6 +21,7 @@ class GenerateFunnelUrl implements ActionableInterface
     public const ACTION_NAME = 'generateWeGetFinancingFunnelAction';
     public const INIT_NAME = 'wp_ajax_nopriv_' . self::ACTION_NAME;
     public const FUNCTION_NAME = 'execute';
+    public const SOFTWARE_NAME = 'WordPress-WooCommerce';
     public const GENERATE_FUNNEL_ERROR_TABLE = [
         'firstName' => [
             'fields' => ['billing_first_name'],
@@ -215,6 +216,8 @@ class GenerateFunnelUrl implements ActionableInterface
                 ];
             }
 
+            global $wp_version;
+
             $requestArray = [
                 'first_name' => $data['billing_first_name'],
                 'last_name' => $data['billing_last_name'],
@@ -226,6 +229,9 @@ class GenerateFunnelUrl implements ActionableInterface
                 'success_url' => '',
                 'failure_url' => '',
                 'postback_url' => PostbackUpdate::getPostbackUpdateUrl(),
+                'software_name' => self::SOFTWARE_NAME,
+                'software_version' => $wp_version . '-' . constant('WOOCOMMERCE_VERSION'),
+                'software_plugin_version' => '-',
                 'billing_address' => [
                     'street1' => $customer->get_billing_address() . ' ' . $customer->get_billing_address_2(),
                     'city' => $customer->get_billing_city(),
