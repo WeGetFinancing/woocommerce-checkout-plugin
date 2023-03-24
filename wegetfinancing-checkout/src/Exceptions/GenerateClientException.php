@@ -4,7 +4,7 @@ namespace WeGetFinancing\Checkout\Exception;
 
 use Exception;
 
-class GenerateFunnelClientException extends Exception
+class GenerateClientException extends Exception
 {
     public const GENERATE_CLIENT_VALIDATION_ERROR_CODE = 1;
     public const GENERATE_CLIENT_VALIDATION_ERROR_MESSAGE =
