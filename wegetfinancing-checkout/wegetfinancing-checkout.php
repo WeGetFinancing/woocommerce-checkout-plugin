@@ -18,8 +18,8 @@
  * Author URI:        https://github.com/WeGetFinancing
  * Text Domain:       wegetfinancing-checkout
  * License:           LGPL-3.0-only
- * License URI:       https://github.com/WeGetFinancing/magento-checkout-plugin#LICENSE
- * Update URI:        https://github.com/WeGetFinancing/magento-checkout-plugin
+ * License URI:       https://github.com/WeGetFinancing/woocommerce-checkout-plugin#LICENSE
+ * Update URI:        https://github.com/WeGetFinancing/woocommerce-checkout-plugin
  */
 
 require __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
