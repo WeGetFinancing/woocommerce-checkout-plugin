@@ -15,7 +15,7 @@
     "php": ">=8.0",
     "symfony/dependency-injection": "^6.2",
     "twig/twig": "^3.0",
-    "wegetfinancing/php-sdk": ">=v2.1.0"
+    "wegetfinancing/php-sdk": "=v2.2.0"
   },
   "require-dev": {
     "phpmd/phpmd": "@stable"

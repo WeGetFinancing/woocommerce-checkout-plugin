@@ -12,10 +12,6 @@
 
         <parameter key="app.base_path"/>
         <parameter key="app.api.version">1.9</parameter>
-        <parameter key="app.api.url.production">https://api.wegetfinancing.com</parameter>
-        <parameter key="app.api.url.sandbox">https://api.sandbox.wegetfinancing.com</parameter>
-        <parameter key="app.api.v3.url.production">https://apisrv.wegetfinancing.com</parameter>
-        <parameter key="app.api.v3.url.sandbox">https://apisrv.sandbox.wegetfinancing.com</parameter>
         <parameter key="app.funnel.js">https://cdn.wegetfinancing.com/libs/1.0/getfinancing.js</parameter>
         <parameter key="app.checkout_button.url">https://wiki.dev.wegetfinancing.com/public/brand/resources/buttons/logoCircular.svg</parameter>
 
@@ -50,17 +46,11 @@
         <service id="printToAdminOrderInvIdInField" class="WeGetFinancing\Checkout\PostMeta\PrintToAdminOrderInvIdInField">
             <argument type="service" id="twig"/>
         </service>
-        <service id="generateFunnelUrl" class="WeGetFinancing\Checkout\Ajax\Public\GenerateFunnelUrl">
-            <argument>%app.api.url.production%</argument>
-            <argument>%app.api.url.sandbox%</argument>
-        </service>
+        <service id="generateFunnelUrl" class="WeGetFinancing\Checkout\Ajax\Public\GenerateFunnelUrl"/>
         <service id="postbackUpdate" class="WeGetFinancing\Checkout\Ajax\Public\PostbackUpdate">
             <argument>%app.api.version%</argument>
         </service>
         <service id="registerShippedOrderStatus" class="WeGetFinancing\Checkout\PostStatus\RegisterShippedOrderStatus"/>
-        <service id="onOrderStatusChangeToShipped" class="WeGetFinancing\Checkout\PostStatus\OnOrderStatusChangeToShipped">
-            <argument>%app.api.v3.url.production%</argument>
-            <argument>%app.api.v3.url.sandbox%</argument>
-        </service>
+        <service id="onOrderStatusChangeToShipped" class="WeGetFinancing\Checkout\PostStatus\OnOrderStatusChangeToShipped"/>
     </services>
 </container>

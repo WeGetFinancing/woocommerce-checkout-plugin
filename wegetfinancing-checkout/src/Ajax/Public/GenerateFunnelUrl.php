@@ -2,20 +2,15 @@
 
 namespace WeGetFinancing\Checkout\Ajax\Public;
 
-use WeGetFinancing\Checkout\ActionableInterface;
+use WeGetFinancing\Checkout\AbstractActionableWithClient;
 use WeGetFinancing\Checkout\App;
-use WeGetFinancing\Checkout\Exception\GenerateFunnelClientException;
+use WeGetFinancing\Checkout\Exception\GenerateClientException;
 use WeGetFinancing\Checkout\Exception\GetFunnelRequestException;
-use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing;
-use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
-use WeGetFinancing\SDK\Client;;
-
-use WeGetFinancing\SDK\Entity\AuthEntity;
 use WeGetFinancing\SDK\Entity\Request\LoanRequestEntity;
 use WeGetFinancing\SDK\Exception\EntityValidationException;
 
-class GenerateFunnelUrl implements ActionableInterface
+class GenerateFunnelUrl extends AbstractActionableWithClient
 {
     use AddableTrait;
     public const ACTION_NAME = 'generateWeGetFinancingFunnelAction';
@@ -57,18 +52,6 @@ class GenerateFunnelUrl implements ActionableInterface
         ],
     ];
 
-    protected string $apiUrlProduction;
-
-    protected string $apiUrlSandbox;
-
-
-    public function __construct(
-        string $apiUrlProduction,
-        string $apiUrlSandbox
-    ) {
-        $this->apiUrlProduction = $apiUrlProduction;
-        $this->apiUrlSandbox = $apiUrlSandbox;
-    }
     public function init(): void
     {
         $this->addAction();
@@ -119,11 +102,11 @@ class GenerateFunnelUrl implements ActionableInterface
                 'isSuccess' => false,
                 'violations' => $violations
             ]);
-        } catch (GenerateFunnelClientException $exception) {
+        } catch (GenerateClientException $exception) {
             $this->ajaxRespondJson([
                 'isSuccess' => false,
                 'message' => '<strong>' . translate(
-                        GenerateFunnelClientException::GRACEFUL_ERROR_MESSAGE,
+                        GenerateClientException::GRACEFUL_ERROR_MESSAGE,
                         App::DOMAIN_LOCALE
                     ) . '</strong>'
             ]);
@@ -261,45 +244,6 @@ class GenerateFunnelUrl implements ActionableInterface
             throw new GetFunnelRequestException(
                 GetFunnelRequestException::GET_POST_REQUEST_ERROR_MESSAGE,
                 GetFunnelRequestException::GET_POST_REQUEST_ERROR_CODE
-            );
-        }
-    }
-
-    /**
-     * @return Client
-     * @throws GenerateFunnelClientException
-     */
-    protected function generateClient(): Client
-    {
-        try {
-            $options = WeGetFinancing::getOptions();
-
-            $auth = AuthEntity::make([
-                'username' => $options[WeGetFinancingValueObject::USERNAME_FIELD_ID],
-                'password'  => $options[WeGetFinancingValueObject::PASSWORD_FIELD_ID],
-                'merchantId' => $options[WeGetFinancingValueObject::MERCHANT_ID_FIELD_ID],
-                'url' => "yes" === $options[WeGetFinancingValueObject::IS_SANDBOX_FIELD_ID]
-                    ? $this->apiUrlSandbox
-                    : $this->apiUrlProduction
-            ]);
-
-            return Client::Make($auth);
-        } catch (EntityValidationException $exception) {
-            error_log("GenerateFunnelUrl::generateClient entity validation error");
-            error_log($exception->getCode() . ' - ' . $exception->getMessage());
-            error_log(print_r($exception->getTraceAsString(), true));
-            error_log(json_encode($exception->getViolations()));
-            throw new GenerateFunnelClientException(
-                GenerateFunnelClientException::GENERATE_CLIENT_VALIDATION_ERROR_MESSAGE,
-                GenerateFunnelClientException::GENERATE_CLIENT_VALIDATION_ERROR_CODE
-            );
-        } catch (\Throwable $exception) {
-            error_log("GenerateFunnelUrl::generateClient unexpected error");
-            error_log($exception->getCode() . ' - ' . $exception->getMessage());
-            error_log(print_r($exception->getTraceAsString(), true));
-            throw new GenerateFunnelClientException(
-                GenerateFunnelClientException::GENERATE_CLIENT_UNEXPECTED_ERROR_MESSAGE,
-                GenerateFunnelClientException::GENERATE_CLIENT_UNEXPECTED_ERROR_CODE
             );
         }
     }
