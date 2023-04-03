@@ -1,4 +1,4 @@
-FROM php:8.2-fpm
+FROM php:8.0-fpm
 
 #install magento's required extensions
 RUN apt-get -y update \

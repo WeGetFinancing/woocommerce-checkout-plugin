@@ -13,7 +13,7 @@
   ],
   "require": {
     "php": ">=8.0",
-    "symfony/dependency-injection": "^6.2",
+    "symfony/dependency-injection": "^6.0.20",
     "twig/twig": "^3.0",
     "wegetfinancing/php-sdk": "=v2.2.0"
   },

@@ -1,0 +1,118 @@
+<style>
+    .row {
+        padding-top: 2em;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <h1>WeGetFinancing PPE Configuration Page</h1>
+    </div>
+    <div class="row">
+        <div class="card">
+            <div class="card-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="{{ weGetFinancingApiKey }}" class="form-label">Price Selector</label>
+                        <input
+                                id="{{ weGetFinancingApiKey }}"
+                                value=".price-item"
+                                type="text"
+                                class="form-control"
+                                aria-describedby="{{ weGetFinancingApiKey }}_help"
+                        />
+                        <div id="{{ weGetFinancingApiKey }}_help" class="form-text">Class to find the prices on the page</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ weGetFinancingOrg }}" class="form-label">Product Name Selector</label>
+                        <input
+                                id="{{ weGetFinancingOrg }}"
+                                value=".name-item"
+                                type="text"
+                                class="form-control"
+                                aria-describedby="{{ weGetFinancingOrg }}_help"
+                        />
+                        <div id="{{ weGetFinancingOrg }}_help" class="form-text">If applyNow is set to true, this selector is</div>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                        <label class="form-check-label" for="exampleCheck1">Debug</label>
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ weGetFinancingApiKey }}" class="form-label">Token</label>
+                        <input
+                                id="{{ weGetFinancingApiKey }}"
+                                value=""
+                                type="text"
+                                class="form-control"
+                                aria-describedby="{{ weGetFinancingApiKey }}_help"
+                        />
+                        <div id="{{ weGetFinancingApiKey }}_help" class="form-text">Merchants need to add their WeGetFinancing's access token</div>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                        <label class="form-check-label" for="exampleCheck1">Apply Now</label>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                        <label class="form-check-label" for="exampleCheck1">Branded</label>
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ weGetFinancingApiKey }}" class="form-label">Min Amount</label>
+                        <input
+                                id="{{ weGetFinancingApiKey }}"
+                                value=""
+                                type="text"
+                                class="form-control"
+                                aria-describedby="{{ weGetFinancingApiKey }}_help"
+                        />
+                        <div id="{{ weGetFinancingApiKey }}_help" class="form-text">We will not show the PPE if the amount is below this number</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ weGetFinancingApiKey }}" class="form-label">Custom Text</label>
+                        <input
+                                id="{{ weGetFinancingApiKey }}"
+                                value="or just"
+                                type="text"
+                                class="form-control"
+                                aria-describedby="{{ weGetFinancingApiKey }}_help"
+                        />
+                        <div id="{{ weGetFinancingApiKey }}_help" class="form-text">Add any text before the monthly payment in the message under the price</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ weGetFinancingApiKey }}" class="form-label">Position</label>
+                        <input
+                                id="{{ weGetFinancingApiKey }}"
+                                value="center"
+                                type="text"
+                                class="form-control"
+                                aria-describedby="{{ weGetFinancingApiKey }}_help"
+                        />
+                        <div id="{{ weGetFinancingApiKey }}_help" class="form-text">Positions the widget horizontally. The options are equalSpacing' | 'leading' | 'trailing' | 'center' | 'fill' | 'fillEvenly'</div>
+                    </div>
+                    <a id="weGetFinancing_config_save" class="btn btn-primary">Save</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function woourchingpt_save_settings(settings) {
+        let request = {
+            'action': '{{ ajaxAction }}',
+            'data': settings
+        }
+
+        jQuery.ajax({
+            type: "post",
+            dataType: "json",
+            url: "{{ ajaxUrl }}",
+            data: request,
+            success: function(response){
+                alert("SUCCESS");
+            },
+            error: function(){
+                alert("ERROR");
+            },
+        });
+    }
+</script>

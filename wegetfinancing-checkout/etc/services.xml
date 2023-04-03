@@ -25,6 +25,7 @@
             <parameter>postbackUpdate</parameter>
             <parameter>registerShippedOrderStatus</parameter>
             <parameter>onOrderStatusChangeToShipped</parameter>
+            <parameter>configurePpeAdminPage</parameter>
         </parameter>
     </parameters>
 
@@ -52,5 +53,8 @@
         </service>
         <service id="registerShippedOrderStatus" class="WeGetFinancing\Checkout\PostStatus\RegisterShippedOrderStatus"/>
         <service id="onOrderStatusChangeToShipped" class="WeGetFinancing\Checkout\PostStatus\OnOrderStatusChangeToShipped"/>
+        <service id="configurePpeAdminPage" class="WeGetFinancing\Checkout\Page\Admin\ConfigurePpe">
+            <argument type="service" id="twig"/>
+        </service>
     </services>
 </container>
