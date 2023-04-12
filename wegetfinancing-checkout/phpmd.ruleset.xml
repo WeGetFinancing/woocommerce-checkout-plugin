@@ -6,7 +6,7 @@
          xsi:noNamespaceSchemaLocation="http://pmd.sf.net/ruleset_xml_schema.xsd">
 
     <description>
-        PHPMD ruleset enforced on the wegetfinance/php-sdk project.
+        PHPMD ruleset enforced on the wegetfinance/woocommerce-checkout-plugin project.
     </description>
 
     <rule ref="rulesets/cleancode.xml" />

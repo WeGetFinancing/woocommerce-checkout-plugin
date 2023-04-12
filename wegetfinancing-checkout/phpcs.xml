@@ -8,7 +8,9 @@
     <arg name="colors"/>
     <arg name="extensions" value="php"/>
 
-    <rule ref="PSR12"/>
+    <rule ref="PSR12">
+        <exclude name="PSR1.Methods.CamelCapsMethodName.NotCamelCaps" />
+    </rule>
 
     <file>bin/</file>
     <file>config/</file>

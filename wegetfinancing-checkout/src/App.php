@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WeGetFinancing\Checkout;
 
 use Exception;
@@ -42,7 +44,7 @@ class App implements ActionableInterface
         $this->init();
     }
 
-    public function init():void
+    public function init(): void
     {
         $this->addAction();
     }

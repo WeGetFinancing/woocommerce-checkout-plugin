@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WeGetFinancing\Checkout\PostMeta;
 
 use Twig\Environment;
@@ -13,6 +15,7 @@ use WeGetFinancing\Checkout\Wp\AddableTrait;
 class PrintToAdminOrderInvIdInField implements ActionableInterface
 {
     use AddableTrait;
+
     public const INIT_NAME = 'woocommerce_admin_order_data_after_order_details';
     public const FUNCTION_NAME = 'execute';
 
@@ -46,7 +49,7 @@ class PrintToAdminOrderInvIdInField implements ActionableInterface
                     OrderInvIdValueObject::ORDER_INV_ID_FIELD_ADMIN_LABEL,
                     App::DOMAIN_LOCALE
                 ),
-                'value' => get_post_meta($order->id,'_' . OrderInvIdValueObject::ORDER_INV_ID_FIELD_ID,true)
+                'value' => get_post_meta($order->id, '_' . OrderInvIdValueObject::ORDER_INV_ID_FIELD_ID, true),
             ]
         );
     }

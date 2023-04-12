@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WeGetFinancing\Checkout\PostStatus;
 
 use DateTime;
@@ -11,6 +13,7 @@ use WeGetFinancing\SDK\Entity\Request\UpdateShippingStatusRequestEntity;
 class OnOrderStatusChangeToShipped extends AbstractActionableWithClient
 {
     use AddableTrait;
+
     public const INIT_NAME = 'woocommerce_order_status_changed';
     public const FUNCTION_NAME = 'execute';
     public const STATUS_ALREADY_SHIPPED_META = "wgf_wc_is_already_shipped";
@@ -28,12 +31,12 @@ class OnOrderStatusChangeToShipped extends AbstractActionableWithClient
                 return;
             }
 
-            $invId = get_post_meta($order_id,'_' . OrderInvIdValueObject::ORDER_INV_ID_FIELD_ID,true);
-            
+            $invId = get_post_meta($order_id, '_' . OrderInvIdValueObject::ORDER_INV_ID_FIELD_ID, true);
+
             if (true === empty($invId)) {
                 return;
             }
-            
+
             $client = $this->generateClient();
 
             $updateRequest = UpdateShippingStatusRequestEntity::make([
@@ -41,7 +44,7 @@ class OnOrderStatusChangeToShipped extends AbstractActionableWithClient
                 'trackingId' => '-',
                 'trackingCompany' => '-',
                 'deliveryDate' => (new DateTime())->modify('+1 day')->format('Y-m-d'),
-                'invId' => $invId
+                'invId' => $invId,
             ]);
 
             $response = $client->updateStatus($updateRequest);

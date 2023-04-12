@@ -8,6 +8,8 @@ services:
     restart: "no"
     volumes:
       - ./wegetfinancing-checkout:/app
+    environment:
+      - PHP_CS_FIXER_IGNORE_ENV=1
 
   db:
     image: mariadb:10.7.7-focal

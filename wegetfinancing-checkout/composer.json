@@ -18,10 +18,9 @@
     "wegetfinancing/php-sdk": "=v2.2.0"
   },
   "require-dev": {
-    "phpmd/phpmd": "@stable",
-    "phpstan/phpstan": "^1",
-    "squizlabs/php_codesniffer": "^3",
-    "friendsofphp/php-cs-fixer": "^3"
+    "phpstan/phpstan": "@stable",
+    "squizlabs/php_codesniffer": "@stable",
+    "friendsofphp/php-cs-fixer": "@stable"
   },
   "autoload": {
     "psr-4": {
@@ -37,9 +36,6 @@
     ],
     "cs-fix-test": [
       "php -d memory_limit=-1 vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run"
-    ],
-    "phpmd": [
-      "php -d memory_limit=-1 vendor/bin/phpmd src,tests text phpmd.ruleset.xml"
     ],
     "phpcs": [
       "php -d memory_limit=-1 vendor/bin/phpcs phpcs.xml src/"
