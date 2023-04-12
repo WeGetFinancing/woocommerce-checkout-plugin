@@ -1,0 +1,7 @@
+parameters:
+    level: 5
+    paths:
+        - src
+    checkGenericClassInNonGenericObjectType: false
+    ignoreErrors:
+        - '#Function [a-zA-Z0-9\\_]+ not found\.#'
