@@ -23,11 +23,6 @@ This can help to increase your sales and customer satisfaction by providing an e
 * Secure payment processing: All transactions are safe inside our secure platform.
 * Detailed reporting and analytics: Detailed analytics of your financed sales.
 
-== Screenshots ==
-
-1. This screen shot description corresponds to screenshot-1.(png|jpg|jpeg|gif). Screenshots are stored in the /assets directory.
-2. This is the second screen shot
-
 == Changelog ==
 
 = 1.0.0 =
