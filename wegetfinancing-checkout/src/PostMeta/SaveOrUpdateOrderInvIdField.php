@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WeGetFinancing\Checkout\PostMeta;
 
 use WeGetFinancing\Checkout\ActionableInterface;
@@ -8,6 +10,7 @@ use WeGetFinancing\Checkout\Wp\AddableTrait;
 class SaveOrUpdateOrderInvIdField implements ActionableInterface
 {
     use AddableTrait;
+
     public const INIT_NAME = 'woocommerce_checkout_update_order_meta';
     public const FUNCTION_NAME = 'execute';
 

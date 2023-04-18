@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WeGetFinancing\Checkout\PaymentGateway;
 
 use Twig\Environment;
@@ -15,6 +17,7 @@ use WeGetFinancing\Checkout\Wp\AddableTrait;
 class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
 {
     use AddableTrait;
+
     public const GATEWAY_ID = "wegetfinancing";
     public const INIT_NAME = 'woocommerce_update_options_payment_gateways_';
     public const FUNCTION_NAME = 'process_admin_options';
@@ -74,7 +77,7 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                     'type'    => 'checkbox',
                     'label'   =>
                         translate(WeGetFinancingValueObject::IS_SANDBOX_FIELD_LABEL, App::DOMAIN_LOCALE),
-                    'default' => 'yes'
+                    'default' => 'yes',
                 ],
                 WeGetFinancingValueObject::USERNAME_FIELD_ID => [
                     'title'   =>
@@ -102,32 +105,32 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                         translate(WeGetFinancingValueObject::MERCHANT_ID_FIELD_LABEL, App::DOMAIN_LOCALE),
                     'default'     => '',
                     'desc_tip'    => true,
-                ]
+                ],
             ]
         );
     }
 
     /**
-     * @return void
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
+     * @return void
      */
     public function admin_options(): void
     {
         echo $this->twig->render(
             'admin/payment_settings.twig',
             [
-                'form' => $this->generate_settings_html([], false)
+                'form' => $this->generate_settings_html([], false),
             ]
         );
     }
 
     /**
-     * @return void
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
+     * @return void
      */
     public function payment_fields(): void
     {
@@ -142,7 +145,7 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                 'checkout_button_alt' => WeGetFinancingValueObject::CHECKOUT_BUTTON_ALT,
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'ajax_action' => GenerateFunnelUrl::ACTION_NAME,
-                'order_inv_id_field_id' => OrderInvIdValueObject::ORDER_INV_ID_FIELD_ID
+                'order_inv_id_field_id' => OrderInvIdValueObject::ORDER_INV_ID_FIELD_ID,
             ]
         );
     }
@@ -168,11 +171,11 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
         // Return thank you redirect
         return [
             'result' => WeGetFinancingValueObject::PROCESS_PAYMENT_SUCCESS_ID,
-            'redirect' => $this->get_return_url($order)
+            'redirect' => $this->get_return_url($order),
         ];
     }
 
-    static public function getOptions(): false|array
+    public static function getOptions(): false|array
     {
         return get_option("woocommerce_" . App::ID . "_settings");
     }
