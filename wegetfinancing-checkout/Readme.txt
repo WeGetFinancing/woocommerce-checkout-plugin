@@ -1,4 +1,4 @@
-=== Plugin Name ===
+=== WeGetFinancing Payment Gateway ===
 Contributors: wegetfinancing
 Tags: WeGetFinancing, Checkout, Payment
 Requires at least: 5.9
