@@ -11,7 +11,7 @@
         </parameter>
 
         <parameter key="app.base_path"/>
-        <parameter key="app.api.version">1.9</parameter>
+        <parameter key="app.api.version" type="string">1.9</parameter>
         <parameter key="app.funnel.js">https://cdn.wegetfinancing.com/libs/1.0/getfinancing.js</parameter>
         <parameter key="app.checkout_button.url">https://wiki.dev.wegetfinancing.com/public/brand/resources/buttons/logoCircular.svg</parameter>
 
