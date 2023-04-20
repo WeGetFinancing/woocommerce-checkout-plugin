@@ -76,9 +76,9 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 ]);
             }
 
-            error_log("GenerateFunnelUrl::execute request new loan funnel error.");
-
+            error_log(self::class . "::execute request new loan funnel error.");
             error_log(print_r($data, true));
+
             $this->ajaxRespondJson([
                 'isSuccess' => false,
                 'message' => '<strong>Remote server error</strong>',
@@ -122,7 +122,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 ) . '</strong>',
             ]);
         } catch (\Throwable $exception) {
-            error_log("GenerateFunnelUrl::execute unexpected error.");
+            error_log(self::class . "::execute unexpected error.");
             error_log($exception->getCode() . ' - ' . $exception->getMessage());
             error_log(print_r($exception->getTraceAsString(), true));
             $this->ajaxRespondJson([

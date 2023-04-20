@@ -31,7 +31,7 @@ abstract class AbstractActionableWithClient implements ActionableInterface
 
             return Client::Make($auth);
         } catch (EntityValidationException $exception) {
-            error_log("AbstractActionableWithClient::generateClient entity validation error");
+            error_log(self::class . "::generateClient entity validation error");
             error_log($exception->getCode() . ' - ' . $exception->getMessage());
             error_log(print_r($exception->getTraceAsString(), true));
             error_log(json_encode($exception->getViolations()));
@@ -40,7 +40,7 @@ abstract class AbstractActionableWithClient implements ActionableInterface
                 GenerateClientException::GENERATE_CLIENT_VALIDATION_ERROR_CODE
             );
         } catch (\Throwable $exception) {
-            error_log("AbstractActionableWithClient::generateClient unexpected error");
+            error_log(self::class . "::generateClient unexpected error");
             error_log($exception->getCode() . ' - ' . $exception->getMessage());
             error_log(print_r($exception->getTraceAsString(), true));
             throw new GenerateClientException(

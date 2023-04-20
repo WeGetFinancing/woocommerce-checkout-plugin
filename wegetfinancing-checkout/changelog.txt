@@ -7,3 +7,6 @@
 
 = 1.0.1 =
 * PHP 8.0 compatibility hotfix
+
+= 1.0.2 =
+* Improved error management
