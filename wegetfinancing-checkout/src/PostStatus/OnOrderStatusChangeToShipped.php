@@ -58,9 +58,8 @@ class OnOrderStatusChangeToShipped extends AbstractActionableWithClient
                 return;
             }
 
-            error_log("OnOrderStatusChangeToShipped::execute Error code " . $response->getCode());
-            error_log("OnOrderStatusChangeToShipped::execute Error data " .
-                print_r($response->getData(), true));
+            error_log(self::class . "::execute Error code " . $response->getCode());
+            error_log("Error data " . print_r($response->getData(), true));
         }
     }
 }

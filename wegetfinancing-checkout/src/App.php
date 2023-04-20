@@ -9,6 +9,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Throwable;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 
 class App implements ActionableInterface
@@ -33,15 +34,21 @@ class App implements ActionableInterface
      */
     public function __construct(string $basePath)
     {
-        $containerBuilder = new ContainerBuilder();
-        $loader = new XmlFileLoader(
-            $containerBuilder,
-            new FileLocator($basePath . DIRECTORY_SEPARATOR . self::CONFIG_DIR)
-        );
-        $loader->load(self::DEFAULT_SERVICE_XML_FILE);
-        $this->container = $containerBuilder;
-        $this->container->setParameter('app.base_path', $basePath);
-        $this->init();
+        try {
+            $containerBuilder = new ContainerBuilder();
+            $loader = new XmlFileLoader(
+                $containerBuilder,
+                new FileLocator($basePath . DIRECTORY_SEPARATOR . self::CONFIG_DIR)
+            );
+            $loader->load(self::DEFAULT_SERVICE_XML_FILE);
+            $this->container = $containerBuilder;
+            $this->container->setParameter('app.base_path', $basePath);
+            $this->init();
+        } catch (Throwable $exception) {
+            error_log(self::class . "::__construct unexpected error");
+            error_log($exception->getCode() . ' - ' . $exception->getMessage());
+            error_log(print_r($exception->getTraceAsString(), true));
+        }
     }
 
     public function init(): void
@@ -50,7 +57,7 @@ class App implements ActionableInterface
     }
 
     /**
-     * @throws Exception
+     * @throws Throwable
      */
     public function execute(): void
     {
@@ -62,9 +69,15 @@ class App implements ActionableInterface
 
         $initList = $this->container->getParameter(self::INIT_LIST_PARAMS);
         foreach ($initList as $init) {
-            /** @var ActionableInterface $obj */
-            $obj = $this->container->get($init);
-            $obj->init();
+            try {
+                /** @var ActionableInterface $obj */
+                $obj = $this->container->get($init);
+                $obj->init();
+            } catch (Throwable $exception) {
+                error_log(self::class . "::execute() Error initializing object " . $init);
+                throw $exception;
+            }
+
         }
     }
 }
