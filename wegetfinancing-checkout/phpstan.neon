@@ -1,0 +1,11 @@
+parameters:
+    level: 5
+    paths:
+        - src
+    checkGenericClassInNonGenericObjectType: false
+    ignoreErrors:
+        - '#Function [a-zA-Z0-9\\_]+ not found\.#'
+        - '#Parameter \$request of method WeGetFinancing\\Checkout\\Ajax\\Public\\PostbackUpdate::[a-zA-Z0-9\\_]+\(\) has invalid type WP_REST_Request\.#'
+        - '#Call to method get_body\(\) on an unknown class WP_REST_Request\.#'
+    excludePaths:
+        - src/PaymentGateway/WeGetFinancing.php

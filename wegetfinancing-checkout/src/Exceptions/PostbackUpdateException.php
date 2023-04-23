@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WeGetFinancing\Checkout\Exception;
 
 use Exception;
@@ -21,5 +23,4 @@ class PostbackUpdateException extends Exception
     public const INVALID_REQUEST_INVALID_STATUS_ERROR_MESSAGE = 'Status field is invalid.';
     public const INVALID_REQUEST_EMPTY_TRANSACTION_ID_ERROR_CODE = 8;
     public const INVALID_REQUEST_EMPTY_TRANSACTION_ID_ERROR_MESSAGE = 'Transaction Id field is empty.';
-
 }

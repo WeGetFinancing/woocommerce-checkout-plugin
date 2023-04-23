@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WeGetFinancing\Checkout\Ajax\Public;
 
 use WeGetFinancing\Checkout\ActionableInterface;
@@ -32,7 +34,7 @@ class PostbackUpdate implements ActionableInterface
         self::WGF_APPROVED_STATUS,
         self::WGF_PREAPPROVED_STATUS,
         self::WGF_REJECTED_STATUS,
-        self::WGF_REFUND_STATUS
+        self::WGF_REFUND_STATUS,
     ];
     public const WC_PROCESSING_STATUS = "wc-processing";
     public const WC_FAILED_STATUS = "wc-failed";
@@ -58,7 +60,7 @@ class PostbackUpdate implements ActionableInterface
             [
                 'methods' => self::METHOD,
                 'callback' => [$this, 'action'],
-                'permission_callback' => function() {
+                'permission_callback' => function () {
                     return true;
                 },
             ]
@@ -72,13 +74,13 @@ class PostbackUpdate implements ActionableInterface
     {
         try {
             $array = $this->getValidArrayRequest($request);
-            $args = array(
+            $args = [
                 'meta_key' => OrderInvIdValueObject::ORDER_META,
                 'meta_value' => $array[self::INV_ID_FIELD],
                 'post_type' => 'shop_order',
                 'post_status' => 'any',
-                'posts_per_page' => 1
-            );
+                'posts_per_page' => 1,
+            ];
             $posts = get_posts($args);
 
             $order = wc_get_order($posts[0]->ID);
@@ -94,18 +96,17 @@ class PostbackUpdate implements ActionableInterface
             echo "NO";
             die();
         }
-
     }
 
-    static public function getPostbackUpdateUrl(): string
+    public static function getPostbackUpdateUrl(): string
     {
         return get_site_url() . self::REST_PREFIX . self::REST_NAMESPACE . self::REST_ROUTE;
     }
 
     /**
      * @param WP_REST_Request $request
-     * @return array
      * @throws PostbackUpdateException
+     * @return array
      */
     protected function getValidArrayRequest(WP_REST_Request $request): array
     {
@@ -125,39 +126,47 @@ class PostbackUpdate implements ActionableInterface
             );
         }
 
-        if (false === array_key_exists(self::VERSION_FIELD, $data) ||
-            true === empty($data[self::VERSION_FIELD])) {
+        if (
+            false === array_key_exists(self::VERSION_FIELD, $data) ||
+            true === empty($data[self::VERSION_FIELD])
+        ) {
             throw new PostbackUpdateException(
                 PostbackUpdateException::INVALID_REQUEST_EMPTY_INV_ID_ERROR_MESSAGE,
                 PostbackUpdateException::INVALID_REQUEST_EMPTY_INV_ID_ERROR_CODE
             );
         }
 
-        if (false === array_key_exists(self::INV_ID_FIELD, $data) ||
-            true === empty($data[self::INV_ID_FIELD])) {
+        if (
+            false === array_key_exists(self::INV_ID_FIELD, $data) ||
+            true === empty($data[self::INV_ID_FIELD])
+        ) {
             throw new PostbackUpdateException(
                 PostbackUpdateException::INVALID_REQUEST_EMPTY_INV_ID_ERROR_MESSAGE,
                 PostbackUpdateException::INVALID_REQUEST_EMPTY_INV_ID_ERROR_CODE
             );
         }
 
-        if (false === array_key_exists(self::UPDATES_FIELD, $data) ||
-            true === empty($data[self::UPDATES_FIELD])) {
+        if (
+            false === array_key_exists(self::UPDATES_FIELD, $data) ||
+            true === empty($data[self::UPDATES_FIELD])
+        ) {
             throw new PostbackUpdateException(
                 PostbackUpdateException::INVALID_REQUEST_EMPTY_UPDATES_ERROR_MESSAGE,
                 PostbackUpdateException::INVALID_REQUEST_EMPTY_UPDATES_ERROR_CODE
             );
         }
 
-        if (false === array_key_exists(self::STATUS_FIELD, $data[self::UPDATES_FIELD]) ||
-            true === empty($data[self::UPDATES_FIELD][self::STATUS_FIELD])) {
+        if (
+            false === array_key_exists(self::STATUS_FIELD, $data[self::UPDATES_FIELD]) ||
+            true === empty($data[self::UPDATES_FIELD][self::STATUS_FIELD])
+        ) {
             throw new PostbackUpdateException(
                 PostbackUpdateException::INVALID_REQUEST_EMPTY_STATUS_ERROR_MESSAGE,
                 PostbackUpdateException::INVALID_REQUEST_EMPTY_STATUS_ERROR_CODE
             );
         }
 
-        if (false === in_array($data[self::UPDATES_FIELD][self::STATUS_FIELD], self::VALID_STATUSES)) {
+        if (false === in_array($data[self::UPDATES_FIELD][self::STATUS_FIELD], self::VALID_STATUSES, true)) {
             throw new PostbackUpdateException(
                 PostbackUpdateException::INVALID_REQUEST_INVALID_STATUS_ERROR_MESSAGE . " " .
                     $data[self::UPDATES_FIELD][self::STATUS_FIELD],
@@ -165,8 +174,10 @@ class PostbackUpdate implements ActionableInterface
             );
         }
 
-        if (false === array_key_exists(self::TRANSACTION_ID_FIELD, $data) ||
-            true === empty($data[self::TRANSACTION_ID_FIELD])) {
+        if (
+            false === array_key_exists(self::TRANSACTION_ID_FIELD, $data) ||
+            true === empty($data[self::TRANSACTION_ID_FIELD])
+        ) {
             throw new PostbackUpdateException(
                 PostbackUpdateException::INVALID_REQUEST_EMPTY_TRANSACTION_ID_ERROR_MESSAGE,
                 PostbackUpdateException::INVALID_REQUEST_EMPTY_TRANSACTION_ID_ERROR_CODE

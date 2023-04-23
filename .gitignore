@@ -7,3 +7,5 @@ vendor/
 composer.lock
 .env
 var
+.php-cs-fixer.cache
+.phpcs-cache

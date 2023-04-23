@@ -1,0 +1,12 @@
+== Changelog ==
+
+= 1.0.0 =
+* Implemented payment funnel functionalities
+* PostBack functionalities to update order status
+* Shipping information data automatically updated to wegetfinancing dashboard
+
+= 1.0.1 =
+* PHP 8.0 compatibility hotfix
+
+= 1.0.2 =
+* Improved error management

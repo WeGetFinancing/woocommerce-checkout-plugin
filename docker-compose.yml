@@ -8,6 +8,8 @@ services:
     restart: "no"
     volumes:
       - ./wegetfinancing-checkout:/app
+    environment:
+      - PHP_CS_FIXER_IGNORE_ENV=1
 
   db:
     image: mariadb:10.7.7-focal
@@ -21,7 +23,7 @@ services:
   wp:
     depends_on:
       - db
-    image: wordpress:6.1.1-php8.2-fpm-alpine
+    image: wordpress:6.2-php8.0-fpm-alpine
     container_name: wp
     restart: always
     user: "root:root"
@@ -35,7 +37,7 @@ services:
     volumes:
       - ./env/wp/custom.ini:/usr/local/etc/php/conf.d/custom.ini
       - ./var/wp:/var/www/html
-      - ./wegetfinancing-checkout:/var/www/html/wp-content/plugins/wegetfinancing-checkout
+#      - ./wegetfinancing-checkout:/var/www/html/wp-content/plugins/wegetfinancing-checkout
 
   lb:
     image: caddy:2.6.2-alpine
