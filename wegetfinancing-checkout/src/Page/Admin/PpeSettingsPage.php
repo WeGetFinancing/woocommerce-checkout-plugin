@@ -6,7 +6,7 @@ use Twig\Environment;
 use WeGetFinancing\Checkout\App;
 use WeGetFinancing\Checkout\ActionableInterface;
 
-class ConfigurePpe implements ActionableInterface
+class PpeSettingsPage implements ActionableInterface
 {
     public const PAGE_TITLE = 'WeGetFinancing PPE Configuration Dashboard';
     public const MENU_TITLE = 'WeGetFinancing PPE';
@@ -14,7 +14,7 @@ class ConfigurePpe implements ActionableInterface
     public const MENU_SLUG = 'wgf-ppe-dashboard';
     public const METHOD_RENDERER = 'render';
     public const ICON = 'dashicons-schedule';
-    public const PAGE_TEMPLATE = 'admin/configure_ppe.twig';
+    public const PAGE_TEMPLATE = 'admin/ppe_settings.twig';
 
     protected Environment $twig;
 

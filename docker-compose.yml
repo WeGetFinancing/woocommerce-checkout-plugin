@@ -37,7 +37,7 @@ services:
     volumes:
       - ./env/wp/custom.ini:/usr/local/etc/php/conf.d/custom.ini
       - ./var/wp:/var/www/html
-#      - ./wegetfinancing-checkout:/var/www/html/wp-content/plugins/wegetfinancing-checkout
+      - ./wegetfinancing-checkout:/var/www/html/wp-content/plugins/wegetfinancing-checkout
 
   lb:
     image: caddy:2.6.2-alpine

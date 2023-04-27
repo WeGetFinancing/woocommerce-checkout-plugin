@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace WeGetFinancing\Checkout\Ajax\Public;
 
+use Throwable;
 use WeGetFinancing\Checkout\ActionableInterface;
 use WeGetFinancing\Checkout\Exception\PostbackUpdateException;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
@@ -87,10 +88,10 @@ class PostbackUpdate implements ActionableInterface
 
             $order->update_status($this->getStatus($array[self::UPDATES_FIELD][self::STATUS_FIELD]));
 
-            echo self::getPostbackUpdateUrl();
+            echo "OK";
             die();
-        } catch (\Throwable $exception) {
-            error_log("PostbackUpdate::action");
+        } catch (Throwable $exception) {
+            error_log(self::class . "::action() Error:");
             error_log($exception->getCode() . ' - ' . $exception->getMessage());
             error_log(print_r($exception->getTraceAsString(), true));
             echo "NO";

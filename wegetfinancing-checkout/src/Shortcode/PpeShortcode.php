@@ -6,9 +6,8 @@ use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
-use WeGetFinancing\Checkout\Ajax\Public\ConfigurePpeAjax;
 
-class WeGetFinancingPpe
+class PpeShortcode
 {
     public const INIT_NAME = 'wegetfinancing-ppe';
 
@@ -34,11 +33,19 @@ class WeGetFinancingPpe
      */
     public function execute(mixed $attributes, mixed $content = ""): string
     {
+        wp_enqueue_style('wegetfinancing_ppe_css', 'https://ppe.sandbox.dev.wegetfinancing.com/index.css');
+        wp_enqueue_script(
+            'wegetfinancing_ppe_js',
+            'https://cdn.jsdelivr.net/npm/@shopify/polaris@10.48.0/build/cjs/index.min.js',
+            ['jquery'],
+            '',
+            false
+        );
+
         return $this->twig->render(
-            'view/store',
+            'store/ppe_shortcode.twig',
             [
-                "ajaxUrl" => admin_url('admin-ajax.php'),
-                "ajaxAction" => ConfigurePpeAjax::INIT_NAME
+                "ajaxUrl" => admin_url('admin-ajax.php')
             ]
         );
     }

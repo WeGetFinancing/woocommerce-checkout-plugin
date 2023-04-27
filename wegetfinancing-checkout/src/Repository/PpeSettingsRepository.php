@@ -4,7 +4,7 @@ namespace WeGetFinancing\Checkout\Repository;
 
 use WeGetFinancing\Checkout\App;
 
-class PpeSettings
+class PpeSettingsRepository
 {
     public const PREFIX = 'wegetfinancing_';
     public const SUFFIX = '_settings';

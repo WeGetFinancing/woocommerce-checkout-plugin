@@ -11,7 +11,6 @@ interface PpeSettings
     public const IS_APPLY_NOW = 'is_apply_now';
     public const IS_BRANDED = 'is_branded';
     public const MINIMUM_AMOUNT = 'minimum_amount';
-
     public const CUSTOM_TEXT = 'custom_text';
     public const POSITION = 'minimum_amount';
     public const VALID_POSITIONS = [
