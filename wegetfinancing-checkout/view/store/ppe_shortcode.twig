@@ -1,11 +1,11 @@
 <script>
     // In case there are no config.json file the widget configuration can be added here
     const ppeConfiguration = {
-        priceSelector: ".woocommerce-Price-amount", // the class name of the html element containing the prices on the page (REQUIRED) (string)
-        productNameSelector: ".name-item", // if applyNow is set to true, this selector is REQUIRED (string)
+        priceSelector: ".price", // the class name of the html element containing the prices on the page (REQUIRED) (string)
+        productNameSelector: ".woocommerce-loop-product__title", // if applyNow is set to true, this selector is REQUIRED (string)
         debug: true, // if true, prints debug messages on the console (boolean)
-        token: "btdGVzdC1nZi1nZXRmaW5hbmNpbmcuY698", // Merchants need to add their WeGetFinancing's access token as a string (REQUIRED)
-        applyNow: false, // If set to true, a link to the simple loan form will be added (boolean)
+        token: "MTAxMmFhZjBkYWU5NDRkMDdlNWU2YmZhZTQ2ZTI2NWM=", // Merchants need to add their WeGetFinancing's access token as a string (REQUIRED)
+        applyNow: true, // If set to true, a link to the simple loan form will be added (boolean)
         branded: true, // If true, WeGetFinancing branding will be rendered (boolean)
         minAmount: 1000, // we will not show the PPE if the amount is below this number (REQUIRED) (number)
         customText: "or just", // Add any text before the monthly payment in the message under the price (string)

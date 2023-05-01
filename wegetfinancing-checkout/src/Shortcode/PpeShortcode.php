@@ -36,7 +36,7 @@ class PpeShortcode
         wp_enqueue_style('wegetfinancing_ppe_css', 'https://ppe.sandbox.dev.wegetfinancing.com/index.css');
         wp_enqueue_script(
             'wegetfinancing_ppe_js',
-            'https://cdn.jsdelivr.net/npm/@shopify/polaris@10.48.0/build/cjs/index.min.js',
+            'https://ppe.sandbox.dev.wegetfinancing.com/index.js',
             ['jquery'],
             '',
             false
