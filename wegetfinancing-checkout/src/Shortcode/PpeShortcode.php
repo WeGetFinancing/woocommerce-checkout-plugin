@@ -33,12 +33,17 @@ class PpeShortcode
      */
     public function execute(mixed $attributes, mixed $content = ""): string
     {
-        wp_enqueue_style('wegetfinancing_ppe_css', 'https://ppe.sandbox.dev.wegetfinancing.com/index.css');
+        wp_enqueue_style(
+            'wegetfinancing_ppe_css',
+            'https://ppe.sandbox.dev.wegetfinancing.com/index.css',
+            [],
+            null)
+        ;
         wp_enqueue_script(
             'wegetfinancing_ppe_js',
             'https://ppe.sandbox.dev.wegetfinancing.com/index.js',
             ['jquery'],
-            '',
+            null,
             false
         );
 
