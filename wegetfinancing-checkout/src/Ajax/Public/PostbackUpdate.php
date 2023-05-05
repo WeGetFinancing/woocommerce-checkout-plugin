@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace WeGetFinancing\Checkout\Ajax\Public;
 
+use Exception;
 use Throwable;
 use WeGetFinancing\Checkout\ActionableInterface;
 use WeGetFinancing\Checkout\Exception\PostbackUpdateException;
+use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
 use WeGetFinancing\Checkout\PostMeta\OrderInvIdValueObject;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
@@ -106,12 +108,20 @@ class PostbackUpdate implements ActionableInterface
 
     /**
      * @param WP_REST_Request $request
-     * @throws PostbackUpdateException
      * @return array
+     * @throws Exception
+     * @throws PostbackUpdateException
      */
     protected function getValidArrayRequest(WP_REST_Request $request): array
     {
+        $signature = $request->get_header('x-signature');
+        $timestamp = $request->get_header('x-timestamp');
         $body = $request->get_body();
+
+        if (false === $this->verifySignature($signature, $body, $timestamp)) {
+            throw new Exception("Invalid Signature");
+        }
+
         if (true === empty($body)) {
             throw new PostbackUpdateException(
                 PostbackUpdateException::EMPTY_BODY_ERROR_MESSAGE,
@@ -197,5 +207,19 @@ class PostbackUpdate implements ActionableInterface
             self::WGF_REFUND_STATUS => self::WC_REFUNDED_STATUS,
             default => false,
         };
+    }
+
+    protected function verifySignature(string $signature, string $body, string $timestamp): bool
+    {
+        $username = WeGetFinancing::getOptions()[WeGetFinancingValueObject::USERNAME_FIELD_ID];
+        $password = WeGetFinancing::getOptions()[WeGetFinancingValueObject::PASSWORD_FIELD_ID];
+
+        $string = hash(
+            'sha256',
+            $timestamp . $username . $body . $password,
+            false
+        );
+
+        return $signature == $string;
     }
 }

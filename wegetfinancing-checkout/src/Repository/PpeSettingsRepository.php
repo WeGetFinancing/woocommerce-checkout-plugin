@@ -3,6 +3,8 @@
 namespace WeGetFinancing\Checkout\Repository;
 
 use WeGetFinancing\Checkout\App;
+use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing;
+use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
 
 class PpeSettingsRepository
 {
@@ -39,6 +41,14 @@ class PpeSettingsRepository
         $options = self::getOptions();
         $options[$optionName] = $optionValue;
         return self::setOptions($options, $autoload);
+    }
+
+    static public function getOptionOrDefault($optionName, $defaultValue): int|string|bool
+    {
+        $option = self::getOption($optionName);
+        return true === is_null($option)
+            ? $defaultValue
+            : $option;
     }
 
     static protected function getOptionsName(): string

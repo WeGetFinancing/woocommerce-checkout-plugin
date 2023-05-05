@@ -1,15 +1,14 @@
 <script>
-    // In case there are no config.json file the widget configuration can be added here
     const ppeConfiguration = {
-        priceSelector: ".price", // the class name of the html element containing the prices on the page (REQUIRED) (string)
-        productNameSelector: ".woocommerce-loop-product__title", // if applyNow is set to true, this selector is REQUIRED (string)
-        debug: true, // if true, prints debug messages on the console (boolean)
-        token: "MTAxMmFhZjBkYWU5NDRkMDdlNWU2YmZhZTQ2ZTI2NWM=", // Merchants need to add their WeGetFinancing's access token as a string (REQUIRED)
-        applyNow: true, // If set to true, a link to the simple loan form will be added (boolean)
-        branded: true, // If true, WeGetFinancing branding will be rendered (boolean)
-        minAmount: 1000, // we will not show the PPE if the amount is below this number (REQUIRED) (number)
-        customText: "or just", // Add any text before the monthly payment in the message under the price (string)
-        position: "center" // positions the widget horizontally. The options are the following string options : 'equalSpacing' | 'leading' | 'trailing' | 'center' | 'fill' | 'fillEvenly'
+        priceSelector: "{{ ppePriceSelectorValue }}",
+        productNameSelector: "{{ ppeProductNameSelectorValue }}",
+        debug: {{ ppeIsDebugValue }},
+        token: "{{ ppeTokenValue }}",//MTAxMmFhZjBkYWU5NDRkMDdlNWU2YmZhZTQ2ZTI2NWM=
+        applyNow: {{ ppeIsApplyNowValue }},
+        branded: {{ ppeIsBrandedValue }},
+        minAmount: {{ ppeMinAmountValue }},
+        customText: "{{ ppeCustomTextValue }}",
+        position: "{{ ppePositionValue }}"
     }
     window.ppeConfiguration = ppeConfiguration
 </script>
