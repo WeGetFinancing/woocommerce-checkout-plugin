@@ -4,18 +4,18 @@ namespace WeGetFinancing\Checkout\Ajax\Admin;
 
 use Exception;
 use Throwable;
-use WeGetFinancing\Checkout\ActionableInterface;
+use WeGetFinancing\Checkout\AbstractActionableWithClient;
 use WeGetFinancing\Checkout\ValueObject\PpeSettings;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 use WeGetFinancing\Checkout\Repository\PpeSettingsRepository;
+use WeGetFinancing\SDK\Service\PpeClient;
 
-class PpeSettingsAjax implements ActionableInterface
+class PpeSettingsAjax extends AbstractActionableWithClient
 {
     use AddableTrait;
     public const ACTION_NAME = 'upsertPpeSettingsAction';
     public const INIT_NAME = 'wp_ajax_' . self::ACTION_NAME;
     public const FUNCTION_NAME = 'execute';
-
 
     public function init(): void
     {
@@ -126,6 +126,16 @@ class PpeSettingsAjax implements ActionableInterface
                 $violations[] = [
                     'field' => PpeSettings::MERCHANT_TOKEN_ID,
                     'message' => '<b>' .PpeSettings::MERCHANT_TOKEN_NAME . '</b> cannot be empty.'
+                ];
+            }
+
+            $client = $this->generateClient();
+            $response = $client->testPpe($data[PpeSettings::MERCHANT_TOKEN_ID]);
+            if (PpeClient::TEST_ERROR_RESPONSE === $response['status'] ||
+                PpeClient::TEST_EMPTY_RESPONSE === $response['status']) {
+                $violations[] = [
+                    'field' => PpeSettings::MERCHANT_TOKEN_ID,
+                    'message' => '<b>' .PpeSettings::MERCHANT_TOKEN_NAME . '</b> Error: ' . $response['message']
                 ];
             }
 
