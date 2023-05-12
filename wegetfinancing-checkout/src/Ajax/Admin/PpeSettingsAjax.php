@@ -87,6 +87,11 @@ class PpeSettingsAjax extends AbstractActionableWithClient
                 "true" === $_POST['data'][PpeSettings::IS_APPLY_NOW_ID]
             );
 
+            PpeSettingsRepository::setOption(
+                PpeSettings::PPE_IS_CONFIGURED,
+                true
+            );
+
             wp_send_json(
                 ['isSuccess' => true],
                 201
@@ -95,6 +100,10 @@ class PpeSettingsAjax extends AbstractActionableWithClient
             error_log(self::class . "::execute() unexpected error.");
             error_log($exception->getCode() . ' - ' . $exception->getMessage());
             error_log(print_r($exception->getTraceAsString(), true));
+            PpeSettingsRepository::setOption(
+                PpeSettings::PPE_IS_CONFIGURED,
+                false
+            );
             wp_send_json([], 500);
         }
     }

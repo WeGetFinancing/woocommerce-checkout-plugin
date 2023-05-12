@@ -14,7 +14,7 @@ interface PpeSettings
     public const IS_DEBUG_NAME = 'Debug';
     public const IS_DEBUG_DEFAULT_VALUE = true;
     public const MERCHANT_TOKEN_ID = 'wgf_ppe_settings_merchant_token_id';
-    public const MERCHANT_TOKEN_NAME = 'Token';
+    public const MERCHANT_TOKEN_NAME = 'Token ID';
     public const MERCHANT_TOKEN_DEFAULT_VALUE = '';
     public const IS_APPLY_NOW_ID = 'wgf_ppe_settings_is_apply_now_id';
     public const IS_APPLY_NOW_NAME = 'Apply Now';
@@ -40,4 +40,5 @@ interface PpeSettings
         'fillEvenly'
     ];
     public const SAVE_BUTTON_ID = 'wgf_ppe_setting_save_button';
+    public const PPE_IS_CONFIGURED = "ppe_is_configured";
 }

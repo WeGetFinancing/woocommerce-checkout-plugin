@@ -45,6 +45,15 @@ class PpeShortcode
      */
     public function execute(mixed $attributes, mixed $content = ""): string
     {
+        $isSetup = PpeSettingsRepository::getOptionOrDefault(
+            PpeSettings::PPE_IS_CONFIGURED,
+            false
+        );
+
+        if (false === $isSetup) {
+            return "";
+        }
+
         wp_enqueue_style(
             self::STYLE_HANDLE,
             $this->getStyle(),

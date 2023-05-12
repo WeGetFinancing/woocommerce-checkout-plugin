@@ -91,7 +91,7 @@ class PpeSettingsPage implements ActionableInterface
                     PpeSettings::PRODUCT_NAME_SELECTOR_DEFAULT_VALUE
                 ),
                 'ppeIsDebugId' => PpeSettings::IS_DEBUG_ID,
-                'ppeIsDebugName' => PpeSettings::IS_BRANDED_NAME,
+                'ppeIsDebugName' => PpeSettings::IS_DEBUG_NAME,
                 'ppeIsDebugValue' => PpeSettingsRepository::getOptionOrDefault(
                     PpeSettings::IS_DEBUG_ID,
                     PpeSettings::IS_DEBUG_DEFAULT_VALUE
