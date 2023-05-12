@@ -20,6 +20,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
     public const INIT_NAME = 'wp_ajax_nopriv_' . self::ACTION_NAME;
     public const FUNCTION_NAME = 'execute';
     public const SOFTWARE_NAME = 'WordPress-WooCommerce';
+    public const SOFTWARE_VERSION = '1.1.0';
     public const GENERATE_FUNNEL_ERROR_TABLE = [
         'firstName' => [
             'fields' => ['billing_first_name'],
@@ -225,7 +226,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 'postback_url' => PostbackUpdate::getPostbackUpdateUrl(),
                 'software_name' => self::SOFTWARE_NAME,
                 'software_version' => $wp_version . '-' . constant('WOOCOMMERCE_VERSION'),
-                'software_plugin_version' => '-',
+                'software_plugin_version' => self::SOFTWARE_VERSION,
                 'billing_address' => [
                     'street1' => $customer->get_billing_address() . ' ' . $customer->get_billing_address_2(),
                     'city' => $customer->get_billing_city(),
