@@ -10,3 +10,8 @@
 
 = 1.0.2 =
 * Improved error management
+
+= 1.1.0 =
+* PPE Feature
+* Only signed postback are accepted
+* Software version is sent per each funnel url generation

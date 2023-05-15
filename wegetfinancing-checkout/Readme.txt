@@ -35,3 +35,8 @@ This can help to increase your sales and customer satisfaction by providing an e
 
 = 1.0.2 =
 * Improved error management
+
+= 1.1.0 =
+* PPE Feature
+* Only signed postback are accepted
+* Software version is sent per each funnel url generation
