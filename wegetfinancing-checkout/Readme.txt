@@ -3,7 +3,7 @@ Contributors: wegetfinancing
 Tags: WeGetFinancing, Checkout, Payment
 Requires at least: 5.9
 Tested up to: 6.2
-Stable tag: 1.0.2
+Stable tag: 1.1.1
 Requires PHP: 8.0
 License: LGPL-3.0-only
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -40,3 +40,6 @@ This can help to increase your sales and customer satisfaction by providing an e
 * PPE Feature
 * Only signed postback are accepted
 * Software version is sent per each funnel url generation
+
+= 1.1.1 =
+* Improved escaping and code quality
