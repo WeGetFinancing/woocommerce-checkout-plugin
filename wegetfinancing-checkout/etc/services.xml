@@ -12,6 +12,8 @@
 
         <parameter key="app.base_path"/>
         <parameter key="app.api.version" type="string">1.9</parameter>
+        <parameter key="app.software.name" type="string">WordPress-WooCommerce</parameter>
+        <parameter key="app.software.plugin.version" type="string">1.1.1</parameter>
         <parameter key="app.funnel.js">https://cdn.wegetfinancing.com/libs/1.0/getfinancing.js</parameter>
         <parameter key="app.checkout_button.url">https://wiki.dev.wegetfinancing.com/public/brand/resources/buttons/logoCircular.svg</parameter>
         <parameter key="app.ppe.js.prod">https://ppe.wegetfinancing.com/index.js</parameter>
@@ -56,7 +58,11 @@
         <service id="printToAdminOrderInvIdInField" class="WeGetFinancing\Checkout\PostMeta\PrintToAdminOrderInvIdInField">
             <argument type="service" id="twig"/>
         </service>
-        <service id="generateFunnelUrl" class="WeGetFinancing\Checkout\Ajax\Public\GenerateFunnelUrl"/>
+        <service id="generateFunnelUrl" class="WeGetFinancing\Checkout\Ajax\Public\GenerateFunnelUrl">
+            <argument>%app.api.version%</argument>
+            <argument>%app.software.name%</argument>
+            <argument>%app.software.plugin.version%</argument>
+        </service>
         <service id="postbackUpdate" class="WeGetFinancing\Checkout\Ajax\Public\PostbackUpdate">
             <argument>%app.api.version%</argument>
         </service>

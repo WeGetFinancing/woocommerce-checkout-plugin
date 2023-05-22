@@ -11,6 +11,7 @@ use WeGetFinancing\Checkout\Exception\PostbackUpdateException;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
 use WeGetFinancing\Checkout\PostMeta\OrderInvIdValueObject;
+use WeGetFinancing\Checkout\Service\RequestValidatorUtility;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 use WP_REST_Request;
 
@@ -42,6 +43,7 @@ class PostbackUpdate implements ActionableInterface
     public const WC_PROCESSING_STATUS = "wc-processing";
     public const WC_FAILED_STATUS = "wc-failed";
     public const WC_REFUNDED_STATUS = "refunded";
+    public const SIGNATURE_ALGO = "sha256";
 
     protected string $version;
 
@@ -76,7 +78,8 @@ class PostbackUpdate implements ActionableInterface
     public function action(WP_REST_Request $request): void
     {
         try {
-            $array = $this->getValidArrayRequest($request);
+            $data = $this->getSignedData($request);
+            $array = $this->getValidData($data);
             $args = [
                 'meta_key' => OrderInvIdValueObject::ORDER_META,
                 'meta_value' => $array[self::INV_ID_FIELD],
@@ -88,7 +91,7 @@ class PostbackUpdate implements ActionableInterface
 
             $order = wc_get_order($posts[0]->ID);
 
-            $order->update_status($this->getStatus($array[self::UPDATES_FIELD][self::STATUS_FIELD]));
+            $order->update_status($this->getStatus($array[self::STATUS_FIELD]));
 
             echo "OK";
             die();
@@ -107,12 +110,78 @@ class PostbackUpdate implements ActionableInterface
     }
 
     /**
-     * @param WP_REST_Request $request
+     * @param array $data
      * @return array
-     * @throws Exception
      * @throws PostbackUpdateException
      */
-    protected function getValidArrayRequest(WP_REST_Request $request): array
+    protected function getValidData(array $data): array
+    {
+        $result = [];
+
+        if (RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty($data, self::VERSION_FIELD)) {
+            throw new PostbackUpdateException(
+                PostbackUpdateException::INVALID_REQUEST_EMPTY_INV_ID_ERROR_MESSAGE,
+                PostbackUpdateException::INVALID_REQUEST_EMPTY_INV_ID_ERROR_CODE
+            );
+        }
+        $result[self::VERSION_FIELD] = sanitize_text_field($data[self::VERSION_FIELD]);
+
+        if (RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty($data, self::INV_ID_FIELD)) {
+            throw new PostbackUpdateException(
+                PostbackUpdateException::INVALID_REQUEST_EMPTY_INV_ID_ERROR_MESSAGE,
+                PostbackUpdateException::INVALID_REQUEST_EMPTY_INV_ID_ERROR_CODE
+            );
+        }
+        $result[self::INV_ID_FIELD] = sanitize_text_field($data[self::INV_ID_FIELD]);
+
+        if (RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty($data, self::UPDATES_FIELD)) {
+            throw new PostbackUpdateException(
+                PostbackUpdateException::INVALID_REQUEST_EMPTY_UPDATES_ERROR_MESSAGE,
+                PostbackUpdateException::INVALID_REQUEST_EMPTY_UPDATES_ERROR_CODE
+            );
+        }
+        $result[self::UPDATES_FIELD] = sanitize_text_field($data[self::UPDATES_FIELD]);
+
+        if (
+            RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
+                $data[self::UPDATES_FIELD],
+                self::STATUS_FIELD
+            )
+        ) {
+            throw new PostbackUpdateException(
+                PostbackUpdateException::INVALID_REQUEST_EMPTY_STATUS_ERROR_MESSAGE,
+                PostbackUpdateException::INVALID_REQUEST_EMPTY_STATUS_ERROR_CODE
+            );
+        } else {
+            $result[self::STATUS_FIELD] = sanitize_text_field($data[self::UPDATES_FIELD][self::STATUS_FIELD]);
+
+            if (false === in_array($result[self::STATUS_FIELD], self::VALID_STATUSES, true)) {
+                throw new PostbackUpdateException(
+                    PostbackUpdateException::INVALID_REQUEST_INVALID_STATUS_ERROR_MESSAGE . " " .
+                    $data[self::UPDATES_FIELD][self::STATUS_FIELD],
+                    PostbackUpdateException::INVALID_REQUEST_INVALID_STATUS_ERROR_CODE
+                );
+            }
+        }
+
+        if (RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty($data, self::TRANSACTION_ID_FIELD)) {
+            throw new PostbackUpdateException(
+                PostbackUpdateException::INVALID_REQUEST_EMPTY_TRANSACTION_ID_ERROR_MESSAGE,
+                PostbackUpdateException::INVALID_REQUEST_EMPTY_TRANSACTION_ID_ERROR_CODE
+            );
+        }
+        $result[self::TRANSACTION_ID_FIELD] = sanitize_text_field($data[self::TRANSACTION_ID_FIELD]);
+
+        return $result;
+    }
+
+    /**
+     * @param WP_REST_Request $request
+     * @return array
+     * @throws PostbackUpdateException
+     * @throws Exception
+     */
+    protected function getSignedData(WP_REST_Request $request): array
     {
         $signature = $request->get_header('x-signature');
         $timestamp = $request->get_header('x-timestamp');
@@ -137,65 +206,21 @@ class PostbackUpdate implements ActionableInterface
             );
         }
 
-        if (
-            false === array_key_exists(self::VERSION_FIELD, $data) ||
-            true === empty($data[self::VERSION_FIELD])
-        ) {
-            throw new PostbackUpdateException(
-                PostbackUpdateException::INVALID_REQUEST_EMPTY_INV_ID_ERROR_MESSAGE,
-                PostbackUpdateException::INVALID_REQUEST_EMPTY_INV_ID_ERROR_CODE
-            );
-        }
-
-        if (
-            false === array_key_exists(self::INV_ID_FIELD, $data) ||
-            true === empty($data[self::INV_ID_FIELD])
-        ) {
-            throw new PostbackUpdateException(
-                PostbackUpdateException::INVALID_REQUEST_EMPTY_INV_ID_ERROR_MESSAGE,
-                PostbackUpdateException::INVALID_REQUEST_EMPTY_INV_ID_ERROR_CODE
-            );
-        }
-
-        if (
-            false === array_key_exists(self::UPDATES_FIELD, $data) ||
-            true === empty($data[self::UPDATES_FIELD])
-        ) {
-            throw new PostbackUpdateException(
-                PostbackUpdateException::INVALID_REQUEST_EMPTY_UPDATES_ERROR_MESSAGE,
-                PostbackUpdateException::INVALID_REQUEST_EMPTY_UPDATES_ERROR_CODE
-            );
-        }
-
-        if (
-            false === array_key_exists(self::STATUS_FIELD, $data[self::UPDATES_FIELD]) ||
-            true === empty($data[self::UPDATES_FIELD][self::STATUS_FIELD])
-        ) {
-            throw new PostbackUpdateException(
-                PostbackUpdateException::INVALID_REQUEST_EMPTY_STATUS_ERROR_MESSAGE,
-                PostbackUpdateException::INVALID_REQUEST_EMPTY_STATUS_ERROR_CODE
-            );
-        }
-
-        if (false === in_array($data[self::UPDATES_FIELD][self::STATUS_FIELD], self::VALID_STATUSES, true)) {
-            throw new PostbackUpdateException(
-                PostbackUpdateException::INVALID_REQUEST_INVALID_STATUS_ERROR_MESSAGE . " " .
-                    $data[self::UPDATES_FIELD][self::STATUS_FIELD],
-                PostbackUpdateException::INVALID_REQUEST_INVALID_STATUS_ERROR_CODE
-            );
-        }
-
-        if (
-            false === array_key_exists(self::TRANSACTION_ID_FIELD, $data) ||
-            true === empty($data[self::TRANSACTION_ID_FIELD])
-        ) {
-            throw new PostbackUpdateException(
-                PostbackUpdateException::INVALID_REQUEST_EMPTY_TRANSACTION_ID_ERROR_MESSAGE,
-                PostbackUpdateException::INVALID_REQUEST_EMPTY_TRANSACTION_ID_ERROR_CODE
-            );
-        }
-
         return $data;
+    }
+
+    protected function verifySignature(string $signature, string $body, string $timestamp): bool
+    {
+        $username = WeGetFinancing::getOptions()[WeGetFinancingValueObject::USERNAME_FIELD_ID];
+        $password = WeGetFinancing::getOptions()[WeGetFinancingValueObject::PASSWORD_FIELD_ID];
+
+        $string = hash(
+            self::SIGNATURE_ALGO,
+            $timestamp . $username . $body . $password,
+            false
+        );
+
+        return $signature == $string;
     }
 
     protected function getStatus(string $status): bool|string
@@ -207,19 +232,5 @@ class PostbackUpdate implements ActionableInterface
             self::WGF_REFUND_STATUS => self::WC_REFUNDED_STATUS,
             default => false,
         };
-    }
-
-    protected function verifySignature(string $signature, string $body, string $timestamp): bool
-    {
-        $username = WeGetFinancing::getOptions()[WeGetFinancingValueObject::USERNAME_FIELD_ID];
-        $password = WeGetFinancing::getOptions()[WeGetFinancingValueObject::PASSWORD_FIELD_ID];
-
-        $string = hash(
-            'sha256',
-            $timestamp . $username . $body . $password,
-            false
-        );
-
-        return $signature == $string;
     }
 }

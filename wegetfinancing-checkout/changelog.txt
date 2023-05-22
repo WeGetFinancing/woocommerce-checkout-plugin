@@ -15,3 +15,6 @@
 * PPE Feature
 * Only signed postback are accepted
 * Software version is sent per each funnel url generation
+
+= 1.1.1 =
+* Improved escaping and code quality

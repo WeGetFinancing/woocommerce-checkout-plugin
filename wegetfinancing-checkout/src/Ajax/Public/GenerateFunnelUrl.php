@@ -8,6 +8,8 @@ use WeGetFinancing\Checkout\AbstractActionableWithClient;
 use WeGetFinancing\Checkout\App;
 use WeGetFinancing\Checkout\Exception\GenerateClientException;
 use WeGetFinancing\Checkout\Exception\GetFunnelRequestException;
+use WeGetFinancing\Checkout\Service\RequestValidatorUtility;
+use WeGetFinancing\Checkout\ValueObject\GenerateFunnelUrlRequest;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 use WeGetFinancing\SDK\Entity\Request\LoanRequestEntity;
 use WeGetFinancing\SDK\Exception\EntityValidationException;
@@ -19,42 +21,53 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
     public const ACTION_NAME = 'generateWeGetFinancingFunnelAction';
     public const INIT_NAME = 'wp_ajax_nopriv_' . self::ACTION_NAME;
     public const FUNCTION_NAME = 'execute';
-    public const SOFTWARE_NAME = 'WordPress-WooCommerce';
-    public const SOFTWARE_VERSION = '1.1.0';
+    public const UNEXPECTED_ERROR_HTML_MESSAGE = '<strong>Unexpected error</strong>';
+    public const REMOTE_SERVER_ERROR_HTML_MESSAGE = '<strong>Remote server error</strong>';
+    public const INTERNAL_SERVER_ERROR_HTML_MESSAGE = '<strong>Internal server error</strong>';
     public const GENERATE_FUNNEL_ERROR_TABLE = [
         'firstName' => [
-            'fields' => ['billing_first_name'],
+            'fields' => [GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID],
             'message' => '<strong>Billing First name</strong>',
         ],
         'lastName' => [
-            'fields' => ['billing_last_name'],
+            'fields' => [GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID],
             'message' => '<strong>Billing Last name</strong>',
         ],
         'street1' => [
-            'fields' => ['billing_address_1', 'billing_address_2'],
+            'fields' => [
+                GenerateFunnelUrlRequest::BILLING_ADDRESS_1_ID, GenerateFunnelUrlRequest::BILLING_ADDRESS_2_ID
+            ],
             'message' => '<strong>Billing Street address</strong>',
         ],
         'city' => [
-            'fields' => ['billing_city'],
+            'fields' => [GenerateFunnelUrlRequest::BILLING_CITY_ID],
             'message' => '<strong>Billing Town / City</strong>',
         ],
         'state' => [
-            'fields' => ['billing_state'],
+            'fields' => [GenerateFunnelUrlRequest::BILLING_STATE_ID],
             'message' => '<strong>Billing State</strong>',
         ],
         'zipcode' => [
-            'fields' => ['billing_postcode'],
+            'fields' => [GenerateFunnelUrlRequest::BILLING_POSTCODE_ID],
             'message' => '<strong>Billing ZIP Code</strong>',
         ],
         'phone' => [
-            'fields' => ['billing_phone'],
+            'fields' => [GenerateFunnelUrlRequest::BILLING_PHONE_ID],
             'message' => '<strong>Billing ZIP Code</strong>',
         ],
         'email' => [
-            'fields' => ['billing_phone'],
+            'fields' => [GenerateFunnelUrlRequest::BILLING_EMAIL_ID],
             'message' => '<strong>Billing Email address</strong>',
         ],
     ];
+
+    protected array $violations = [];
+
+    public function __construct(
+        protected string $apiVersion,
+        protected string $softwareName,
+        protected $softwarePluginVersion
+    ) {}
 
     public function init(): void
     {
@@ -66,31 +79,38 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
         try {
             $client = $this->generateClient();
             $request = $this->getRequest();
-            $response = $client->requestNewLoan($request);
+            $loanRequest = $this->getLoanRequest($request);
+            $response = $client->requestNewLoan($loanRequest);
             $data = $response->getData();
 
             if (true === $response->getIsSuccess()) {
-                $this->ajaxRespondJson([
-                    'isSuccess' => true,
-                    'invId' => $data['invId'],
-                    'href' => $data['href'],
-                ]);
+                wp_send_json(
+                    [
+                        'isSuccess' => true,
+                        'invId' => $data['invId'],
+                        'href' => $data['href'],
+                    ],
+                    200
+                );
             }
 
-            error_log(self::class . "::execute request new loan funnel error.");
+            error_log(self::class."::execute() Remote error requesting new loan url. Request:");
             error_log(print_r($data, true));
 
-            $this->ajaxRespondJson([
-                'isSuccess' => false,
-                'message' => '<strong>Remote server error</strong>',
-            ]);
+            wp_send_json(
+                [
+                    'isSuccess' => false,
+                    'message' => self::REMOTE_SERVER_ERROR_HTML_MESSAGE,
+                ],
+                200
+            );
         } catch (EntityValidationException $exception) {
             $violations = [];
             foreach ($exception->getViolations() as $violation) {
                 if (false === array_key_exists($violation['field'], self::GENERATE_FUNNEL_ERROR_TABLE)) {
                     $violations['generic'] = [
                         'fields' => [],
-                        'messages' => '<strong>Internal server error</strong>',
+                        'messages' => self::INTERNAL_SERVER_ERROR_HTML_MESSAGE,
                     ];
                     continue;
                 }
@@ -102,95 +122,126 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                     $violation['message']
                 );
             }
-            $this->ajaxRespondJson([
-                'isSuccess' => false,
-                'violations' => $violations,
-            ]);
+            wp_send_json(
+                [
+                    'isSuccess' => false,
+                    'violations' => $violations,
+                ],
+                200
+            );
         } catch (GenerateClientException $exception) {
-            $this->ajaxRespondJson([
-                'isSuccess' => false,
-                'message' => '<strong>' . translate(
-                    GenerateClientException::GRACEFUL_ERROR_MESSAGE,
-                    App::DOMAIN_LOCALE
-                ) . '</strong>',
-            ]);
+            wp_send_json(
+                [
+                    'isSuccess' => false,
+                    'message' => '<strong>' . translate(
+                        GenerateClientException::GRACEFUL_ERROR_MESSAGE,
+                        App::DOMAIN_LOCALE
+                    ) . '</strong>',
+                ],
+                200
+            );
         } catch (GetFunnelRequestException $exception) {
-            $this->ajaxRespondJson([
-                'isSuccess' => false,
-                'message' => '<strong>' . translate(
-                    GetFunnelRequestException::GRACEFUL_ERROR_MESSAGE,
-                    App::DOMAIN_LOCALE
-                ) . '</strong>',
-            ]);
+            wp_send_json(
+                [
+                    'isSuccess' => false,
+                    'message' => '<strong>' . translate(
+                        GetFunnelRequestException::GRACEFUL_ERROR_MESSAGE,
+                        App::DOMAIN_LOCALE
+                    ) . '</strong>',
+                ],
+                200
+            );
         } catch (\Throwable $exception) {
             error_log(self::class . "::execute unexpected error.");
             error_log($exception->getCode() . ' - ' . $exception->getMessage());
             error_log(print_r($exception->getTraceAsString(), true));
-            $this->ajaxRespondJson([
-                'isSuccess' => false,
-                'message' => '<strong>Unexpected error</strong>',
-            ]);
+            wp_send_json(
+                [
+                    'isSuccess' => false,
+                    'message' => self::UNEXPECTED_ERROR_HTML_MESSAGE,
+                ],
+                200
+            );
         }
     }
 
     /**
+     * @return array
+     * @throws EntityValidationException
+     */
+    public function getRequest(): array
+    {
+        $data = $_POST['data'];
+        $result = [];
+        $violations = [];
+
+        if (RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
+            $data, GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID
+        )) {
+            $violations[] = [
+                'field' => 'firstName',
+                'message' => 'firstName cannot be empty.',
+            ];
+        }
+        $result[GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID] =
+            sanitize_text_field($data[GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID]);
+
+        if (RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
+            $data, GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID
+        )) {
+            $violations[] = [
+                'field' => 'lastName',
+                'message' => 'lastName cannot be empty.',
+            ];
+        }
+        $result[GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID] =
+            sanitize_text_field($data[GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID]);
+
+        if (RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
+            $data, GenerateFunnelUrlRequest::BILLING_EMAIL_ID
+        )) {
+            $violations[] = [
+                'field' => 'email',
+                'message' => 'email cannot be empty.',
+            ];
+        }
+        $result[GenerateFunnelUrlRequest::BILLING_EMAIL_ID] =
+            sanitize_email($data[GenerateFunnelUrlRequest::BILLING_EMAIL_ID]);
+
+        if (RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
+            $data, GenerateFunnelUrlRequest::BILLING_PHONE_ID
+        )) {
+            $violations[] = [
+                'field' => 'phone',
+                'message' => 'phone cannot be empty.',
+            ];
+        }
+        $result[GenerateFunnelUrlRequest::BILLING_PHONE_ID] =
+            sanitize_text_field($data[GenerateFunnelUrlRequest::BILLING_PHONE_ID]);
+
+        if (false === empty($violations)) {
+            throw new EntityValidationException(
+                'Invalid generate funnel request',
+                11,
+                null,
+                $violations
+            );
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $request
+     * @return LoanRequestEntity
      * @throws EntityValidationException
      * @throws GetFunnelRequestException
-     * @return LoanRequestEntity
      */
-    protected function getRequest(): LoanRequestEntity
+    protected function getLoanRequest(array $request): LoanRequestEntity
     {
         try {
-            $data = $_POST['data'];
-            $violations = [];
-            if (
-                false === array_key_exists('billing_first_name', $data) ||
-                true === empty($data['billing_first_name'])
-            ) {
-                $violations[] = [
-                    'field' => 'firstName',
-                    'message' => 'firstName cannot be empty.',
-                ];
-            }
-            if (
-                false === array_key_exists('billing_last_name', $data) ||
-                true === empty($data['billing_last_name'])
-            ) {
-                $violations[] = [
-                    'field' => 'lastName',
-                    'message' => 'lastName cannot be empty.',
-                ];
-            }
-            if (
-                false === array_key_exists('billing_email', $data) ||
-                true === empty($data['billing_email'])
-            ) {
-                $violations[] = [
-                    'field' => 'email',
-                    'message' => 'email cannot be empty.',
-                ];
-            }
-            if (
-                false === array_key_exists('billing_phone', $data) ||
-                true === empty($data['billing_phone'])
-            ) {
-                $violations[] = [
-                    'field' => 'phone',
-                    'message' => 'phone cannot be empty.',
-                ];
-            }
-            if (false === empty($violations)) {
-                throw new EntityValidationException(
-                    'Invalid generate funnel request',
-                    11,
-                    null,
-                    $violations
-                );
-            }
-
-
-            $customer = WC()->cart->get_customer();
             $cartItems = [];
+            $customer = WC()->cart->get_customer();
 
             foreach (WC()->cart->get_cart() as $item) {
                 $product = $item['data'];
@@ -211,22 +262,20 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 ];
             }
 
-            global $wp_version;
-
             $requestArray = [
-                'first_name' => $data['billing_first_name'],
-                'last_name' => $data['billing_last_name'],
+                'first_name' => $request[GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID],
+                'last_name' => $request[GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID],
                 'shipping_amount' => WC()->cart->get_shipping_total(),
-                'version' => '1.9',
-                'email' => $data['billing_email'],
-                'phone' => $data['billing_phone'],
+                'version' => $this->apiVersion,
+                'email' => $request[GenerateFunnelUrlRequest::BILLING_EMAIL_ID],
+                'phone' => $request[GenerateFunnelUrlRequest::BILLING_PHONE_ID],
                 'merchant_transaction_id' => '**',
                 'success_url' => '',
                 'failure_url' => '',
                 'postback_url' => PostbackUpdate::getPostbackUpdateUrl(),
-                'software_name' => self::SOFTWARE_NAME,
-                'software_version' => $wp_version . '-' . constant('WOOCOMMERCE_VERSION'),
-                'software_plugin_version' => self::SOFTWARE_VERSION,
+                'software_name' => $this->softwareName,
+                'software_version' => $this->getSoftwareVersion(),
+                'software_plugin_version' => $this->softwarePluginVersion,
                 'billing_address' => [
                     'street1' => $customer->get_billing_address() . ' ' . $customer->get_billing_address_2(),
                     'city' => $customer->get_billing_city(),
@@ -244,13 +293,13 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
 
             return LoanRequestEntity::make($requestArray);
         } catch (EntityValidationException $exception) {
-            error_log("GenerateFunnelUrl::getRequestArray entity validation error");
+            error_log(self::class."::getLoanRequest() entity validation error");
             error_log($exception->getCode() . ' - ' . $exception->getMessage());
             error_log(print_r($exception->getTraceAsString(), true));
             error_log(json_encode($exception->getViolations()));
             throw $exception;
         } catch (\Throwable $exception) {
-            error_log("GenerateFunnelUrl::getRequestArray unexpected error");
+            error_log(self::class."::getLoanRequest() unexpected error");
             error_log($exception->getCode() . ' - ' . $exception->getMessage());
             error_log(print_r($exception->getTraceAsString(), true));
             throw new GetFunnelRequestException(
@@ -260,9 +309,9 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
         }
     }
 
-    protected function ajaxRespondJson(array $responseArray): void
+    protected function getSoftwareVersion(): string
     {
-        echo json_encode($responseArray);
-        wp_die();
+        global $wp_version;
+        return $wp_version . '-' . constant('WOOCOMMERCE_VERSION');
     }
 }
