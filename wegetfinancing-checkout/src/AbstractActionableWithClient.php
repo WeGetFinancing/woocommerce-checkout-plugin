@@ -20,15 +20,13 @@ abstract class AbstractActionableWithClient implements ActionableInterface
     protected function generateClient(): Client
     {
         try {
-            $options = WeGetFinancing::getOptions();
-
+            $isSandbox = WeGetFinancing::getOption(WeGetFinancingValueObject::IS_SANDBOX_FIELD_ID);
             $auth = AuthEntity::make([
-                'username' => $options[WeGetFinancingValueObject::USERNAME_FIELD_ID],
-                'password'  => $options[WeGetFinancingValueObject::PASSWORD_FIELD_ID],
-                'merchantId' => $options[WeGetFinancingValueObject::MERCHANT_ID_FIELD_ID],
-                'prod' => false === ("yes" === $options[WeGetFinancingValueObject::IS_SANDBOX_FIELD_ID]),
+                'username' => WeGetFinancing::getOption(WeGetFinancingValueObject::USERNAME_FIELD_ID),
+                'password'  => WeGetFinancing::getOption(WeGetFinancingValueObject::PASSWORD_FIELD_ID),
+                'merchantId' => WeGetFinancing::getOption(WeGetFinancingValueObject::MERCHANT_ID_FIELD_ID),
+                'prod' => false === ("yes" === $isSandbox),
             ]);
-
             return Client::Make($auth);
         } catch (EntityValidationException $exception) {
             error_log(self::class . "::generateClient entity validation error");

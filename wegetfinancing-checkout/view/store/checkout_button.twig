@@ -13,8 +13,7 @@
     });
 
     function wGF_WC_Gateway(){
-        const checkoutButton = jQuery('form[name="checkout"] #place_order'),
-            woocommerceError = jQuery(".woocommerce-error");
+        const checkoutButton = jQuery('form[name="checkout"] #place_order');
 
         if (jQuery('form[name="checkout"] input[name="payment_method"]:checked').val() === '{{ payment_method_id }}') {
 
@@ -23,7 +22,7 @@
             if(jQuery('#wgf_checkout_button').length <= 0) {
                 checkoutButton.parent().append(`
                             <a id="wgf_checkout_button"  class="wgf_checkout_button" href="#wgf_checkout">
-                                <img src="{{ checkout_button_image_url }}" alt="{{ checkout_button_alt }}">
+                                <img style="max-width: 320px;" src="{{ checkout_button_image_url }}" alt="{{ checkout_button_alt }}">
                             </a>
                         `);
 
@@ -47,8 +46,8 @@
                         data: requestNewFunnelData,
                         success: function(response){
                             if (response.isSuccess === false) {
-                                if ( woocommerceError.length ) {
-                                    woocommerceError.parent().remove();
+                                if ( jQuery(".woocommerce-error").length ) {
+                                    jQuery(".woocommerce-error").parent().remove();
                                 }
 
                                 let error_message = '<div class="woocommerce-notices-wrapper">' +
@@ -70,7 +69,7 @@
 
                                 error_message += "</ul></div>";
 
-                                jQuery(".entry-content > .woocommerce").prepend(error_message);
+                                jQuery("{{ error_display_selector|raw }}").{{ error_display_method }}(error_message);
                             } else {
                                 jQuery('#{{ order_inv_id_field_id }}').val(response.invId);
                                 new GetFinancing(
@@ -83,11 +82,11 @@
                             }
                         },
                         error: function(){
-                            if ( woocommerceError.length ) {
-                                woocommerceError.parent().remove();
+                            if ( jQuery(".woocommerce-error").length ) {
+                                jQuery(".woocommerce-error").parent().remove();
                             }
 
-                            jQuery(".woocommerce").prepend('<div class="woocommerce-notices-wrapper">' +
+                            jQuery("{{ error_display_selector|raw }}").{{ error_display_method }}('<div class="woocommerce-notices-wrapper">' +
                                 '<ul class="woocommerce-error" id="wegetfinancing-woocommerce-error">' +
                                 '<li>Unexpected server error</li>' +
                                 '</ul>' +

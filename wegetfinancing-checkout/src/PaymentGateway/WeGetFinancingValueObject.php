@@ -31,4 +31,22 @@ class WeGetFinancingValueObject
     public const PROCESS_PAYMENT_SUCCESS_ID = "success";
     public const HANDLE_FUNNEL_SCRIPT = "wgf-checkout-funnel";
     public const CHECKOUT_BUTTON_ALT = "WeGetFinancing Checkout Button";
+    public const ERROR_SELECTOR_FIELD_ID = "wgf_error_selector";
+    public const ERROR_SELECTOR_FIELD_TITLE = "Display error selector";
+    public const ERROR_SELECTOR_FIELD_LABEL =
+        "The selector used to find the element where to attach the error messages";
+    public const ERROR_SELECTOR_FIELD_DEFAULT = '.entry-content > .woocommerce';
+    public const ERROR_ATTACH_FIELD_ID = "wgf_error_attach_type";
+    public const ERROR_ATTACH_FIELD_TITLE = "Display error method";
+    public const ERROR_ATTACH_FIELD_LABEL = "The method used to display the html errors, " .
+        "it can be prepend (before the selector) or append (after the selector)";
+    public const ERROR_ATTACH_FIELD_DEFAULT = self::ERROR_ATTACH_FIELD_PREPEND_VALUE;
+    public const ERROR_ATTACH_FIELD_PREPEND_VALUE = 'prepend';
+    public const ERROR_ATTACH_FIELD_PREPEND_LABEL = 'Prepend';
+    public const ERROR_ATTACH_FIELD_APPEND_VALUE = 'append';
+    public const ERROR_ATTACH_FIELD_APPEND_LABEL = 'Append';
+    public const ERROR_ATTACH_FIELD_VALUES = [
+        self::ERROR_ATTACH_FIELD_PREPEND_VALUE => self::ERROR_ATTACH_FIELD_PREPEND_LABEL,
+        self::ERROR_ATTACH_FIELD_APPEND_VALUE => self::ERROR_ATTACH_FIELD_APPEND_LABEL,
+    ];
 }

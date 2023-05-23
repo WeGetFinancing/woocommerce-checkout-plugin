@@ -3,7 +3,7 @@ Contributors: wegetfinancing
 Tags: WeGetFinancing, Checkout, Payment
 Requires at least: 5.9
 Tested up to: 6.2
-Stable tag: 1.1.1
+Stable tag: 1.2.0
 Requires PHP: 8.0
 License: LGPL-3.0-only
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -43,3 +43,8 @@ This can help to increase your sales and customer satisfaction by providing an e
 
 = 1.1.1 =
 * Improved escaping and code quality
+
+= 1.2.0 =
+* Configurable location to display error message in the checkout section
+* Fixed checkout button dimension
+* Updated documentation

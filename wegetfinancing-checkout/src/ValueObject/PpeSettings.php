@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WeGetFinancing\Checkout\ValueObject;
 
 interface PpeSettings
@@ -37,7 +39,7 @@ interface PpeSettings
         'trailing',
         'center',
         'fill',
-        'fillEvenly'
+        'fillEvenly',
     ];
     public const SAVE_BUTTON_ID = 'wgf_ppe_setting_save_button';
     public const PPE_IS_CONFIGURED = "ppe_is_configured";

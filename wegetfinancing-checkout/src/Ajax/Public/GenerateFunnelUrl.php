@@ -35,7 +35,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
         ],
         'street1' => [
             'fields' => [
-                GenerateFunnelUrlRequest::BILLING_ADDRESS_1_ID, GenerateFunnelUrlRequest::BILLING_ADDRESS_2_ID
+                GenerateFunnelUrlRequest::BILLING_ADDRESS_1_ID, GenerateFunnelUrlRequest::BILLING_ADDRESS_2_ID,
             ],
             'message' => '<strong>Billing Street address</strong>',
         ],
@@ -67,7 +67,8 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
         protected string $apiVersion,
         protected string $softwareName,
         protected $softwarePluginVersion
-    ) {}
+    ) {
+    }
 
     public function init(): void
     {
@@ -94,7 +95,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 );
             }
 
-            error_log(self::class."::execute() Remote error requesting new loan url. Request:");
+            error_log(self::class . "::execute() Remote error requesting new loan url. Request:");
             error_log(print_r($data, true));
 
             wp_send_json(
@@ -166,8 +167,8 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
     }
 
     /**
-     * @return array
      * @throws EntityValidationException
+     * @return array
      */
     public function getRequest(): array
     {
@@ -175,9 +176,12 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
         $result = [];
         $violations = [];
 
-        if (RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
-            $data, GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID
-        )) {
+        if (
+            RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
+                $data,
+                GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID
+            )
+        ) {
             $violations[] = [
                 'field' => 'firstName',
                 'message' => 'firstName cannot be empty.',
@@ -186,9 +190,12 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
         $result[GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID] =
             sanitize_text_field($data[GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID]);
 
-        if (RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
-            $data, GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID
-        )) {
+        if (
+            RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
+                $data,
+                GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID
+            )
+        ) {
             $violations[] = [
                 'field' => 'lastName',
                 'message' => 'lastName cannot be empty.',
@@ -197,9 +204,12 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
         $result[GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID] =
             sanitize_text_field($data[GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID]);
 
-        if (RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
-            $data, GenerateFunnelUrlRequest::BILLING_EMAIL_ID
-        )) {
+        if (
+            RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
+                $data,
+                GenerateFunnelUrlRequest::BILLING_EMAIL_ID
+            )
+        ) {
             $violations[] = [
                 'field' => 'email',
                 'message' => 'email cannot be empty.',
@@ -208,9 +218,12 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
         $result[GenerateFunnelUrlRequest::BILLING_EMAIL_ID] =
             sanitize_email($data[GenerateFunnelUrlRequest::BILLING_EMAIL_ID]);
 
-        if (RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
-            $data, GenerateFunnelUrlRequest::BILLING_PHONE_ID
-        )) {
+        if (
+            RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
+                $data,
+                GenerateFunnelUrlRequest::BILLING_PHONE_ID
+            )
+        ) {
             $violations[] = [
                 'field' => 'phone',
                 'message' => 'phone cannot be empty.',
@@ -233,9 +246,9 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
 
     /**
      * @param array $request
-     * @return LoanRequestEntity
      * @throws EntityValidationException
      * @throws GetFunnelRequestException
+     * @return LoanRequestEntity
      */
     protected function getLoanRequest(array $request): LoanRequestEntity
     {
@@ -293,13 +306,13 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
 
             return LoanRequestEntity::make($requestArray);
         } catch (EntityValidationException $exception) {
-            error_log(self::class."::getLoanRequest() entity validation error");
+            error_log(self::class . "::getLoanRequest() entity validation error");
             error_log($exception->getCode() . ' - ' . $exception->getMessage());
             error_log(print_r($exception->getTraceAsString(), true));
             error_log(json_encode($exception->getViolations()));
             throw $exception;
         } catch (\Throwable $exception) {
-            error_log(self::class."::getLoanRequest() unexpected error");
+            error_log(self::class . "::getLoanRequest() unexpected error");
             error_log($exception->getCode() . ' - ' . $exception->getMessage());
             error_log(print_r($exception->getTraceAsString(), true));
             throw new GetFunnelRequestException(
