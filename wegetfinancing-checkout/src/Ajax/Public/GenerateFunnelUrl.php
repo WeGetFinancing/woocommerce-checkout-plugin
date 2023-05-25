@@ -53,7 +53,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
         ],
         'phone' => [
             'fields' => [GenerateFunnelUrlRequest::BILLING_PHONE_ID],
-            'message' => '<strong>Billing ZIP Code</strong>',
+            'message' => '<strong>Billing Phone</strong>',
         ],
         'email' => [
             'fields' => [GenerateFunnelUrlRequest::BILLING_EMAIL_ID],

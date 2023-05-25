@@ -68,7 +68,7 @@ class PpeShortcode
             $this->getScript(),
             ['jquery'],
             null,
-            false
+            true
         );
 
         return $this->twig->render(
