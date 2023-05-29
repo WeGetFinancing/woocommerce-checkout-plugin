@@ -165,7 +165,12 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
      */
     public function payment_fields(): void
     {
-        wp_enqueue_script(WeGetFinancingValueObject::HANDLE_FUNNEL_SCRIPT, $GLOBALS[App::ID][App::FUNNEL_JS]);
+        wp_enqueue_script(
+            WeGetFinancingValueObject::HANDLE_FUNNEL_SCRIPT, $GLOBALS[App::ID][App::FUNNEL_JS],
+            ['jquery'],
+            null,
+            true
+        );
 
         echo $this->twig->render(
             'store/checkout_button.twig',
