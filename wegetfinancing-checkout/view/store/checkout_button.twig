@@ -13,7 +13,10 @@
 </style>
 <script>
     jQuery(document).ready(function() {
-        jQuery('form[name="checkout"] input[name="payment_method"]').eq(0).prop('checked', true).attr( 'checked', 'checked' );
+        jQuery('form[name="checkout"] input[name="payment_method"]')
+            .eq(0)
+            .prop('checked', true)
+            .attr( 'checked', 'checked' );
         wGF_WC_Gateway();
     });
 
@@ -30,6 +33,9 @@
         const checkoutButton = jQuery('form[name="checkout"] #place_order');
 
         if (jQuery('form[name="checkout"] input[name="payment_method"]:checked').val() === '{{ payment_method_id }}') {
+            if ( jQuery(".woocommerce-error").length ) {
+                jQuery(".woocommerce-error").parent().remove();
+            }
 
             checkoutButton.hide();
 
