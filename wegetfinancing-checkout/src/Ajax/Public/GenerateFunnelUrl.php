@@ -234,14 +234,15 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 'field' => 'email',
                 'message' => 'email cannot be empty.',
             ];
-        }
-        $result[GenerateFunnelUrlRequest::BILLING_EMAIL_ID] =
-            sanitize_email($data[GenerateFunnelUrlRequest::BILLING_EMAIL_ID]);
-        if (true === empty($result[GenerateFunnelUrlRequest::BILLING_EMAIL_ID])) {
-            $this->violations[] = [
-                'field' => 'email',
-                'message' => 'email must be a valid e-mail.',
-            ];
+        } else {
+            $result[GenerateFunnelUrlRequest::BILLING_EMAIL_ID] =
+                sanitize_email($data[GenerateFunnelUrlRequest::BILLING_EMAIL_ID]);
+            if (true === empty($result[GenerateFunnelUrlRequest::BILLING_EMAIL_ID])) {
+                $this->violations[] = [
+                    'field' => 'email',
+                    'message' => 'email must be a valid e-mail.',
+                ];
+            }
         }
 
         if (
