@@ -240,7 +240,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
         if (true === empty($result[GenerateFunnelUrlRequest::BILLING_EMAIL_ID])) {
             $this->violations[] = [
                 'field' => 'email',
-                'message' => 'email must be a valid email.',
+                'message' => 'email must be a valid e-mail.',
             ];
         }
 
