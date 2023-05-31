@@ -65,6 +65,8 @@ Our plugin allow you to offer:
    6. *Display error method*: in HTML we can append (after) or prepend (before) the element elected, here you can select the behaviour of the attachment. The default value works fine with default WooCommerce template.
 9. Click on the "Save Changes" button, if successfully saved, it will show you the following success note:
    ![Plugin Activation](./assets/setup-6.png)
+10. Come back to .....
+11. Check Enable button
 
 ### 3.2 Configure PPE
 

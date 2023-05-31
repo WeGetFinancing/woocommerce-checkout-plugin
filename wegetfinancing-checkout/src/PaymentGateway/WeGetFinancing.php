@@ -13,6 +13,7 @@ use WeGetFinancing\Checkout\Ajax\Public\GenerateFunnelUrl;
 use WeGetFinancing\Checkout\App;
 use WeGetFinancing\Checkout\PostMeta\OrderInvIdValueObject;
 use WeGetFinancing\Checkout\Repository\GetOptionRepositoryTrait;
+use WeGetFinancing\Checkout\ValueObject\GenerateFunnelUrlRequest;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 
 class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
@@ -175,6 +176,17 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
         echo $this->twig->render(
             'store/checkout_button.twig',
             [
+                GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID => GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID,
+                GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID => GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID,
+                GenerateFunnelUrlRequest::BILLING_COUNTRY_ID => GenerateFunnelUrlRequest::BILLING_COUNTRY_ID,
+                GenerateFunnelUrlRequest::BILLING_ADDRESS_1_ID => GenerateFunnelUrlRequest::BILLING_ADDRESS_1_ID,
+                GenerateFunnelUrlRequest::BILLING_ADDRESS_2_ID => GenerateFunnelUrlRequest::BILLING_ADDRESS_2_ID,
+                GenerateFunnelUrlRequest::BILLING_CITY_ID => GenerateFunnelUrlRequest::BILLING_CITY_ID,
+                GenerateFunnelUrlRequest::BILLING_STATE_ID => GenerateFunnelUrlRequest::BILLING_STATE_ID,
+                GenerateFunnelUrlRequest::BILLING_POSTCODE_ID => GenerateFunnelUrlRequest::BILLING_POSTCODE_ID,
+                GenerateFunnelUrlRequest::BILLING_PHONE_ID => GenerateFunnelUrlRequest::BILLING_PHONE_ID,
+                GenerateFunnelUrlRequest::BILLING_EMAIL_ID => GenerateFunnelUrlRequest::BILLING_EMAIL_ID,
+                GenerateFunnelUrlRequest::SHIPPING_DIFFERENT_ID => GenerateFunnelUrlRequest::SHIPPING_DIFFERENT_ID,
                 'description' => $this->description,
                 'payment_method_id' => $this->id,
                 'checkout_button_image_url' => $GLOBALS[App::ID][App::CHECKOUT_BUTTON_URL],

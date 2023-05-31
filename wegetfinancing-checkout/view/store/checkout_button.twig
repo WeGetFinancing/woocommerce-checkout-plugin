@@ -47,10 +47,22 @@
                         .removeClass('wgf_checkout_button');
 
                     let wgfFunnelData = {};
-                    wgfFunnelData['billing_first_name'] = jQuery('#billing_first_name').val();
-                    wgfFunnelData['billing_last_name'] = jQuery('#billing_last_name').val();
-                    wgfFunnelData['billing_email'] = jQuery('#billing_email').val();
-                    wgfFunnelData['billing_phone'] = jQuery('#billing_phone').val();
+                    wgfFunnelData['{{ billing_first_name }}'] = jQuery('#{{ billing_first_name }}').val();
+                    wgfFunnelData['{{ billing_last_name }}'] = jQuery('#{{ billing_last_name }}').val();
+                    wgfFunnelData['{{ billing_country }}'] = jQuery('#{{ billing_country }}').val();
+                    wgfFunnelData['{{ billing_address_1 }}'] = jQuery('#{{ billing_address_1 }}').val();
+                    wgfFunnelData['{{ billing_address_2 }}'] = jQuery('#{{ billing_address_2 }}').val();
+                    wgfFunnelData['{{ billing_city }}'] = jQuery('#{{ billing_city }}').val();
+                    wgfFunnelData['{{ billing_state }}'] = jQuery('#{{ billing_state }}').val();
+                    wgfFunnelData['{{ billing_postcode }}'] = jQuery('#{{ billing_postcode }}').val();
+                    wgfFunnelData['{{ billing_phone }}'] = jQuery('#{{ billing_phone }}').val();
+                    wgfFunnelData['{{ billing_email }}'] = jQuery('#{{ billing_email }}').val();
+
+                    if ($('#{{ ship-to-different-address-checkbox }}').is(':checked')) {
+                        wgfFunnelData['{{ ship-to-different-address-checkbox }}'] = 'true';
+                    } else {
+                        wgfFunnelData['{{ ship-to-different-address-checkbox }}'] = 'false';
+                    }
 
                     let requestNewFunnelData = {
                         'action': '{{ ajax_action }}',
@@ -63,11 +75,10 @@
                         url: "{{ ajax_url }}",
                         data: requestNewFunnelData,
                         success: function(response){
+                            if ( jQuery(".woocommerce-error").length ) {
+                                jQuery(".woocommerce-error").parent().remove();
+                            }
                             if (response.isSuccess === false) {
-                                if ( jQuery(".woocommerce-error").length ) {
-                                    jQuery(".woocommerce-error").parent().remove();
-                                }
-
                                 let error_message = '<div class="woocommerce-notices-wrapper">' +
                                     '<ul class="woocommerce-error" id="wegetfinancing-woocommerce-error">';
 
