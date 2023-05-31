@@ -58,10 +58,10 @@
                     wgfFunnelData['{{ billing_phone }}'] = jQuery('#{{ billing_phone }}').val();
                     wgfFunnelData['{{ billing_email }}'] = jQuery('#{{ billing_email }}').val();
 
-                    if ($('#{{ ship-to-different-address-checkbox }}').is(':checked')) {
-                        wgfFunnelData['{{ ship-to-different-address-checkbox }}'] = 'true';
+                    if ($('#ship-to-different-address-checkbox').is(':checked')) {
+                        wgfFunnelData['ship-to-different-address-checkbox'] = 'true';
                     } else {
-                        wgfFunnelData['{{ ship-to-different-address-checkbox }}'] = 'false';
+                        wgfFunnelData['ship-to-different-address-checkbox'] = 'false';
                     }
 
                     let requestNewFunnelData = {

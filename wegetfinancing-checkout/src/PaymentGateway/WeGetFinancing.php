@@ -186,7 +186,6 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                 GenerateFunnelUrlRequest::BILLING_POSTCODE_ID => GenerateFunnelUrlRequest::BILLING_POSTCODE_ID,
                 GenerateFunnelUrlRequest::BILLING_PHONE_ID => GenerateFunnelUrlRequest::BILLING_PHONE_ID,
                 GenerateFunnelUrlRequest::BILLING_EMAIL_ID => GenerateFunnelUrlRequest::BILLING_EMAIL_ID,
-                GenerateFunnelUrlRequest::SHIPPING_DIFFERENT_ID => GenerateFunnelUrlRequest::SHIPPING_DIFFERENT_ID,
                 'description' => $this->description,
                 'payment_method_id' => $this->id,
                 'checkout_button_image_url' => $GLOBALS[App::ID][App::CHECKOUT_BUTTON_URL],
