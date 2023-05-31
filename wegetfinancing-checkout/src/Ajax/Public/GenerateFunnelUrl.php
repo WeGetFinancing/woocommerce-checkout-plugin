@@ -35,7 +35,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
         ],
         'street1' => [
             'fields' => [
-                GenerateFunnelUrlRequest::BILLING_ADDRESS_1_ID, GenerateFunnelUrlRequest::BILLING_ADDRESS_2_ID,
+                GenerateFunnelUrlRequest::BILLING_ADDRESS_1_ID,
             ],
             'message' => '<strong>Billing Street address</strong>',
         ],
@@ -174,7 +174,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
     {
         $data = $_POST['data'];
         $result = [];
-        $violations = [];
+        $this->violations = [];
 
         if (
             RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
@@ -182,7 +182,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID
             )
         ) {
-            $violations[] = [
+            $this->violations[] = [
                 'field' => 'firstName',
                 'message' => 'firstName cannot be empty.',
             ];
@@ -196,7 +196,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID
             )
         ) {
-            $violations[] = [
+            $this->violations[] = [
                 'field' => 'lastName',
                 'message' => 'lastName cannot be empty.',
             ];
@@ -210,7 +210,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 GenerateFunnelUrlRequest::BILLING_EMAIL_ID
             )
         ) {
-            $violations[] = [
+            $this->violations[] = [
                 'field' => 'email',
                 'message' => 'email cannot be empty.',
             ];
@@ -224,7 +224,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 GenerateFunnelUrlRequest::BILLING_PHONE_ID
             )
         ) {
-            $violations[] = [
+            $this->violations[] = [
                 'field' => 'phone',
                 'message' => 'phone cannot be empty.',
             ];
@@ -232,16 +232,100 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
         $result[GenerateFunnelUrlRequest::BILLING_PHONE_ID] =
             sanitize_text_field($data[GenerateFunnelUrlRequest::BILLING_PHONE_ID]);
 
-        if (false === empty($violations)) {
+        $request = $this->decorateRequest($result);
+
+        if (false === empty($this->violations)) {
             throw new EntityValidationException(
                 'Invalid generate funnel request',
                 11,
                 null,
-                $violations
+                $this->violations
             );
         }
 
-        return $result;
+        return $request;
+    }
+
+    public function decorateRequest(array $request): array
+    {
+        $customer = WC()->cart->get_customer();
+
+        $billingAddress = $customer->get_billing_address();
+        if (true === empty($billingAddress)) {
+            $this->violations[] = [
+                'field' => 'street1',
+                'message' => 'street1 cannot be empty.'
+            ];
+        }
+
+        $billingAddress2 = $customer->get_billing_address_2();
+        $billingAddress = (true === empty($billingAddress2))
+            ? $billingAddress
+            : $billingAddress . ' ' . $billingAddress2;
+
+        $billingCity = $customer->get_billing_city();
+        if (true === empty($billingCity)) {
+            $this->violations[] = [
+                'field' => 'city',
+                'message' => 'city cannot be empty.'
+            ];
+        }
+
+        $billingState = $customer->get_billing_state();
+        if (true === empty($billingState)) {
+            $this->violations[] = [
+                'field' => 'state',
+                'message' => 'state cannot be empty.'
+            ];
+        }
+
+        $billingZipcode = $customer->get_billing_postcode();
+        if (true === empty($billingZipcode)) {
+            $this->violations[] = [
+                'field' => 'zipcode',
+                'message' => 'zipcode cannot be empty.'
+            ];
+        }
+
+        $shippingAddress = $customer->get_shipping_address();
+        $shippingAddress = (true === empty($shippingAddress))
+            ? $billingAddress
+            : $shippingAddress;
+        $shippingAddress2 = $customer->get_shipping_address_2();
+        $shippingAddress = (true === empty($shippingAddress2))
+            ? $shippingAddress
+            : $shippingAddress . ' ' . $shippingAddress2;
+
+        $shippingCity = $customer->get_shipping_city();
+        $shippingCity = (true === empty($shippingCity))
+            ? $billingCity
+            : $shippingCity;
+
+        $shippingState = $customer->get_shipping_state();
+        $shippingState = (true === empty($shippingState))
+            ? $billingState
+            : $shippingState;
+
+        $shippingZipcode = $customer->get_shipping_postcode();
+        $shippingZipcode = (true === empty($shippingZipcode))
+            ? $billingZipcode
+            : $shippingZipcode;
+
+        $request['billingAddress'] = [
+            'street1' => $billingAddress,
+            'city' => $billingCity,
+            'state' => $billingState,
+            'zipcode' => $billingZipcode,
+        ];
+
+        $request['shippingAddress'] = [
+            'street1' => $shippingAddress,
+            'city' => $shippingCity,
+            'state' => $shippingState,
+            'zipcode' => $shippingZipcode,
+        ];
+
+        return $request;
     }
 
     /**
@@ -254,7 +338,6 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
     {
         try {
             $cartItems = [];
-            $customer = WC()->cart->get_customer();
 
             foreach (WC()->cart->get_cart() as $item) {
                 $product = $item['data'];
@@ -289,18 +372,8 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 'software_name' => $this->softwareName,
                 'software_version' => $this->getSoftwareVersion(),
                 'software_plugin_version' => $this->softwarePluginVersion,
-                'billing_address' => [
-                    'street1' => $customer->get_billing_address() . ' ' . $customer->get_billing_address_2(),
-                    'city' => $customer->get_billing_city(),
-                    'state' => $customer->get_billing_state(),
-                    'zipcode' => $customer->get_billing_postcode(),
-                ],
-                'shipping_address' => [
-                    'street1' => $customer->get_shipping_state() . ' ' . $customer->get_shipping_address_2(),
-                    'city' => $customer->get_shipping_city(),
-                    'state' => $customer->get_shipping_state(),
-                    'zipcode' => $customer->get_shipping_postcode(),
-                ],
+                'billing_address' => $request['billingAddress'],
+                'shipping_address' => $request['shippingAddress'],
                 'cart_items' => $cartItems,
             ];
 
