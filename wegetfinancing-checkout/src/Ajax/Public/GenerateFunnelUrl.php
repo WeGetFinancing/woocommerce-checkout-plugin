@@ -62,10 +62,6 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
         'shipping_different' => [
             'fields' => [GenerateFunnelUrlRequest::SHIPPING_DIFFERENT_ID],
             'message' => '<strong>Shipping Address</strong>',
-        ],
-        'total_amount' => [
-            'fields' => [],
-            'message' => '<strong>The total amount before tax</strong>'
         ]
     ];
 
@@ -353,13 +349,6 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
             $this->violations[] = [
                 'field' => 'shipping_different',
                 'message' => 'shipping_different has to be the same of billing one.',
-            ];
-        }
-
-        if (1000 > (WC()->cart->get_total(null) - WC()->cart->get_taxes_total())) {
-            $this->violations[] = [
-                'field' => 'total_amount',
-                'message' => 'total_amount has to be greater than 1000 dollars.',
             ];
         }
 
