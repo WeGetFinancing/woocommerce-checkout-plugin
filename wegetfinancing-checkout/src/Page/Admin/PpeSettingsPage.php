@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WeGetFinancing\Checkout\Page\Admin;
 
 use Twig\Environment;
@@ -30,7 +32,8 @@ class PpeSettingsPage implements ActionableInterface
         protected string $bootstrapScript,
         protected string $bootstrapStyle,
         protected string $bootstrapStyleIcons
-    ) {}
+    ) {
+    }
 
     public function init(): void
     {
@@ -81,7 +84,7 @@ class PpeSettingsPage implements ActionableInterface
                 'ppePriceSelectorId' => PpeSettings::PRICE_SELECTOR_ID,
                 'ppePriceSelectorName' => PpeSettings::PRICE_SELECTOR_NAME,
                 'ppePriceSelectorValue' => PpeSettingsRepository::getOptionOrDefault(
-                    PpeSettings::PRICE_SELECTOR_ID, 
+                    PpeSettings::PRICE_SELECTOR_ID,
                     PpeSettings::PRICE_SELECTOR_DEFAULT_VALUE
                 ),
                 'ppeProductNameSelectorId' => PpeSettings::PRODUCT_NAME_SELECTOR_ID,
@@ -132,7 +135,7 @@ class PpeSettingsPage implements ActionableInterface
                     PpeSettings::POSITION_ID,
                     PpeSettings::POSITION_DEFAULT_VALUE
                 ),
-                'ppeSaveButtonId' => PpeSettings::SAVE_BUTTON_ID
+                'ppeSaveButtonId' => PpeSettings::SAVE_BUTTON_ID,
             ]
         );
     }

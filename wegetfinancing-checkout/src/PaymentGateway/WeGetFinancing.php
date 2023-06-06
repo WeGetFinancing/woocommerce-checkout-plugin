@@ -12,12 +12,17 @@ use WeGetFinancing\Checkout\ActionableInterface;
 use WeGetFinancing\Checkout\Ajax\Public\GenerateFunnelUrl;
 use WeGetFinancing\Checkout\App;
 use WeGetFinancing\Checkout\PostMeta\OrderInvIdValueObject;
+use WeGetFinancing\Checkout\Repository\GetOptionRepositoryTrait;
+use WeGetFinancing\Checkout\ValueObject\GenerateFunnelUrlRequest;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 
 class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
 {
     use AddableTrait;
+    use GetOptionRepositoryTrait;
 
+    public const PREFIX = 'woocommerce_';
+    public const SUFFIX = '_settings';
     public const GATEWAY_ID = "wegetfinancing";
     public const INIT_NAME = 'woocommerce_update_options_payment_gateways_';
     public const FUNCTION_NAME = 'process_admin_options';
@@ -106,6 +111,33 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                     'default'     => '',
                     'desc_tip'    => true,
                 ],
+                WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_ID => [
+                    'title' => translate(
+                        WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_TITLE,
+                        App::DOMAIN_LOCALE
+                    ),
+                    'type' => 'text',
+                    'description' => translate(
+                        WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_LABEL,
+                        App::DOMAIN_LOCALE
+                    ),
+                    'default' => WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_DEFAULT,
+                    'desc_tip'    => true,
+                ],
+                WeGetFinancingValueObject::ERROR_ATTACH_FIELD_ID => [
+                    'title' => translate(
+                        WeGetFinancingValueObject::ERROR_ATTACH_FIELD_TITLE,
+                        App::DOMAIN_LOCALE
+                    ),
+                    'type' => 'select',
+                    'description' => translate(
+                        WeGetFinancingValueObject::ERROR_ATTACH_FIELD_LABEL,
+                        App::DOMAIN_LOCALE
+                    ),
+                    'default' => WeGetFinancingValueObject::ERROR_ATTACH_FIELD_DEFAULT,
+                    'options' => WeGetFinancingValueObject::ERROR_ATTACH_FIELD_VALUES,
+                    'desc_tip'    => true,
+                ],
             ]
         );
     }
@@ -134,11 +166,26 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
      */
     public function payment_fields(): void
     {
-        wp_enqueue_script(WeGetFinancingValueObject::HANDLE_FUNNEL_SCRIPT, $GLOBALS[App::ID][App::FUNNEL_JS]);
+        wp_enqueue_script(
+            WeGetFinancingValueObject::HANDLE_FUNNEL_SCRIPT, $GLOBALS[App::ID][App::FUNNEL_JS],
+            ['jquery'],
+            null,
+            true
+        );
 
         echo $this->twig->render(
             'store/checkout_button.twig',
             [
+                GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID => GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID,
+                GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID => GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID,
+                GenerateFunnelUrlRequest::BILLING_COUNTRY_ID => GenerateFunnelUrlRequest::BILLING_COUNTRY_ID,
+                GenerateFunnelUrlRequest::BILLING_ADDRESS_1_ID => GenerateFunnelUrlRequest::BILLING_ADDRESS_1_ID,
+                GenerateFunnelUrlRequest::BILLING_ADDRESS_2_ID => GenerateFunnelUrlRequest::BILLING_ADDRESS_2_ID,
+                GenerateFunnelUrlRequest::BILLING_CITY_ID => GenerateFunnelUrlRequest::BILLING_CITY_ID,
+                GenerateFunnelUrlRequest::BILLING_STATE_ID => GenerateFunnelUrlRequest::BILLING_STATE_ID,
+                GenerateFunnelUrlRequest::BILLING_POSTCODE_ID => GenerateFunnelUrlRequest::BILLING_POSTCODE_ID,
+                GenerateFunnelUrlRequest::BILLING_PHONE_ID => GenerateFunnelUrlRequest::BILLING_PHONE_ID,
+                GenerateFunnelUrlRequest::BILLING_EMAIL_ID => GenerateFunnelUrlRequest::BILLING_EMAIL_ID,
                 'description' => $this->description,
                 'payment_method_id' => $this->id,
                 'checkout_button_image_url' => $GLOBALS[App::ID][App::CHECKOUT_BUTTON_URL],
@@ -146,6 +193,10 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'ajax_action' => GenerateFunnelUrl::ACTION_NAME,
                 'order_inv_id_field_id' => OrderInvIdValueObject::ORDER_INV_ID_FIELD_ID,
+                'error_display_method' => self::getOption(WeGetFinancingValueObject::ERROR_ATTACH_FIELD_ID),
+                'error_display_selector' => htmlspecialchars_decode(
+                    self::getOption(WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_ID),
+                ),
             ]
         );
     }
@@ -175,8 +226,8 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
         ];
     }
 
-    public static function getOptions(): false|array
+    protected static function getOptionsName(): string
     {
-        return get_option("woocommerce_" . App::ID . "_settings");
+        return self::PREFIX . App::ID . self::SUFFIX;
     }
 }

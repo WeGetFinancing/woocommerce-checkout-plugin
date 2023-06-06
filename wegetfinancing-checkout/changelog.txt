@@ -18,3 +18,8 @@
 
 = 1.1.1 =
 * Improved escaping and code quality
+
+= 1.2.0 =
+* Configurable location to display error message in the checkout section
+* Fixed checkout button dimension
+* Updated documentation

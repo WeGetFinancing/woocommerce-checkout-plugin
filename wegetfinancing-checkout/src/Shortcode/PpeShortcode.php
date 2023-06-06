@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WeGetFinancing\Checkout\Shortcode;
 
 use Twig\Environment;
@@ -38,10 +40,10 @@ class PpeShortcode
     /**
      * @param mixed $attributes
      * @param mixed $content
-     * @return string
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
+     * @return string
      */
     public function execute(mixed $attributes, mixed $content = ""): string
     {
@@ -66,7 +68,7 @@ class PpeShortcode
             $this->getScript(),
             ['jquery'],
             null,
-            false
+            true
         );
 
         return $this->twig->render(
@@ -107,7 +109,7 @@ class PpeShortcode
                 'ppePositionValue' => PpeSettingsRepository::getOptionOrDefault(
                     PpeSettings::POSITION_ID,
                     PpeSettings::POSITION_DEFAULT_VALUE
-                )
+                ),
             ]
         );
     }

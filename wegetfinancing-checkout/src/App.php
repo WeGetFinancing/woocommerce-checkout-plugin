@@ -77,7 +77,6 @@ class App implements ActionableInterface
                 error_log(self::class . "::execute() Error initializing object " . $init);
                 throw $exception;
             }
-
         }
     }
 }

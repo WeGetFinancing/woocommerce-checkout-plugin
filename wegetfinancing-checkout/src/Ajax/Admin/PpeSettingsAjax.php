@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WeGetFinancing\Checkout\Ajax\Admin;
 
 use Exception;
@@ -14,6 +16,7 @@ use WeGetFinancing\SDK\Service\PpeClient;
 class PpeSettingsAjax extends AbstractActionableWithClient
 {
     use AddableTrait;
+
     public const ACTION_NAME = 'upsertPpeSettingsAction';
     public const INIT_NAME = 'wp_ajax_' . self::ACTION_NAME;
     public const FUNCTION_NAME = 'execute';
@@ -35,7 +38,7 @@ class PpeSettingsAjax extends AbstractActionableWithClient
                 wp_send_json(
                     [
                         'isSuccess' => false,
-                        'violations' => $this->violations
+                        'violations' => $this->violations,
                     ],
                     200
                 );
@@ -120,7 +123,7 @@ class PpeSettingsAjax extends AbstractActionableWithClient
             if (RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty($data, PpeSettings::PRICE_SELECTOR_ID)) {
                 $this->violations[] = [
                     'field' => PpeSettings::PRICE_SELECTOR_ID,
-                    'message' => '<b>' . PpeSettings::PRICE_SELECTOR_NAME . '</b> cannot be empty.'
+                    'message' => '<b>' . PpeSettings::PRICE_SELECTOR_NAME . '</b> cannot be empty.',
                 ];
             } else {
                 $this->data[PpeSettings::PRICE_SELECTOR_ID] = sanitize_text_field(
@@ -128,12 +131,15 @@ class PpeSettingsAjax extends AbstractActionableWithClient
                 );
             }
 
-            if (RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
-                $data, PpeSettings::PRODUCT_NAME_SELECTOR_ID
-            )) {
+            if (
+                RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
+                    $data,
+                    PpeSettings::PRODUCT_NAME_SELECTOR_ID
+                )
+            ) {
                 $this->violations[] = [
                     'field' => PpeSettings::PRODUCT_NAME_SELECTOR_ID,
-                    'message' => '<b>' .PpeSettings::PRODUCT_NAME_SELECTOR_NAME . '</b> cannot be empty.'
+                    'message' => '<b>' . PpeSettings::PRODUCT_NAME_SELECTOR_NAME . '</b> cannot be empty.',
                 ];
             } else {
                 $this->data[PpeSettings::PRODUCT_NAME_SELECTOR_ID] = sanitize_text_field(
@@ -144,7 +150,7 @@ class PpeSettingsAjax extends AbstractActionableWithClient
             if (RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty($data, PpeSettings::MERCHANT_TOKEN_ID)) {
                 $this->violations[] = [
                     'field' => PpeSettings::MERCHANT_TOKEN_ID,
-                    'message' => '<b>' .PpeSettings::MERCHANT_TOKEN_NAME . '</b> cannot be empty.'
+                    'message' => '<b>' . PpeSettings::MERCHANT_TOKEN_NAME . '</b> cannot be empty.',
                 ];
             } else {
                 $this->data[PpeSettings::MERCHANT_TOKEN_ID] = sanitize_text_field(
@@ -153,12 +159,13 @@ class PpeSettingsAjax extends AbstractActionableWithClient
 
                 $client = $this->generateClient();
                 $response = $client->testPpe($this->data[PpeSettings::MERCHANT_TOKEN_ID]);
-                if (PpeClient::TEST_ERROR_RESPONSE === $response['status'] ||
+                if (
+                    PpeClient::TEST_ERROR_RESPONSE === $response['status'] ||
                     PpeClient::TEST_EMPTY_RESPONSE === $response['status']
                 ) {
                     $this->violations[] = [
                         'field' => PpeSettings::MERCHANT_TOKEN_ID,
-                        'message' => '<b>' .PpeSettings::MERCHANT_TOKEN_NAME . '</b> Error: ' . $response['message']
+                        'message' => '<b>' . PpeSettings::MERCHANT_TOKEN_NAME . '</b> Error: ' . $response['message'],
                     ];
                 }
             }
@@ -166,7 +173,7 @@ class PpeSettingsAjax extends AbstractActionableWithClient
             if (RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty($data, PpeSettings::MINIMUM_AMOUNT_ID)) {
                 $this->violations[] = [
                     'field' => PpeSettings::MINIMUM_AMOUNT_ID,
-                    'message' => '<b>' .PpeSettings::MINIMUM_AMOUNT_NAME . '</b> cannot be empty.'
+                    'message' => '<b>' . PpeSettings::MINIMUM_AMOUNT_NAME . '</b> cannot be empty.',
                 ];
             } else {
                 $this->data[PpeSettings::MINIMUM_AMOUNT_ID] = sanitize_text_field(
@@ -177,16 +184,16 @@ class PpeSettingsAjax extends AbstractActionableWithClient
             if (RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty($data, PpeSettings::POSITION_ID)) {
                 $this->violations[] = [
                     'field' => PpeSettings::POSITION_ID,
-                    'message' =>'<b>' .  PpeSettings::POSITION_NAME . '</b> cannot be empty.'
+                    'message' => '<b>' . PpeSettings::POSITION_NAME . '</b> cannot be empty.',
                 ];
             } else {
                 $this->data[PpeSettings::POSITION_ID] = sanitize_text_field($data[PpeSettings::POSITION_ID]);
 
-                if (false === in_array($this->data[PpeSettings::POSITION_ID], PpeSettings::VALID_POSITIONS)) {
+                if (false === in_array($this->data[PpeSettings::POSITION_ID], PpeSettings::VALID_POSITIONS, true)) {
                     $this->violations[] = [
                         'field' => PpeSettings::POSITION_ID,
                         'message' => '<b>' . PpeSettings::POSITION_NAME . '</b> "' . $data[PpeSettings::POSITION_ID] .
-                            '" is not a valid position.'
+                            '" is not a valid position.',
                     ];
                 }
             }

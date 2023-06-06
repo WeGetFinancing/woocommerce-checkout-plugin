@@ -111,8 +111,8 @@ class PostbackUpdate implements ActionableInterface
 
     /**
      * @param array $data
-     * @return array
      * @throws PostbackUpdateException
+     * @return array
      */
     protected function getValidData(array $data): array
     {
@@ -152,17 +152,17 @@ class PostbackUpdate implements ActionableInterface
                 PostbackUpdateException::INVALID_REQUEST_EMPTY_STATUS_ERROR_MESSAGE,
                 PostbackUpdateException::INVALID_REQUEST_EMPTY_STATUS_ERROR_CODE
             );
-        } else {
-            $result[self::STATUS_FIELD] = sanitize_text_field($data[self::UPDATES_FIELD][self::STATUS_FIELD]);
-
-            if (false === in_array($result[self::STATUS_FIELD], self::VALID_STATUSES, true)) {
-                throw new PostbackUpdateException(
-                    PostbackUpdateException::INVALID_REQUEST_INVALID_STATUS_ERROR_MESSAGE . " " .
-                    $data[self::UPDATES_FIELD][self::STATUS_FIELD],
-                    PostbackUpdateException::INVALID_REQUEST_INVALID_STATUS_ERROR_CODE
-                );
-            }
         }
+        $result[self::STATUS_FIELD] = sanitize_text_field($data[self::UPDATES_FIELD][self::STATUS_FIELD]);
+
+        if (false === in_array($result[self::STATUS_FIELD], self::VALID_STATUSES, true)) {
+            throw new PostbackUpdateException(
+                PostbackUpdateException::INVALID_REQUEST_INVALID_STATUS_ERROR_MESSAGE . " " .
+                $data[self::UPDATES_FIELD][self::STATUS_FIELD],
+                PostbackUpdateException::INVALID_REQUEST_INVALID_STATUS_ERROR_CODE
+            );
+        }
+
 
         if (RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty($data, self::TRANSACTION_ID_FIELD)) {
             throw new PostbackUpdateException(
@@ -177,9 +177,9 @@ class PostbackUpdate implements ActionableInterface
 
     /**
      * @param WP_REST_Request $request
-     * @return array
      * @throws PostbackUpdateException
      * @throws Exception
+     * @return array
      */
     protected function getSignedData(WP_REST_Request $request): array
     {
@@ -211,8 +211,8 @@ class PostbackUpdate implements ActionableInterface
 
     protected function verifySignature(string $signature, string $body, string $timestamp): bool
     {
-        $username = WeGetFinancing::getOptions()[WeGetFinancingValueObject::USERNAME_FIELD_ID];
-        $password = WeGetFinancing::getOptions()[WeGetFinancingValueObject::PASSWORD_FIELD_ID];
+        $username = WeGetFinancing::getOption(WeGetFinancingValueObject::USERNAME_FIELD_ID);
+        $password = WeGetFinancing::getOption(WeGetFinancingValueObject::PASSWORD_FIELD_ID);
 
         $string = hash(
             self::SIGNATURE_ALGO,
@@ -220,7 +220,7 @@ class PostbackUpdate implements ActionableInterface
             false
         );
 
-        return $signature == $string;
+        return $signature === $string;
     }
 
     protected function getStatus(string $status): bool|string
