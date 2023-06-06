@@ -65,9 +65,9 @@ Our plugin allow you to offer:
    6. *Display error method*: in HTML we can append (after) or prepend (before) the element elected, here you can select the behaviour of the attachment. The default value works fine with default WooCommerce template.
 9. Click on the "Save Changes" button, if successfully saved, it will show you the following success note:
    ![Plugin Activation](./assets/setup-6.png)
-10. Come back to .....
-11. Check Enable button
-
+10. Come back to WooCommerce > Settings > Payments
+11. In the main payment table, switch to "ON" the button under the "Enabled" section as per following screenshot
+    ![Plugin Activation](./assets/setup-7.png)
 ### 3.2 Configure PPE
 
 1. Take the Merchant Token ID:
@@ -77,23 +77,23 @@ Our plugin allow you to offer:
    2. Log in with your credentials
    3. From the left menu, select "Integration" > "Conversion boosters"
    
-      ![Plugin Activation](./assets/setup-7.png)
-   4. Copy the Token ID
       ![Plugin Activation](./assets/setup-8.png)
+   4. Copy the Token ID
+      ![Plugin Activation](./assets/setup-9.png)
    5. Log out of the portal
 2. Log in into your WordPress installation, ensure you have administrative privileges.
 3. From the main lateral menu, select "WeGetFinancing PPE"
-   ![Plugin Activation](./assets/setup-9.png)
-4. Compile the settings with your preferences, use the token id from the partner portal
    ![Plugin Activation](./assets/setup-10.png)
-5. If everything is correct, you will receive a success message like this
+4. Compile the settings with your preferences, use the token id from the partner portal
    ![Plugin Activation](./assets/setup-11.png)
+5. If everything is correct, you will receive a success message like this
+   ![Plugin Activation](./assets/setup-12.png)
 6. Copy the shortcode ```[wegetfinancing-ppe]```
 7. Go in the page in which you want to embed, e.g. the shop page, and edit it
 8. Add the shortcode to the page
-   ![Plugin Activation](./assets/setup-12.png)
-9. The PPE widget should appear in the selected page
    ![Plugin Activation](./assets/setup-13.png)
+9. The PPE widget should appear in the selected page
+   ![Plugin Activation](./assets/setup-14.png)
 
 ### 3.3 Test the plugin
 
