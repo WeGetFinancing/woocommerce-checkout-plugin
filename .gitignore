@@ -2,8 +2,7 @@
 !.gitignore
 !.gitkeep
 db
-wp/
-vendor/
+env/empty
 composer.lock
 .env
 var

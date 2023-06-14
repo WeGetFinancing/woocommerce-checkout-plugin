@@ -7,7 +7,7 @@ services:
     container_name: composer
     restart: "no"
     volumes:
-      - ./wegetfinancing-checkout:/app
+      - ./:/app
     environment:
       - PHP_CS_FIXER_IGNORE_ENV=1
 
@@ -37,7 +37,8 @@ services:
     volumes:
       - ./env/wp/custom.ini:/usr/local/etc/php/conf.d/custom.ini
       - ./var/wp:/var/www/html
-      - ./wegetfinancing-checkout:/var/www/html/wp-content/plugins/wegetfinancing-checkout
+      - ./:/var/www/html/wp-content/plugins/wegetfinancing-checkout
+      - ./env/empty:/var/www/html/wp-content/plugins/wegetfinancing-checkout/var/wp:ro
 
   lb:
     image: caddy:2.6.2-alpine
