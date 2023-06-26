@@ -9,6 +9,7 @@ use WeGetFinancing\Checkout\App;
 use WeGetFinancing\Checkout\Exception\GenerateClientException;
 use WeGetFinancing\Checkout\Exception\GetFunnelRequestException;
 use WeGetFinancing\Checkout\Service\RequestValidatorUtility;
+use WeGetFinancing\Checkout\ValueObject\GeneralDataRequest;
 use WeGetFinancing\Checkout\ValueObject\GenerateFunnelUrlRequest;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 use WeGetFinancing\SDK\Entity\Request\LoanRequestEntity;
@@ -25,6 +26,10 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
     public const REMOTE_SERVER_ERROR_HTML_MESSAGE = '<strong>Remote server error</strong>';
     public const INTERNAL_SERVER_ERROR_HTML_MESSAGE = '<strong>Internal server error</strong>';
     public const GENERATE_FUNNEL_ERROR_TABLE = [
+        'general' => [
+            'fields' => [GeneralDataRequest::DATA],
+            'message' => 'An <strong>Invalid Request</strong>',
+        ],
         'firstName' => [
             'fields' => [GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID],
             'message' => '<strong>Billing First name</strong>',
@@ -34,9 +39,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
             'message' => '<strong>Billing Last name</strong>',
         ],
         'street1' => [
-            'fields' => [
-                GenerateFunnelUrlRequest::BILLING_ADDRESS_1_ID,
-            ],
+            'fields' => [GenerateFunnelUrlRequest::BILLING_ADDRESS_1_ID,],
             'message' => '<strong>Billing Street address</strong>',
         ],
         'city' => [
@@ -64,8 +67,6 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
             'message' => '<strong>Shipping Address</strong>',
         ]
     ];
-
-    protected array $violations = [];
 
     public function __construct(
         protected string $apiVersion,
@@ -176,11 +177,9 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
      */
     protected function getRequest(): array
     {
-        $data = $_POST['data'];
-        $this->violations = [];
-
-        $generalData = $this->getGeneralDataFromRequest($data);
-        $addressData = $this->getAddressDataFromRequest($data);
+        $this->validateGeneralDataRequest();
+        $generalData = $this->getGeneralDataFromRequest();
+        $addressData = $this->getAddressDataFromRequest();
 
         if (false === empty($this->violations)) {
             throw new EntityValidationException(
@@ -194,11 +193,11 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
         return array_merge($generalData, $addressData);
     }
 
-    protected function getGeneralDataFromRequest(array $data): array
+    protected function getGeneralDataFromRequest(): array
     {
         if (
             RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
-                $data,
+                $_POST[GeneralDataRequest::DATA],
                 GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID
             )
         ) {
@@ -207,12 +206,13 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 'message' => 'firstName cannot be empty.',
             ];
         }
-        $result[GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID] =
-            sanitize_text_field($data[GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID]);
+        $result[GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID] = sanitize_text_field(
+            $_POST[GeneralDataRequest::DATA][GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID]
+        );
 
         if (
             RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
-                $data,
+                $_POST[GeneralDataRequest::DATA],
                 GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID
             )
         ) {
@@ -221,12 +221,13 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 'message' => 'lastName cannot be empty.',
             ];
         }
-        $result[GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID] =
-            sanitize_text_field($data[GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID]);
+        $result[GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID] = sanitize_text_field(
+            $_POST[GeneralDataRequest::DATA][GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID]
+        );
 
         if (
             RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
-                $data,
+                $_POST[GeneralDataRequest::DATA],
                 GenerateFunnelUrlRequest::BILLING_EMAIL_ID
             )
         ) {
@@ -235,8 +236,9 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 'message' => 'email cannot be empty.',
             ];
         } else {
-            $result[GenerateFunnelUrlRequest::BILLING_EMAIL_ID] =
-                sanitize_email($data[GenerateFunnelUrlRequest::BILLING_EMAIL_ID]);
+            $result[GenerateFunnelUrlRequest::BILLING_EMAIL_ID] = sanitize_email(
+                $_POST[GeneralDataRequest::DATA][GenerateFunnelUrlRequest::BILLING_EMAIL_ID]
+            );
             if (true === empty($result[GenerateFunnelUrlRequest::BILLING_EMAIL_ID])) {
                 $this->violations[] = [
                     'field' => 'email',
@@ -247,7 +249,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
 
         if (
             RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
-                $data,
+                $_POST[GeneralDataRequest::DATA],
                 GenerateFunnelUrlRequest::BILLING_PHONE_ID
             )
         ) {
@@ -256,17 +258,18 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 'message' => 'phone cannot be empty.',
             ];
         }
-        $result[GenerateFunnelUrlRequest::BILLING_PHONE_ID] =
-            sanitize_text_field($data[GenerateFunnelUrlRequest::BILLING_PHONE_ID]);
+        $result[GenerateFunnelUrlRequest::BILLING_PHONE_ID] = sanitize_text_field(
+            $_POST[GeneralDataRequest::DATA][GenerateFunnelUrlRequest::BILLING_PHONE_ID]
+        );
 
         return $result;
     }
 
-    protected function getAddressDataFromRequest(array $data): array
+    protected function getAddressDataFromRequest(): array
     {
         if (
             RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
-                $data,
+                $_POST[GeneralDataRequest::DATA],
                 GenerateFunnelUrlRequest::BILLING_ADDRESS_1_ID
             )
         ) {
@@ -275,15 +278,22 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 'message' => 'street1 cannot be empty.',
             ];
         }
-        $billingAddress = sanitize_text_field($data[GenerateFunnelUrlRequest::BILLING_ADDRESS_1_ID]);
-        $billingAddress2 = sanitize_text_field($data[GenerateFunnelUrlRequest::BILLING_ADDRESS_2_ID]);
+        $billingAddress = sanitize_text_field(
+            $_POST[GeneralDataRequest::DATA][GenerateFunnelUrlRequest::BILLING_ADDRESS_1_ID]
+        );
+        $billingAddress2 = true === array_key_exists(
+                GenerateFunnelUrlRequest::BILLING_ADDRESS_2_ID,
+                $_POST[GeneralDataRequest::DATA]
+            )
+            ? sanitize_text_field($_POST[GeneralDataRequest::DATA][GenerateFunnelUrlRequest::BILLING_ADDRESS_2_ID])
+            : '';
         $billingAddress = (true === empty($billingAddress2))
             ? $billingAddress
             : $billingAddress . ' ' . $billingAddress2;
 
         if (
             RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
-                $data,
+                $_POST[GeneralDataRequest::DATA],
                 GenerateFunnelUrlRequest::BILLING_CITY_ID
             )
         ) {
@@ -292,11 +302,11 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 'message' => 'city cannot be empty.',
             ];
         }
-        $billingCity = sanitize_text_field($data[GenerateFunnelUrlRequest::BILLING_CITY_ID]);
+        $billingCity = sanitize_text_field($_POST[GeneralDataRequest::DATA][GenerateFunnelUrlRequest::BILLING_CITY_ID]);
 
         if (
             RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
-                $data,
+                $_POST[GeneralDataRequest::DATA],
                 GenerateFunnelUrlRequest::BILLING_STATE_ID
             )
         ) {
@@ -305,11 +315,13 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 'message' => 'state cannot be empty.',
             ];
         }
-        $billingState = sanitize_text_field($data[GenerateFunnelUrlRequest::BILLING_STATE_ID]);
+        $billingState = sanitize_text_field(
+            $_POST[GeneralDataRequest::DATA][GenerateFunnelUrlRequest::BILLING_STATE_ID]
+        );
 
         if (
             RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
-                $data,
+                $_POST[GeneralDataRequest::DATA],
                 GenerateFunnelUrlRequest::BILLING_POSTCODE_ID
             )
         ) {
@@ -318,7 +330,9 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 'message' => 'zipcode cannot be empty.',
             ];
         }
-        $billingZipcode = sanitize_text_field($data[GenerateFunnelUrlRequest::BILLING_POSTCODE_ID]);
+        $billingZipcode = sanitize_text_field(
+            $_POST[GeneralDataRequest::DATA][GenerateFunnelUrlRequest::BILLING_POSTCODE_ID]
+        );
 
         $request['billingAddress'] = [
             'street1' => $billingAddress,
@@ -336,7 +350,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
 
         if (
             RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
-                $data,
+                $_POST[GeneralDataRequest::DATA],
                 GenerateFunnelUrlRequest::SHIPPING_DIFFERENT_ID
             )
         ) {
@@ -345,7 +359,11 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 'message' => 'Invalid request, please contact our customer support.',
             ];
         }
-        if ('true' === sanitize_text_field($data[GenerateFunnelUrlRequest::SHIPPING_DIFFERENT_ID])) {
+
+        $shippingToDifferent = sanitize_text_field(
+            $_POST[GeneralDataRequest::DATA][GenerateFunnelUrlRequest::SHIPPING_DIFFERENT_ID]
+        );
+        if ('true' === $shippingToDifferent) {
             $this->violations[] = [
                 'field' => 'shipping_different',
                 'message' => 'shipping_different has to be the same of billing one.',

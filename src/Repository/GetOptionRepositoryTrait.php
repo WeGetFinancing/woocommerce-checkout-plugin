@@ -11,12 +11,12 @@ trait GetOptionRepositoryTrait
         return get_option(self::getOptionsName(), []);
     }
 
-    public static function getOption(string $optionName): mixed
+    public static function getOption(string $optionName, mixed $default = null): mixed
     {
         $options = self::getOptions();
         if (false === array_key_exists($optionName, $options)) {
             error_log(self::class . "::getOption config option name doesn't exists: " . $optionName);
-            return null;
+            return $default;
         }
         return $options[$optionName];
     }

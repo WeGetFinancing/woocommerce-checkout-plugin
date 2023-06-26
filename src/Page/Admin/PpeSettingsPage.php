@@ -11,6 +11,8 @@ use Twig\Error\SyntaxError;
 use WeGetFinancing\Checkout\Ajax\Admin\PpeSettingsAjax;
 use WeGetFinancing\Checkout\App;
 use WeGetFinancing\Checkout\ActionableInterface;
+use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing;
+use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
 use WeGetFinancing\Checkout\Repository\PpeSettingsRepository;
 use WeGetFinancing\Checkout\ValueObject\PpeSettings;
 
@@ -76,11 +78,29 @@ class PpeSettingsPage implements ActionableInterface
      */
     public function render(): void
     {
+        $auth = [
+            'username' => WeGetFinancing::getOption(
+                WeGetFinancingValueObject::USERNAME_FIELD_ID,
+                ''
+            ),
+            'password'  => WeGetFinancing::getOption(
+                WeGetFinancingValueObject::PASSWORD_FIELD_ID,
+                ''
+            ),
+            'merchantId' => WeGetFinancing::getOption(
+                WeGetFinancingValueObject::MERCHANT_ID_FIELD_ID,
+                ''
+            )
+        ];
+
         echo $this->twig->render(
             self::PAGE_TEMPLATE,
             [
                 'ajaxUrl' => admin_url('admin-ajax.php'),
                 'ajaxAction' => PpeSettingsAjax::ACTION_NAME,
+                'isConfigured' => (false === empty($auth['username']) &&
+                    false === empty($auth['password']) &&
+                    false === empty($auth['merchantId'])),
                 'ppePriceSelectorId' => PpeSettings::PRICE_SELECTOR_ID,
                 'ppePriceSelectorName' => PpeSettings::PRICE_SELECTOR_NAME,
                 'ppePriceSelectorValue' => PpeSettingsRepository::getOptionOrDefault(
