@@ -105,6 +105,10 @@
                                 error_message += "</ul></div>";
 
                                 jQuery("{{ error_display_selector|raw }}").{{ error_display_method }}(error_message);
+
+                                jQuery("html, body").animate({
+                                    scrollTop: 0
+                                }, 5);
                             } else {
                                 jQuery('#{{ order_inv_id_field_id }}').val(response.invId);
                                 new GetFinancing(

@@ -17,6 +17,7 @@ class App implements ActionableInterface
     use AddableTrait;
 
     public const ID = 'wegetfinancing';
+    public const PLUGIN_FILE_NAME = 'wegetfinancing-checkout.php';
     public const CONFIG_DIR = 'etc';
     public const DEFAULT_SERVICE_XML_FILE = 'services.xml';
     public const INIT_LIST_PARAMS = 'app.init_list';
@@ -35,15 +36,26 @@ class App implements ActionableInterface
     public function __construct(string $basePath)
     {
         try {
-            $containerBuilder = new ContainerBuilder();
-            $loader = new XmlFileLoader(
-                $containerBuilder,
-                new FileLocator($basePath . DIRECTORY_SEPARATOR . self::CONFIG_DIR)
+            $plugins = apply_filters('active_plugins', get_option('active_plugins' ));
+            if (true === in_array('woocommerce/woocommerce.php', $plugins)) {
+                $containerBuilder = new ContainerBuilder();
+                $loader = new XmlFileLoader(
+                    $containerBuilder,
+                    new FileLocator($basePath . DIRECTORY_SEPARATOR . self::CONFIG_DIR)
+                );
+                $loader->load(self::DEFAULT_SERVICE_XML_FILE);
+                $this->container = $containerBuilder;
+                $this->container->setParameter('app.base_path', $basePath);
+                $this->init();
+                return;
+            }
+            add_action(
+                'admin_notices',
+                function() {
+                    echo '<div class="error"><p>WeGetFinancing Checkout Plugin ' .
+                        'cannot work if WooCommerce Plugin is not activated.</p></div>';
+                }
             );
-            $loader->load(self::DEFAULT_SERVICE_XML_FILE);
-            $this->container = $containerBuilder;
-            $this->container->setParameter('app.base_path', $basePath);
-            $this->init();
         } catch (Throwable $exception) {
             error_log(self::class . "::__construct unexpected error");
             error_log($exception->getCode() . ' - ' . $exception->getMessage());

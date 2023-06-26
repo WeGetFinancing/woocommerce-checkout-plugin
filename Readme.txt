@@ -2,8 +2,8 @@
 Contributors: wegetfinancing
 Tags: WeGetFinancing, Checkout, Payment
 Requires at least: 5.9
-Tested up to: 6.2
-Stable tag: 1.2.0
+Tested up to: 6.2.2
+Stable tag: 1.2.1
 Requires PHP: 8.0
 License: LGPL-3.0-only
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -22,29 +22,3 @@ This can help to increase your sales and customer satisfaction by providing an e
 * All credit types: Approve customers of all credit types.
 * Secure payment processing: All transactions are safe inside our secure platform.
 * Detailed reporting and analytics: Detailed analytics of your financed sales.
-
-== Changelog ==
-
-= 1.0.0 =
-* Implemented payment funnel functionalities
-* PostBack functionalities to update order status
-* Shipping information data automatically updated to wegetfinancing dashboard 
-
-= 1.0.1 =
-* PHP 8.0 compatibility hotfix
-
-= 1.0.2 =
-* Improved error management
-
-= 1.1.0 =
-* PPE Feature
-* Only signed postback are accepted
-* Software version is sent per each funnel url generation
-
-= 1.1.1 =
-* Improved escaping and code quality
-
-= 1.2.0 =
-* Configurable location to display error message in the checkout section
-* Fixed checkout button dimension
-* Updated documentation

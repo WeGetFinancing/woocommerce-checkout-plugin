@@ -14,11 +14,17 @@
             </div>
         </div>
     </div>
-    <div id="ppe_settings_messages_area"></div>
+    <div style="padding-top: 25px;" id="ppe_settings_messages_area">
+        {% if isConfigured == false %}
+            <div class="notice notice-error is-dismissible">
+                <p>WeGetFinancing Checkout is not configured, please configure it via WooCommerce > Settings > Payments.</p>
+            </div>
+        {% endif %}
+    </div>
     <div class="row">
         <div class="card">
             <div class="card-body">
-                <form>
+                <form id="wegetfinancing-ppe-config-form">
                     <div class="mb-3">
                         <label for="{{ ppePriceSelectorId }}" class="form-label">{{ ppePriceSelectorName }}</label>
                         <input
@@ -97,7 +103,7 @@
                         />
                         <div id="{{ ppePositionId }}_help" class="form-text">Positions the widget horizontally. The options are equalSpacing' | 'leading' | 'trailing' | 'center' | 'fill' | 'fillEvenly'</div>
                     </div>
-                    <a id="{{ ppeSaveButtonId }}" class="btn btn-primary">Save</a>
+                    <a id="{{ ppeSaveButtonId }}" class="btn btn-primary {% if isConfigured == false %}disabled{% endif %}">Save</a>
                 </form>
             </div>
         </div>
@@ -130,13 +136,19 @@
                         '<p>Data successfully saved.</p>'+
                         '</div>');
                 }
+                jQuery("html, body").animate({
+                    scrollTop: 0
+                }, 5);
             },
             error: function(){
                 let message = jQuery("#ppe_settings_messages_area");
                 message.html('');
-                message.html('<<div class="notice notice-error is-dismissible">'+
+                message.html('<div class="notice notice-error is-dismissible">'+
                     '<p>Unexpected server error, please contact our tech support.</p>'+
                     '</div>');
+                jQuery("html, body").animate({
+                    scrollTop: 0
+                }, 5);
             },
         });
     }
@@ -174,4 +186,10 @@
 
         wgf_ppe_save_settings(settings);
     });
+
+    {% if isConfigured == false %}
+        jQuery(document).ready(function() {
+            jQuery("#wegetfinancing-ppe-config-form input").prop("disabled", true);
+        });
+    {% endif %}
 </script>

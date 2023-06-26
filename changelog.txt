@@ -23,3 +23,9 @@
 * Configurable location to display error message in the checkout section
 * Fixed checkout button dimension
 * Updated documentation
+
+= 1.2.1 =
+* Request fix: before the request was taken and tested now is tested and taken
+* WooCommerce dependency fix if WooCommerce is not installed the plugin will not run and display a graceful error message
+* Set Up PPE bug fix: in order to prevent error during ppe configuration, if plugin is not set up you will not be no more able to set up the ppe
+* Improved error readability: now it scroll up to where the error messages section should be
