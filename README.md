@@ -24,15 +24,17 @@ Our plugin allow you to offer:
 
 ### 2.1. Via the plugin.zip file
 
-1. Download the plugin.zip file provided in the root directory of this GitHub repository
+1. Download the github zip as shown in the next image.
+   ![Plugin Activation](./assets/github_zip_file_download.jpg)
 2. Log in into your WordPress installation, ensure you have administrative privileges.
-3. Go to Plugins > Add New
+3. Go to Plugins > Add New.
 4. Click on the button "Upload Plugin", it is positioned nearby the header "Add Plugins"
 5. Click on the button "Choose file" to select the plugin.zip file that you downloaded before
 6. Proceed with Install Now and follow the instructions
 7. Once installed go to Plugins > Installed Plugins
 8. Find the plugin, it's called "WeGetFinancing Payment Gateway", and click on  the "Activate" button
    ![Plugin Activation](./assets/install-1.png)
+
 ## 3. Configuration
 
 ### 3.1 First set up
@@ -52,9 +54,10 @@ Our plugin allow you to offer:
    ![Plugin Activation](./assets/setup-3.png)
 4. Click on the tab "Payments"
    ![Plugin Activation](./assets/setup-4.png)
-5. You can see our plugin called "WeGetFinancing", enable it with the relative check 
-6. Click on the "Save Changes" button 
-7. Click on the "Finish set up" button, you will see a form like the following one:
+5. You can see our plugin called "WeGetFinancing"
+6. Click on the "Finish set up" button on the right side. 
+   ![Plugin Activation](./assets/finish_set_up_button.png)
+7. You will see a form like the following one:
    ![Plugin Activation](./assets/setup-5.png)
 8. Fill the form as per following description:
    1. *Sandbox Environment*: if enabled, all the API calls will pass through the sandbox environment, otherwise to production.
@@ -68,6 +71,7 @@ Our plugin allow you to offer:
 10. Come back to WooCommerce > Settings > Payments
 11. In the main payment table, switch to "ON" the button under the "Enabled" section as per following screenshot
     ![Plugin Activation](./assets/setup-7.png)
+
 ### 3.2 Configure PPE
 
 1. Take the Merchant Token ID:
@@ -89,7 +93,8 @@ Our plugin allow you to offer:
 5. If everything is correct, you will receive a success message like this
    ![Plugin Activation](./assets/setup-12.png)
 6. Copy the shortcode ```[wegetfinancing-ppe]```
-7. Go in the page in which you want to embed, e.g. the shop page, and edit it
+7. Go in the page in which you want to embed, e.g. the shop page, and edit it.
+   ![Plugin Activation](./assets/pages_admin_dashboard.png)
 8. Add the shortcode to the page
    ![Plugin Activation](./assets/setup-13.png)
 9. The PPE widget should appear in the selected page
