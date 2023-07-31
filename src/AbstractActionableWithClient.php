@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WeGetFinancing\Checkout;
 
+if (!defined( 'ABSPATH' )) exit;
+
 use WeGetFinancing\Checkout\Exception\GenerateClientException;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;

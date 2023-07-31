@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WeGetFinancing\Checkout\PaymentGateway;
 
+if (!defined( 'ABSPATH' )) exit;
+
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -35,11 +37,19 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
         $this->id = static::GATEWAY_ID;
         $this->has_fields = false;
         $this->icon = '';
-        $this->method_title = translate(WeGetFinancingValueObject::METHOD_TITLE, App::DOMAIN_LOCALE);
-        $this->method_description =
-            translate(WeGetFinancingValueObject::METHOD_DESCRIPTION, App::DOMAIN_LOCALE);
-        $this->title = translate(WeGetFinancingValueObject::TITLE, App::DOMAIN_LOCALE);
-        $this->description = translate(WeGetFinancingValueObject::DESCRIPTION, App::DOMAIN_LOCALE);
+        $this->method_title = __('WeGetFinancing', 'wegetfinancing-payment-gateway');
+        $this->method_description = __(
+            "Boost your sales by adding WeGetFinancing to your checkout. " .
+            "Offer affordable monthly payments to your existing customers while you receive the money" .
+            " directly into your account, in one lump sum.",
+            'wegetfinancing-payment-gateway'
+        );
+        $this->title = __('WeGetFinancing', 'wegetfinancing-payment-gateway');
+        $this->description = __(
+            "Pay monthly, obtain instant approval with no extensive paperwork." .
+            " Get credit approval in just seconds, so you can complete your purchase immediately, hassle-free.",
+            'wegetfinancing-payment-gateway'
+        );
         $this->supports    = [
             'products',
             'refunds',
@@ -77,63 +87,43 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
             WeGetFinancingValueObject::FIELDSET_ID,
             [
                 WeGetFinancingValueObject::IS_SANDBOX_FIELD_ID => [
-                    'title'   =>
-                        translate(WeGetFinancingValueObject::IS_SANDBOX_FIELD_TITLE, App::DOMAIN_LOCALE),
-                    'type'    => 'checkbox',
-                    'label'   =>
-                        translate(WeGetFinancingValueObject::IS_SANDBOX_FIELD_LABEL, App::DOMAIN_LOCALE),
+                    'title' => WeGetFinancingValueObject::IS_SANDBOX_FIELD_TITLE,
+                    'type' => 'checkbox',
+                    'label' => WeGetFinancingValueObject::IS_SANDBOX_FIELD_LABEL,
                     'default' => 'yes',
                 ],
                 WeGetFinancingValueObject::USERNAME_FIELD_ID => [
-                    'title'   =>
-                        translate(WeGetFinancingValueObject::USERNAME_FIELD_TITLE, App::DOMAIN_LOCALE),
-                    'type'    => 'text',
-                    'description'   =>
-                        translate(WeGetFinancingValueObject::USERNAME_FIELD_LABEL, App::DOMAIN_LOCALE),
+                    'title' => WeGetFinancingValueObject::USERNAME_FIELD_TITLE,
+                    'type' => 'text',
+                    'description' => WeGetFinancingValueObject::USERNAME_FIELD_LABEL,
                     'default' => '',
-                    'desc_tip'    => true,
+                    'desc_tip' => true,
                 ],
                 WeGetFinancingValueObject::PASSWORD_FIELD_ID => [
-                    'title'   =>
-                        translate(WeGetFinancingValueObject::PASSWORD_FIELD_TITLE, App::DOMAIN_LOCALE),
+                    'title'   => WeGetFinancingValueObject::PASSWORD_FIELD_TITLE,
                     'type'        => 'password',
-                    'description'   =>
-                        translate(WeGetFinancingValueObject::PASSWORD_FIELD_LABEL, App::DOMAIN_LOCALE),
+                    'description'   => WeGetFinancingValueObject::PASSWORD_FIELD_LABEL,
                     'default'     => '',
                     'desc_tip'    => true,
                 ],
                 WeGetFinancingValueObject::MERCHANT_ID_FIELD_ID => [
-                    'title'   =>
-                        translate(WeGetFinancingValueObject::MERCHANT_ID_FIELD_TITLE, App::DOMAIN_LOCALE),
+                    'title'   => WeGetFinancingValueObject::MERCHANT_ID_FIELD_TITLE,
                     'type'        => 'text',
-                    'description'   =>
-                        translate(WeGetFinancingValueObject::MERCHANT_ID_FIELD_LABEL, App::DOMAIN_LOCALE),
+                    'description'   => WeGetFinancingValueObject::MERCHANT_ID_FIELD_LABEL,
                     'default'     => '',
                     'desc_tip'    => true,
                 ],
                 WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_ID => [
-                    'title' => translate(
-                        WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_TITLE,
-                        App::DOMAIN_LOCALE
-                    ),
+                    'title' => WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_TITLE,
                     'type' => 'text',
-                    'description' => translate(
-                        WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_LABEL,
-                        App::DOMAIN_LOCALE
-                    ),
+                    'description' => WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_LABEL,
                     'default' => WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_DEFAULT,
                     'desc_tip'    => true,
                 ],
                 WeGetFinancingValueObject::ERROR_ATTACH_FIELD_ID => [
-                    'title' => translate(
-                        WeGetFinancingValueObject::ERROR_ATTACH_FIELD_TITLE,
-                        App::DOMAIN_LOCALE
-                    ),
+                    'title' => WeGetFinancingValueObject::ERROR_ATTACH_FIELD_TITLE,
                     'type' => 'select',
-                    'description' => translate(
-                        WeGetFinancingValueObject::ERROR_ATTACH_FIELD_LABEL,
-                        App::DOMAIN_LOCALE
-                    ),
+                    'description' => WeGetFinancingValueObject::ERROR_ATTACH_FIELD_LABEL,
                     'default' => WeGetFinancingValueObject::ERROR_ATTACH_FIELD_DEFAULT,
                     'options' => WeGetFinancingValueObject::ERROR_ATTACH_FIELD_VALUES,
                     'desc_tip'    => true,
@@ -213,7 +203,7 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
         // Mark as on-hold (we're awaiting the payment)
         $order->update_status(
             WeGetFinancingValueObject::ON_HOLD_STATUS_ID,
-            translate(WeGetFinancingValueObject::ON_HOLD_STATUS_LABEL, App::DOMAIN_LOCALE)
+            WeGetFinancingValueObject::ON_HOLD_STATUS_LABEL
         );
         // Reduce stock levels
         wc_reduce_stock_levels($order->get_id());

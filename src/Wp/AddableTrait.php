@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WeGetFinancing\Checkout\Wp;
 
+if (!defined( 'ABSPATH' )) exit;
+
 /**
  * This trait give to the class the ability of being loaded into WordPress as an action.
  * It implements part of the behaviour of ActionableInterface and therefore require the existence

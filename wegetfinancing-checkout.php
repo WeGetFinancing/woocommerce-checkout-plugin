@@ -16,7 +16,7 @@
  * Requires PHP:      8.0
  * Author:            Riccardo De Leo
  * Author URI:        https://github.com/WeGetFinancing
- * Text Domain:       wegetfinancing-checkout
+ * Text Domain:       wegetfinancing-payment-gateway
  * License:           LGPL-3.0-only
  * License URI:       https://github.com/WeGetFinancing/woocommerce-checkout-plugin#LICENSE
  */

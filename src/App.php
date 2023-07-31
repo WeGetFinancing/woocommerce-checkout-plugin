@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WeGetFinancing\Checkout;
 
+if (!defined( 'ABSPATH' )) exit;
+
 use Exception;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -21,7 +23,6 @@ class App implements ActionableInterface
     public const CONFIG_DIR = 'etc';
     public const DEFAULT_SERVICE_XML_FILE = 'services.xml';
     public const INIT_LIST_PARAMS = 'app.init_list';
-    public const DOMAIN_LOCALE = 'wegetfinancing-checkout-locale';
     public const RENDER = 'twig';
     public const FUNNEL_JS = 'app.funnel.js';
     public const CHECKOUT_BUTTON_URL = 'app.checkout_button.url';

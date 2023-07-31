@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WeGetFinancing\Checkout\Ajax\Admin;
 
+if (!defined( 'ABSPATH' )) exit;
+
 use Exception;
 use Throwable;
 use WeGetFinancing\Checkout\AbstractActionableWithClient;

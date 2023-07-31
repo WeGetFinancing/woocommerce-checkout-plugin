@@ -11,6 +11,13 @@ services:
     environment:
       - PHP_CS_FIXER_IGNORE_ENV=1
 
+  npm:
+    image: node:20-alpine
+    restart: "no"
+    volumes:
+      - ./:/app
+    working_dir: /app
+
   db:
     image: mariadb:10.7.7-focal
     container_name: db

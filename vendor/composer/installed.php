@@ -1,15 +1,42 @@
 <?php return array(
     'root' => array(
         'name' => 'wegetfinancing/woocommerce-checkout-plugin',
-        'pretty_version' => '1.2.0',
-        'version' => '1.2.0.0',
+        'pretty_version' => '1.2.1',
+        'version' => '1.2.1.0',
         'reference' => NULL,
         'type' => 'software',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'dev' => false,
+        'dev' => true,
     ),
     'versions' => array(
+        'composer/pcre' => array(
+            'pretty_version' => '3.1.0',
+            'version' => '3.1.0.0',
+            'reference' => '4bff79ddd77851fe3cdd11616ed3f92841ba5bd2',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/./pcre',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
+        'composer/semver' => array(
+            'pretty_version' => '3.3.2',
+            'version' => '3.3.2.0',
+            'reference' => '3953f23262f2bff1919fc82183ad9acb13ff62c9',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/./semver',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
+        'composer/xdebug-handler' => array(
+            'pretty_version' => '3.0.3',
+            'version' => '3.0.3.0',
+            'reference' => 'ced299686f41dce890debac69273b47ffe98a40c',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/./xdebug-handler',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
         'doctrine/annotations' => array(
             'pretty_version' => '1.14.3',
             'version' => '1.14.3.0',
@@ -37,6 +64,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'friendsofphp/php-cs-fixer' => array(
+            'pretty_version' => 'v3.14.2',
+            'version' => '3.14.2.0',
+            'reference' => '14f0541651841b63640e7aafad041ad55dc7aa88',
+            'type' => 'application',
+            'install_path' => __DIR__ . '/../friendsofphp/php-cs-fixer',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
         'guzzlehttp/guzzle' => array(
             'pretty_version' => '7.5.1',
             'version' => '7.5.1.0',
@@ -63,6 +99,15 @@
             'install_path' => __DIR__ . '/../guzzlehttp/psr7',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'phpstan/phpstan' => array(
+            'pretty_version' => '1.10.15',
+            'version' => '1.10.15.0',
+            'reference' => '762c4dac4da6f8756eebb80e528c3a47855da9bd',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../phpstan/phpstan',
+            'aliases' => array(),
+            'dev_requirement' => true,
         ),
         'psr/cache' => array(
             'pretty_version' => '2.0.0',
@@ -92,6 +137,21 @@
             'dev_requirement' => false,
             'provided' => array(
                 0 => '1.1|2.0',
+            ),
+        ),
+        'psr/event-dispatcher' => array(
+            'pretty_version' => '1.0.0',
+            'version' => '1.0.0.0',
+            'reference' => 'dbefd12671e8a14ec7f180cab83036ed26714bb0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../psr/event-dispatcher',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
+        'psr/event-dispatcher-implementation' => array(
+            'dev_requirement' => true,
+            'provided' => array(
+                0 => '1.0',
             ),
         ),
         'psr/http-client' => array(
@@ -148,6 +208,12 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'psr/log-implementation' => array(
+            'dev_requirement' => true,
+            'provided' => array(
+                0 => '1.0|2.0|3.0',
+            ),
+        ),
         'psr/simple-cache-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
@@ -162,6 +228,24 @@
             'install_path' => __DIR__ . '/../ralouphie/getallheaders',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'sebastian/diff' => array(
+            'pretty_version' => '4.0.5',
+            'version' => '4.0.5.0',
+            'reference' => '74be17022044ebaaecfdf0c5cd504fc9cd5a7131',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../sebastian/diff',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
+        'squizlabs/php_codesniffer' => array(
+            'pretty_version' => '3.7.2',
+            'version' => '3.7.2.0',
+            'reference' => 'ed8e00df0a83aa96acf703f8c2979ff33341f879',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../squizlabs/php_codesniffer',
+            'aliases' => array(),
+            'dev_requirement' => true,
         ),
         'symfony/cache' => array(
             'pretty_version' => 'v5.4.23',
@@ -196,6 +280,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'symfony/console' => array(
+            'pretty_version' => 'v6.0.19',
+            'version' => '6.0.19.0',
+            'reference' => 'c3ebc83d031b71c39da318ca8b7a07ecc67507ed',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/console',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
         'symfony/dependency-injection' => array(
             'pretty_version' => 'v6.0.20',
             'version' => '6.0.20.0',
@@ -214,6 +307,30 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'symfony/event-dispatcher' => array(
+            'pretty_version' => 'v6.0.19',
+            'version' => '6.0.19.0',
+            'reference' => '2eaf8e63bc5b8cefabd4a800157f0d0c094f677a',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/event-dispatcher',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
+        'symfony/event-dispatcher-contracts' => array(
+            'pretty_version' => 'v3.0.2',
+            'version' => '3.0.2.0',
+            'reference' => '7bc61cc2db649b4637d331240c5346dcc7708051',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/event-dispatcher-contracts',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
+        'symfony/event-dispatcher-implementation' => array(
+            'dev_requirement' => true,
+            'provided' => array(
+                0 => '2.0|3.0',
+            ),
+        ),
         'symfony/filesystem' => array(
             'pretty_version' => 'v6.0.19',
             'version' => '6.0.19.0',
@@ -223,6 +340,24 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'symfony/finder' => array(
+            'pretty_version' => 'v6.0.19',
+            'version' => '6.0.19.0',
+            'reference' => '5cc9cac6586fc0c28cd173780ca696e419fefa11',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/finder',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
+        'symfony/options-resolver' => array(
+            'pretty_version' => 'v6.0.19',
+            'version' => '6.0.19.0',
+            'reference' => '6a180d1c45e0d9797470ca9eb46215692de00fa3',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/options-resolver',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
         'symfony/polyfill-ctype' => array(
             'pretty_version' => 'v1.27.0',
             'version' => '1.27.0.0',
@@ -231,6 +366,24 @@
             'install_path' => __DIR__ . '/../symfony/polyfill-ctype',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'symfony/polyfill-intl-grapheme' => array(
+            'pretty_version' => 'v1.27.0',
+            'version' => '1.27.0.0',
+            'reference' => '511a08c03c1960e08a883f4cffcacd219b758354',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/polyfill-intl-grapheme',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
+        'symfony/polyfill-intl-normalizer' => array(
+            'pretty_version' => 'v1.27.0',
+            'version' => '1.27.0.0',
+            'reference' => '19bd1e4fcd5b91116f14d8533c57831ed00571b6',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/polyfill-intl-normalizer',
+            'aliases' => array(),
+            'dev_requirement' => true,
         ),
         'symfony/polyfill-mbstring' => array(
             'pretty_version' => 'v1.27.0',
@@ -268,6 +421,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'symfony/process' => array(
+            'pretty_version' => 'v6.0.19',
+            'version' => '6.0.19.0',
+            'reference' => '2114fd60f26a296cc403a7939ab91478475a33d4',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/process',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
         'symfony/serializer' => array(
             'pretty_version' => 'v5.4.23',
             'version' => '5.4.23.0',
@@ -291,6 +453,24 @@
             'provided' => array(
                 0 => '1.1|2.0|3.0',
             ),
+        ),
+        'symfony/stopwatch' => array(
+            'pretty_version' => 'v6.0.19',
+            'version' => '6.0.19.0',
+            'reference' => '011e781839dd1d2eb8119f65ac516a530f60226d',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/stopwatch',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
+        'symfony/string' => array(
+            'pretty_version' => 'v6.0.19',
+            'version' => '6.0.19.0',
+            'reference' => 'd9e72497367c23e08bf94176d2be45b00a9d232a',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/string',
+            'aliases' => array(),
+            'dev_requirement' => true,
         ),
         'symfony/translation-contracts' => array(
             'pretty_version' => 'v3.0.2',
@@ -319,6 +499,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'twbs/bootstrap' => array(
+            'pretty_version' => 'v5.3.1',
+            'version' => '5.3.1.0',
+            'reference' => '2a1bf52b73fc9a97f6fef75aa1b29b3e9f0288b3',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../twbs/bootstrap',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'twig/twig' => array(
             'pretty_version' => 'v3.6.0',
             'version' => '3.6.0.0',
@@ -327,6 +516,12 @@
             'install_path' => __DIR__ . '/../twig/twig',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'twitter/bootstrap' => array(
+            'dev_requirement' => false,
+            'replaced' => array(
+                0 => 'v5.3.1',
+            ),
         ),
         'wegetfinancing/php-sdk' => array(
             'pretty_version' => '2.4.0',
@@ -338,8 +533,8 @@
             'dev_requirement' => false,
         ),
         'wegetfinancing/woocommerce-checkout-plugin' => array(
-            'pretty_version' => '1.2.0',
-            'version' => '1.2.0.0',
+            'pretty_version' => '1.2.1',
+            'version' => '1.2.1.0',
             'reference' => NULL,
             'type' => 'software',
             'install_path' => __DIR__ . '/../../',
