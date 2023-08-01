@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WeGetFinancing\Checkout\ValueObject;
 
+if (!defined( 'ABSPATH' )) exit;
+
 interface GenerateFunnelUrlRequest
 {
     public const BILLING_FIRST_NAME_ID = 'billing_first_name';

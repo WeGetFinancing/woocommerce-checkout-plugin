@@ -8,3 +8,4 @@ composer.lock
 var
 .php-cs-fixer.cache
 .phpcs-cache
+node_modules/

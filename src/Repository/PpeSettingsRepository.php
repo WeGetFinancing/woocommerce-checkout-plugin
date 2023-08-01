@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WeGetFinancing\Checkout\Repository;
 
+if (!defined( 'ABSPATH' )) exit;
+
 use WeGetFinancing\Checkout\App;
 
 class PpeSettingsRepository

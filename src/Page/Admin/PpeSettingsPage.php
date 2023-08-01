@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WeGetFinancing\Checkout\Page\Admin;
 
+if (!defined( 'ABSPATH' )) exit;
+
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -18,8 +20,6 @@ use WeGetFinancing\Checkout\ValueObject\PpeSettings;
 
 class PpeSettingsPage implements ActionableInterface
 {
-    public const PAGE_TITLE = 'WeGetFinancing PPE Configuration Dashboard';
-    public const MENU_TITLE = 'WeGetFinancing PPE';
     public const CAPABILITY = 'manage_options';
     public const MENU_SLUG = 'wgf-ppe-dashboard';
     public const METHOD_RENDERER = 'render';
@@ -31,9 +31,9 @@ class PpeSettingsPage implements ActionableInterface
 
     public function __construct(
         protected Environment $twig,
+        protected string $filePath,
         protected string $bootstrapScript,
-        protected string $bootstrapStyle,
-        protected string $bootstrapStyleIcons
+        protected string $bootstrapStyle
     ) {
     }
 
@@ -46,24 +46,9 @@ class PpeSettingsPage implements ActionableInterface
     }
     public function execute(): void
     {
-        wp_enqueue_style(
-            self::BOOTSTRAP_STYLE_HANDLE,
-            $this->bootstrapStyle
-        );
-        wp_enqueue_style(
-            self::BOOTSTRAP_STYLE_ICONS_HANDLE,
-            $this->bootstrapStyleIcons
-        );
-        wp_enqueue_script(
-            self::BOOTSTRAP_SCRIPT_HANDLE,
-            $this->bootstrapScript,
-            ['jquery'],
-            '',
-            true
-        );
         add_menu_page(
-            __(self::PAGE_TITLE, App::DOMAIN_LOCALE),
-            __(self::MENU_TITLE, App::DOMAIN_LOCALE),
+            __('WeGetFinancing PPE Configuration Dashboard', 'wegetfinancing-payment-gateway'),
+            __('WeGetFinancing PPE', 'wegetfinancing-payment-gateway'),
             self::CAPABILITY,
             self::MENU_SLUG,
             [$this, self::METHOD_RENDERER],
@@ -92,6 +77,20 @@ class PpeSettingsPage implements ActionableInterface
                 ''
             )
         ];
+
+        wp_enqueue_style(
+            self::BOOTSTRAP_STYLE_HANDLE,
+            plugins_url($this->bootstrapStyle, $this->filePath),
+            false
+        );
+
+        wp_enqueue_script(
+            self::BOOTSTRAP_SCRIPT_HANDLE,
+            plugins_url($this->bootstrapScript, $this->filePath),
+            ['jquery'],
+            false,
+            true
+        );
 
         echo $this->twig->render(
             self::PAGE_TEMPLATE,

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WeGetFinancing\Checkout\PostMeta;
 
+if (!defined( 'ABSPATH' )) exit;
+
 class OrderInvIdValueObject
 {
     public const EXTRA_FIELDS_ID = 'wegetfinancing_extra_fields';

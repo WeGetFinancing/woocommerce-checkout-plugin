@@ -4,15 +4,10 @@ declare(strict_types=1);
 
 namespace WeGetFinancing\Checkout\PaymentGateway;
 
+if (!defined( 'ABSPATH' )) exit;
+
 class WeGetFinancingValueObject
 {
-    public const METHOD_TITLE = "WeGetFinancing";
-    public const METHOD_DESCRIPTION = "Boost your sales by adding WeGetFinancing to your checkout. " .
-        "Offer affordable monthly payments to your existing customers while you receive the money" .
-        " directly into your account, in one lump sum.";
-    public const TITLE = "WeGetFinancing";
-    public const DESCRIPTION = "Pay monthly, obtain instant approval with no extensive paperwork." .
-        " Get credit approval in just seconds, so you can complete your purchase immediately, hassle-free.";
     public const FIELDSET_ID = "wgf_form_fields";
     public const IS_SANDBOX_FIELD_ID = "wgf_is_sandbox";
     public const IS_SANDBOX_FIELD_TITLE = "Sandbox Environment";

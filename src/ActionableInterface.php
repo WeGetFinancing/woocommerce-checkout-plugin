@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WeGetFinancing\Checkout;
 
+if (!defined( 'ABSPATH' )) exit;
+
 /**
  * This interface describe a class with the following behaviour:
  *  - Single purpose class

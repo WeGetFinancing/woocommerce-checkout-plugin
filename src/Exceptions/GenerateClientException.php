@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WeGetFinancing\Checkout\Exception;
 
+if (!defined( 'ABSPATH' )) exit;
+
 use Exception;
 
 class GenerateClientException extends Exception

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WeGetFinancing\Checkout\Ajax\Public;
 
+if (!defined( 'ABSPATH' )) exit;
+
 use Exception;
 use Throwable;
 use WeGetFinancing\Checkout\ActionableInterface;

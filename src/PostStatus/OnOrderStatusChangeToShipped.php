@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WeGetFinancing\Checkout\PostStatus;
 
+if (!defined( 'ABSPATH' )) exit;
+
 use DateTime;
 use WeGetFinancing\Checkout\AbstractActionableWithClient;
 use WeGetFinancing\Checkout\PostMeta\OrderInvIdValueObject;

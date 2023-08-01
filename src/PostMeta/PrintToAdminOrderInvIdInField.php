@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WeGetFinancing\Checkout\PostMeta;
 
+if (!defined( 'ABSPATH' )) exit;
+
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -41,14 +43,8 @@ class PrintToAdminOrderInvIdInField implements ActionableInterface
         echo $this->twig->render(
             'admin/order_inv_id.twig',
             [
-                'title' => translate(
-                    OrderInvIdValueObject::ORDER_INV_ID_FIELD_ADMIN_TITLE,
-                    App::DOMAIN_LOCALE
-                ),
-                'label' => translate(
-                    OrderInvIdValueObject::ORDER_INV_ID_FIELD_ADMIN_LABEL,
-                    App::DOMAIN_LOCALE
-                ),
+                'title' => OrderInvIdValueObject::ORDER_INV_ID_FIELD_ADMIN_TITLE,
+                'label' => OrderInvIdValueObject::ORDER_INV_ID_FIELD_ADMIN_LABEL,
                 'value' => get_post_meta($order->id, '_' . OrderInvIdValueObject::ORDER_INV_ID_FIELD_ID, true),
             ]
         );

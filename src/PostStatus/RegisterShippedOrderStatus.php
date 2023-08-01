@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WeGetFinancing\Checkout\PostStatus;
 
+if (!defined( 'ABSPATH' )) exit;
+
 use WeGetFinancing\Checkout\ActionableInterface;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 

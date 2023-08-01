@@ -29,3 +29,9 @@
 * WooCommerce dependency fix if WooCommerce is not installed the plugin will not run and display a graceful error message
 * Set Up PPE bug fix: in order to prevent error during ppe configuration, if plugin is not set up you will not be no more able to set up the ppe
 * Improved error readability: now it scroll up to where the error messages section should be
+
+= 1.2.2 =
+* Changing the look of wp-admin limited to our settings page
+* Calling files remotely limited to oEmbed calls only
+* Internationalization without variables
+* Disallowed direct file access to plugin files

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WeGetFinancing\Checkout\Ajax\Public;
 
+if (!defined( 'ABSPATH' )) exit;
+
 use WeGetFinancing\Checkout\AbstractActionableWithClient;
 use WeGetFinancing\Checkout\App;
 use WeGetFinancing\Checkout\Exception\GenerateClientException;
@@ -22,7 +24,6 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
     public const ACTION_NAME = 'generateWeGetFinancingFunnelAction';
     public const INIT_NAME = 'wp_ajax_nopriv_' . self::ACTION_NAME;
     public const FUNCTION_NAME = 'execute';
-    public const UNEXPECTED_ERROR_HTML_MESSAGE = '<strong>Unexpected error</strong>';
     public const REMOTE_SERVER_ERROR_HTML_MESSAGE = '<strong>Remote server error</strong>';
     public const INTERNAL_SERVER_ERROR_HTML_MESSAGE = '<strong>Internal server error</strong>';
     public const GENERATE_FUNNEL_ERROR_TABLE = [
@@ -135,24 +136,13 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 ],
                 200
             );
-        } catch (GenerateClientException $exception) {
+        } catch (GenerateClientException | GetFunnelRequestException $exception) {
             wp_send_json(
                 [
                     'isSuccess' => false,
-                    'message' => '<strong>' . translate(
-                        GenerateClientException::GRACEFUL_ERROR_MESSAGE,
-                        App::DOMAIN_LOCALE
-                    ) . '</strong>',
-                ],
-                200
-            );
-        } catch (GetFunnelRequestException $exception) {
-            wp_send_json(
-                [
-                    'isSuccess' => false,
-                    'message' => '<strong>' . translate(
-                        GetFunnelRequestException::GRACEFUL_ERROR_MESSAGE,
-                        App::DOMAIN_LOCALE
+                    'message' => '<strong>' . __(
+                        'Unexpected network error',
+                        'wegetfinancing-payment-gateway'
                     ) . '</strong>',
                 ],
                 200
@@ -164,7 +154,10 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
             wp_send_json(
                 [
                     'isSuccess' => false,
-                    'message' => self::UNEXPECTED_ERROR_HTML_MESSAGE,
+                    'message' => '<strong>' . __(
+                            'Unexpected error',
+                            'wegetfinancing-payment-gateway'
+                        ) . '</strong>',
                 ],
                 200
             );

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WeGetFinancing\Checkout\ValueObject;
 
+if (!defined( 'ABSPATH' )) exit;
+
 interface PpeSettings
 {
     public const PRICE_SELECTOR_ID = 'wgf_ppe_settings_selector_id';
