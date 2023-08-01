@@ -35,7 +35,7 @@ class App implements ActionableInterface
     /**
      * @throws Exception
      */
-    public function __construct(string $basePath, string $filePath)
+    public function __construct(private string $basePath, private string $filePath)
     {
         try {
             $plugins = apply_filters('active_plugins', get_option('active_plugins' ));
@@ -79,7 +79,10 @@ class App implements ActionableInterface
         $GLOBALS[self::ID] = [
             self::RENDER => $this->container->get(self::RENDER),
             self::FUNNEL_JS => $this->container->getParameter(self::FUNNEL_JS),
-            self::CHECKOUT_BUTTON_URL => $this->container->getParameter(self::CHECKOUT_BUTTON_URL),
+            self::CHECKOUT_BUTTON_URL => plugins_url(
+                $this->container->getParameter(self::CHECKOUT_BUTTON_URL),
+                $this->filePath
+            )
         ];
 
         $initList = $this->container->getParameter(self::INIT_LIST_PARAMS);
