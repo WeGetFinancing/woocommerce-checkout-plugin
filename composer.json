@@ -41,6 +41,9 @@
     ],
     "phpcs": [
       "php -d memory_limit=-1 vendor/bin/phpcs phpcs.xml src/"
+    ],
+    "deploy-assets": [
+      "cp vendor/twbs/bootstrap/dist/css/bootstrap.min.css dist/bootstrap.min.css && cp vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js dist/bootstrap.bundle.min.js"
     ]
   }
 }

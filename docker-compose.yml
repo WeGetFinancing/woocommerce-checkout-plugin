@@ -57,6 +57,8 @@ services:
       - .env
     volumes:
       - ./var/wp:/var/www/html
+      - ./:/var/www/html/wp-content/plugins/wegetfinancing-checkout
+      - ./env/empty:/var/www/html/wp-content/plugins/wegetfinancing-checkout/var/wp:ro
       - ./env/lb/Caddyfile:/etc/caddy/Caddyfile
 
 volumes:

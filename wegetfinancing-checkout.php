@@ -25,4 +25,4 @@ require __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autolo
 
 use WeGetFinancing\Checkout\App;
 
-new App(__DIR__);
+new App(__DIR__, __FILE__);

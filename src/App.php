@@ -28,13 +28,14 @@ class App implements ActionableInterface
     public const CHECKOUT_BUTTON_URL = 'app.checkout_button.url';
     public const INIT_NAME = 'init';
     public const FUNCTION_NAME = 'execute';
+    public const PLUGIN_BASE_DIR = "/wp-content/plugins/";
 
     protected ContainerInterface $container;
 
     /**
      * @throws Exception
      */
-    public function __construct(string $basePath)
+    public function __construct(string $basePath, string $filePath)
     {
         try {
             $plugins = apply_filters('active_plugins', get_option('active_plugins' ));
@@ -47,6 +48,7 @@ class App implements ActionableInterface
                 $loader->load(self::DEFAULT_SERVICE_XML_FILE);
                 $this->container = $containerBuilder;
                 $this->container->setParameter('app.base_path', $basePath);
+                $this->container->setParameter('app.file_path', $filePath);
                 $this->init();
                 return;
             }

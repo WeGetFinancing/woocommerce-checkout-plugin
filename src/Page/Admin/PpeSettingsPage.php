@@ -31,9 +31,9 @@ class PpeSettingsPage implements ActionableInterface
 
     public function __construct(
         protected Environment $twig,
+        protected string $filePath,
         protected string $bootstrapScript,
-        protected string $bootstrapStyle,
-        protected string $bootstrapStyleIcons
+        protected string $bootstrapStyle
     ) {
     }
 
@@ -80,17 +80,15 @@ class PpeSettingsPage implements ActionableInterface
 
         wp_enqueue_style(
             self::BOOTSTRAP_STYLE_HANDLE,
-            $this->bootstrapStyle
+            plugins_url($this->bootstrapStyle, $this->filePath),
+            false
         );
-        wp_enqueue_style(
-            self::BOOTSTRAP_STYLE_ICONS_HANDLE,
-            $this->bootstrapStyleIcons
-        );
+
         wp_enqueue_script(
             self::BOOTSTRAP_SCRIPT_HANDLE,
-            $this->bootstrapScript,
+            plugins_url($this->bootstrapScript, $this->filePath),
             ['jquery'],
-            '',
+            false,
             true
         );
 
