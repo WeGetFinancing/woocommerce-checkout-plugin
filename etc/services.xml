@@ -14,7 +14,6 @@
         <parameter key="app.file_path"/>
         <parameter key="app.api.version" type="string">1.9</parameter>
         <parameter key="app.software.name" type="string">WordPress-WooCommerce</parameter>
-        <parameter key="app.software.plugin.version" type="string">1.2.2</parameter>
         <parameter key="app.funnel.js">https://cdn.wegetfinancing.com/libs/1.0/getfinancing.js</parameter>
         <parameter key="app.ppe.js.prod">https://ppe.wegetfinancing.com/index.js</parameter>
         <parameter key="app.ppe.js.sandbox">https://ppe.sandbox.dev.wegetfinancing.com/index.js</parameter>
@@ -63,9 +62,7 @@
             <argument>%app.software.name%</argument>
             <argument>%app.software.plugin.version%</argument>
         </service>
-        <service id="postbackUpdate" class="WeGetFinancing\Checkout\Ajax\Public\PostbackUpdate">
-            <argument>%app.api.version%</argument>
-        </service>
+        <service id="postbackUpdate" class="WeGetFinancing\Checkout\Ajax\Public\PostbackUpdate"/>
         <service id="registerShippedOrderStatus" class="WeGetFinancing\Checkout\PostStatus\RegisterShippedOrderStatus"/>
         <service id="onOrderStatusChangeToShipped" class="WeGetFinancing\Checkout\PostStatus\OnOrderStatusChangeToShipped"/>
         <service id="ppeSettingsAdminPage" class="WeGetFinancing\Checkout\Page\Admin\PpeSettingsPage">

@@ -7,11 +7,13 @@ namespace WeGetFinancing\Checkout;
 if (!defined( 'ABSPATH' )) exit;
 
 use Exception;
+use Service\Logger;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Throwable;
+use WeGetFinancing\Checkout\Exception\AppException;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 
 class App implements ActionableInterface
@@ -19,7 +21,8 @@ class App implements ActionableInterface
     use AddableTrait;
 
     public const ID = 'wegetfinancing';
-    public const PLUGIN_FILE_NAME = 'wegetfinancing-checkout.php';
+    public const PLUGIN_VERSION = '1.3.0';
+    public const INTEGRATION_NAME = 'WordPress-WooCommerce';
     public const CONFIG_DIR = 'etc';
     public const DEFAULT_SERVICE_XML_FILE = 'services.xml';
     public const INIT_LIST_PARAMS = 'app.init_list';
@@ -28,7 +31,6 @@ class App implements ActionableInterface
     public const CHECKOUT_BUTTON_URL = 'app.checkout_button.url';
     public const INIT_NAME = 'init';
     public const FUNCTION_NAME = 'execute';
-    public const PLUGIN_BASE_DIR = "/wp-content/plugins/";
 
     protected ContainerInterface $container;
 
@@ -60,9 +62,10 @@ class App implements ActionableInterface
                 }
             );
         } catch (Throwable $exception) {
-            error_log(self::class . "::__construct unexpected error");
-            error_log($exception->getCode() . ' - ' . $exception->getMessage());
-            error_log(print_r($exception->getTraceAsString(), true));
+            Logger::log(new AppException(
+            AppException::CONSTRUCT_ERROR_MESSAGE,
+            AppException::CONSTRUCT_ERROR_CODE
+            ));
         }
     }
 
@@ -92,9 +95,15 @@ class App implements ActionableInterface
                 $obj = $this->container->get($init);
                 $obj->init();
             } catch (Throwable $exception) {
-                error_log(self::class . "::execute() Error initializing object " . $init);
-                throw $exception;
+                Logger::log($exception);
+                throw new AppException(AppException::INIT_ERROR_MESSAGE, AppException::INIT_ERROR_CODE);
             }
         }
+    }
+
+    static public function getIntegrationVersion(): string
+    {
+        global $wp_version;
+        return $wp_version . '-' . constant('WOOCOMMERCE_VERSION');
     }
 }

@@ -7,6 +7,7 @@ namespace WeGetFinancing\Checkout\Ajax\Public;
 if (!defined( 'ABSPATH' )) exit;
 
 use Exception;
+use Service\Logger;
 use Throwable;
 use WeGetFinancing\Checkout\ActionableInterface;
 use WeGetFinancing\Checkout\Exception\PostbackUpdateException;
@@ -46,13 +47,6 @@ class PostbackUpdate implements ActionableInterface
     public const WC_FAILED_STATUS = "wc-failed";
     public const WC_REFUNDED_STATUS = "refunded";
     public const SIGNATURE_ALGO = "sha256";
-
-    protected string $version;
-
-    public function __construct($version)
-    {
-        $this->version = $version;
-    }
 
     public function init(): void
     {
@@ -98,9 +92,7 @@ class PostbackUpdate implements ActionableInterface
             echo "OK";
             die();
         } catch (Throwable $exception) {
-            error_log(self::class . "::action() Error:");
-            error_log($exception->getCode() . ' - ' . $exception->getMessage());
-            error_log(print_r($exception->getTraceAsString(), true));
+            Logger::log($exception);
             echo "NO";
             die();
         }

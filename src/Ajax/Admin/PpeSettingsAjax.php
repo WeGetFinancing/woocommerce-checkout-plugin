@@ -7,8 +7,11 @@ namespace WeGetFinancing\Checkout\Ajax\Admin;
 if (!defined( 'ABSPATH' )) exit;
 
 use Exception;
+use Service\Logger;
 use Throwable;
 use WeGetFinancing\Checkout\AbstractActionableWithClient;
+use WeGetFinancing\Checkout\Exception\PpeSettingsAjaxException;
+use WeGetFinancing\Checkout\Exception\WpEntityValidationException;
 use WeGetFinancing\Checkout\Service\RequestValidatorUtility;
 use WeGetFinancing\Checkout\ValueObject\GeneralDataRequest;
 use WeGetFinancing\Checkout\ValueObject\PpeSettings;
@@ -47,64 +50,14 @@ class PpeSettingsAjax extends AbstractActionableWithClient
                 );
             }
 
-            PpeSettingsRepository::setOption(
-                PpeSettings::PRICE_SELECTOR_ID,
-                $this->data[PpeSettings::PRICE_SELECTOR_ID]
-            );
-
-            PpeSettingsRepository::setOption(
-                PpeSettings::PRODUCT_NAME_SELECTOR_ID,
-                $this->data[PpeSettings::PRODUCT_NAME_SELECTOR_ID]
-            );
-
-            PpeSettingsRepository::setOption(
-                PpeSettings::MERCHANT_TOKEN_ID,
-                $this->data[PpeSettings::MERCHANT_TOKEN_ID]
-            );
-
-            PpeSettingsRepository::setOption(
-                PpeSettings::MINIMUM_AMOUNT_ID,
-                $this->data[PpeSettings::MINIMUM_AMOUNT_ID]
-            );
-
-            PpeSettingsRepository::setOption(
-                PpeSettings::POSITION_ID,
-                $this->data[PpeSettings::POSITION_ID]
-            );
-
-            PpeSettingsRepository::setOption(
-                PpeSettings::CUSTOM_TEXT_ID,
-                $this->data[PpeSettings::CUSTOM_TEXT_ID]
-            );
-
-            PpeSettingsRepository::setOption(
-                PpeSettings::IS_DEBUG_ID,
-                $this->data[PpeSettings::IS_DEBUG_ID]
-            );
-
-            PpeSettingsRepository::setOption(
-                PpeSettings::IS_BRANDED_ID,
-                $this->data[PpeSettings::IS_BRANDED_ID]
-            );
-
-            PpeSettingsRepository::setOption(
-                PpeSettings::IS_APPLY_NOW_ID,
-                $this->data[PpeSettings::IS_APPLY_NOW_ID]
-            );
-
-            PpeSettingsRepository::setOption(
-                PpeSettings::PPE_IS_CONFIGURED,
-                true
-            );
+            $this->setOptions();
 
             wp_send_json(
                 ['isSuccess' => true],
                 201
             );
         } catch (Throwable $exception) {
-            error_log(self::class . "::execute() unexpected error.");
-            error_log($exception->getCode() . ' - ' . $exception->getMessage());
-            error_log(print_r($exception->getTraceAsString(), true));
+            Logger::log($exception);
             PpeSettingsRepository::setOption(
                 PpeSettings::PPE_IS_CONFIGURED,
                 false
@@ -249,10 +202,64 @@ class PpeSettingsAjax extends AbstractActionableWithClient
                 true === isset($_POST[GeneralDataRequest::DATA][PpeSettings::IS_APPLY_NOW_ID]) &&
                 "true" === sanitize_text_field($_POST[GeneralDataRequest::DATA][PpeSettings::IS_APPLY_NOW_ID]);
         } catch (Throwable $exception) {
-            error_log(self::class . "::validateRequest unexpected error");
-            error_log($exception->getCode() . ' - ' . $exception->getMessage());
-            error_log(print_r($exception->getTraceAsString(), true));
-            throw new Exception(self::class . "::validateRequest unexpected error");
+            Logger::log($exception);
+            throw new PpeSettingsAjaxException(
+                PpeSettingsAjaxException::VALIDATE_REQUEST_UNEXPECTED_MESSAGE,
+                PpeSettingsAjaxException::VALIDATE_REQUEST_UNEXPECTED_CODE
+            );
         }
+    }
+
+    protected function setOptions(): void
+    {
+        PpeSettingsRepository::setOption(
+            PpeSettings::PRICE_SELECTOR_ID,
+            $this->data[PpeSettings::PRICE_SELECTOR_ID]
+        );
+
+        PpeSettingsRepository::setOption(
+            PpeSettings::PRODUCT_NAME_SELECTOR_ID,
+            $this->data[PpeSettings::PRODUCT_NAME_SELECTOR_ID]
+        );
+
+        PpeSettingsRepository::setOption(
+            PpeSettings::MERCHANT_TOKEN_ID,
+            $this->data[PpeSettings::MERCHANT_TOKEN_ID]
+        );
+
+        PpeSettingsRepository::setOption(
+            PpeSettings::MINIMUM_AMOUNT_ID,
+            $this->data[PpeSettings::MINIMUM_AMOUNT_ID]
+        );
+
+        PpeSettingsRepository::setOption(
+            PpeSettings::POSITION_ID,
+            $this->data[PpeSettings::POSITION_ID]
+        );
+
+        PpeSettingsRepository::setOption(
+            PpeSettings::CUSTOM_TEXT_ID,
+            $this->data[PpeSettings::CUSTOM_TEXT_ID]
+        );
+
+        PpeSettingsRepository::setOption(
+            PpeSettings::IS_DEBUG_ID,
+            $this->data[PpeSettings::IS_DEBUG_ID]
+        );
+
+        PpeSettingsRepository::setOption(
+            PpeSettings::IS_BRANDED_ID,
+            $this->data[PpeSettings::IS_BRANDED_ID]
+        );
+
+        PpeSettingsRepository::setOption(
+            PpeSettings::IS_APPLY_NOW_ID,
+            $this->data[PpeSettings::IS_APPLY_NOW_ID]
+        );
+
+        PpeSettingsRepository::setOption(
+            PpeSettings::PPE_IS_CONFIGURED,
+            true
+        );
     }
 }

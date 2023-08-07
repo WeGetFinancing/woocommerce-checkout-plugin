@@ -6,7 +6,9 @@ namespace WeGetFinancing\Checkout;
 
 if (!defined( 'ABSPATH' )) exit;
 
-use WeGetFinancing\Checkout\Exception\GenerateClientException;
+use Service\Logger;
+use WeGetFinancing\Checkout\Exception\AbstractActionableWithClientException;
+use WeGetFinancing\Checkout\Exception\WpEntityValidationException;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
 use WeGetFinancing\Checkout\Service\RequestValidatorUtility;
@@ -20,8 +22,8 @@ abstract class AbstractActionableWithClient implements ActionableInterface
     protected array $violations = [];
 
     /**
-     * @throws GenerateClientException
      * @return Client
+     * @throws AbstractActionableWithClientException
      */
     protected function generateClient(): Client
     {
@@ -44,21 +46,20 @@ abstract class AbstractActionableWithClient implements ActionableInterface
             ]);
             return Client::Make($auth);
         } catch (EntityValidationException $exception) {
-            error_log(self::class . "::generateClient entity validation error");
-            error_log($exception->getCode() . ' - ' . $exception->getMessage());
-            error_log(print_r($exception->getTraceAsString(), true));
-            error_log(json_encode($exception->getViolations()));
-            throw new GenerateClientException(
-                GenerateClientException::GENERATE_CLIENT_VALIDATION_ERROR_MESSAGE,
-                GenerateClientException::GENERATE_CLIENT_VALIDATION_ERROR_CODE
+            Logger::log($exception);
+            Logger::log(new AbstractActionableWithClientException(
+                json_encode($exception->getViolations()),
+                AbstractActionableWithClientException::VALIDATION_JSON_CODE
+            ));
+            throw new AbstractActionableWithClientException(
+                AbstractActionableWithClientException::VALIDATION_ERROR_MESSAGE,
+                AbstractActionableWithClientException::VALIDATION_ERROR_CODE
             );
         } catch (\Throwable $exception) {
-            error_log(self::class . "::generateClient unexpected error");
-            error_log($exception->getCode() . ' - ' . $exception->getMessage());
-            error_log(print_r($exception->getTraceAsString(), true));
-            throw new GenerateClientException(
-                GenerateClientException::GENERATE_CLIENT_UNEXPECTED_ERROR_MESSAGE,
-                GenerateClientException::GENERATE_CLIENT_UNEXPECTED_ERROR_CODE
+            Logger::log($exception);
+            throw new AbstractActionableWithClientException(
+                AbstractActionableWithClientException::GENERATE_CLIENT_UNEXPECTED_ERROR_MESSAGE,
+                AbstractActionableWithClientException::GENERATE_CLIENT_UNEXPECTED_ERROR_CODE
             );
         }
     }
@@ -81,11 +82,9 @@ abstract class AbstractActionableWithClient implements ActionableInterface
                 'message' => 'general was sent to the server.',
             ];
 
-            error_log(self::class . "::validateGeneralDataRequest ERROR: data is not set in the request.");
-
-            throw new EntityValidationException(
-                'Invalid data funnel request',
-                12,
+            throw new WpEntityValidationException(
+                WpEntityValidationException::DATA_NOT_SET_MESSAGE,
+                WpEntityValidationException::DATA_NOT_SET_CODE,
                 null,
                 $this->violations
             );

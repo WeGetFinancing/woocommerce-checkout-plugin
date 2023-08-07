@@ -92,6 +92,12 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                     'label' => WeGetFinancingValueObject::IS_SANDBOX_FIELD_LABEL,
                     'default' => 'yes',
                 ],
+                WeGetFinancingValueObject::IS_SENTRY_FIELD_ID => [
+                    'title'   => WeGetFinancingValueObject::IS_SENTRY_FIELD_TITLE,
+                    'type'    => 'checkbox',
+                    'label'   => WeGetFinancingValueObject::IS_SENTRY_FIELD_LABEL,
+                    'default' => 'no',
+                ],
                 WeGetFinancingValueObject::USERNAME_FIELD_ID => [
                     'title' => WeGetFinancingValueObject::USERNAME_FIELD_TITLE,
                     'type' => 'text',
