@@ -20,6 +20,8 @@ use WeGetFinancing\Checkout\ValueObject\PpeSettings;
 
 class PpeSettingsPage implements ActionableInterface
 {
+    public const PAGE_TITLE = 'WeGetFinancing PPE Configuration Dashboard';
+    public const MENU_TITLE = 'WeGetFinancing PPE';
     public const CAPABILITY = 'manage_options';
     public const MENU_SLUG = 'wgf-ppe-dashboard';
     public const METHOD_RENDERER = 'render';
@@ -47,8 +49,8 @@ class PpeSettingsPage implements ActionableInterface
     public function execute(): void
     {
         add_menu_page(
-            __('WeGetFinancing PPE Configuration Dashboard', 'wegetfinancing-payment-gateway'),
-            __('WeGetFinancing PPE', 'wegetfinancing-payment-gateway'),
+            self::PAGE_TITLE,
+            self::MENU_TITLE,
             self::CAPABILITY,
             self::MENU_SLUG,
             [$this, self::METHOD_RENDERER],
