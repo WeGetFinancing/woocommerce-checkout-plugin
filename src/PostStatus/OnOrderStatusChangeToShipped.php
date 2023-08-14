@@ -7,7 +7,7 @@ namespace WeGetFinancing\Checkout\PostStatus;
 if (!defined( 'ABSPATH' )) exit;
 
 use DateTime;
-use Service\Logger;
+use WeGetFinancing\Checkout\Service\Logger;
 use WeGetFinancing\Checkout\AbstractActionableWithClient;
 use WeGetFinancing\Checkout\Exception\OnOrderStatusChangeToShippedException;
 use WeGetFinancing\Checkout\PostMeta\OrderInvIdValueObject;
@@ -64,7 +64,7 @@ class OnOrderStatusChangeToShipped extends AbstractActionableWithClient
 
             Logger::log(new OnOrderStatusChangeToShippedException(
                 OnOrderStatusChangeToShippedException::REMOTE_ERROR_MESSAGE . $response->getCode() .
-                    print_r($response->getData(), true),
+                    print_r($response->getData(), true) . Logger::getDecorativeData(),
                 OnOrderStatusChangeToShippedException::REMOTE_ERROR_CODE
             ));
         }

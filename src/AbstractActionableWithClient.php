@@ -6,7 +6,7 @@ namespace WeGetFinancing\Checkout;
 
 if (!defined( 'ABSPATH' )) exit;
 
-use Service\Logger;
+use  WeGetFinancing\Checkout\Service\Logger;
 use WeGetFinancing\Checkout\Exception\AbstractActionableWithClientException;
 use WeGetFinancing\Checkout\Exception\WpEntityValidationException;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing;
@@ -52,13 +52,14 @@ abstract class AbstractActionableWithClient implements ActionableInterface
                 AbstractActionableWithClientException::VALIDATION_JSON_CODE
             ));
             throw new AbstractActionableWithClientException(
-                AbstractActionableWithClientException::VALIDATION_ERROR_MESSAGE,
+                AbstractActionableWithClientException::VALIDATION_ERROR_MESSAGE . Logger::getDecorativeData(),
                 AbstractActionableWithClientException::VALIDATION_ERROR_CODE
             );
         } catch (\Throwable $exception) {
             Logger::log($exception);
             throw new AbstractActionableWithClientException(
-                AbstractActionableWithClientException::GENERATE_CLIENT_UNEXPECTED_ERROR_MESSAGE,
+                AbstractActionableWithClientException::GENERATE_CLIENT_UNEXPECTED_ERROR_MESSAGE .
+                    Logger::getDecorativeData(),
                 AbstractActionableWithClientException::GENERATE_CLIENT_UNEXPECTED_ERROR_CODE
             );
         }

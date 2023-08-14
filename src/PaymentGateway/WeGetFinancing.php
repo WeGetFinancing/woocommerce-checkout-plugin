@@ -91,7 +91,7 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                     'title' => WeGetFinancingValueObject::IS_SENTRY_FIELD_TITLE,
                     'type' => 'checkbox',
                     'label' => WeGetFinancingValueObject::IS_SENTRY_FIELD_LABEL,
-                    'default' => 'no',
+                    'default' => 'yes',
                 ],
                 WeGetFinancingValueObject::USERNAME_FIELD_ID => [
                     'title' => WeGetFinancingValueObject::USERNAME_FIELD_TITLE,
@@ -186,6 +186,7 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                 'error_display_selector' => htmlspecialchars_decode(
                     self::getOption(WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_ID),
                 ),
+                'nonce' => wp_create_nonce(WeGetFinancingValueObject::NONCE)
             ]
         );
     }

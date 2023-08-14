@@ -40,3 +40,4 @@
 * Implemented Sentry log, which allows to centralize all of our installation logs on our Sentry monitor
 * Implemented nonce on all of our ajax call
 * Removed multi-language support
+* Update ppe to the latest settings

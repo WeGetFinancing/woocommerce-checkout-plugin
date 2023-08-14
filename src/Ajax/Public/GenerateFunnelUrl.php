@@ -6,13 +6,14 @@ namespace WeGetFinancing\Checkout\Ajax\Public;
 
 if (!defined( 'ABSPATH' )) exit;
 
-use Service\Logger;
 use Throwable;
 use WeGetFinancing\Checkout\AbstractActionableWithClient;
 use WeGetFinancing\Checkout\App;
 use WeGetFinancing\Checkout\Exception\AbstractActionableWithClientException;
 use WeGetFinancing\Checkout\Exception\GenerateFunnelUrlException;
 use WeGetFinancing\Checkout\Exception\GetFunnelRequestException;
+use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
+use WeGetFinancing\Checkout\Service\Logger;
 use WeGetFinancing\Checkout\Service\RequestValidatorUtility;
 use WeGetFinancing\Checkout\ValueObject\GeneralDataRequest;
 use WeGetFinancing\Checkout\ValueObject\GenerateFunnelUrlRequest;
@@ -83,6 +84,8 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
     public function execute(): void
     {
         try {
+            check_ajax_referer(WeGetFinancingValueObject::NONCE);
+
             $client = $this->generateClient();
             $request = $this->getRequest();
             $loanRequest = $this->getLoanRequest($request);

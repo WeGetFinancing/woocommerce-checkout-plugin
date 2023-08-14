@@ -108,6 +108,14 @@ class PpeShortcode
                     PpeSettings::CUSTOM_TEXT_ID,
                     PpeSettings::CUSTOM_TEXT_DEFAULT_VALUE
                 ),
+                'ppeIsHoverValue' => PpeSettingsRepository::getOptionOrDefault(
+                    PpeSettings::IS_HOVER_ID,
+                    PpeSettings::IS_HOVER_DEFAULT_VALUE
+                ),
+                'ppeFontSizeValue' => PpeSettingsRepository::getOptionOrDefault(
+                    PpeSettings::FONT_SIZE_ID,
+                    PpeSettings::FONT_SIZE_DEFAULT_VALUE
+                ),
                 'ppePositionValue' => PpeSettingsRepository::getOptionOrDefault(
                     PpeSettings::POSITION_ID,
                     PpeSettings::POSITION_DEFAULT_VALUE

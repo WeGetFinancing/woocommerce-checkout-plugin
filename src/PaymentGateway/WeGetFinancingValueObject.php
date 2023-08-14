@@ -48,4 +48,5 @@ class WeGetFinancingValueObject
         self::ERROR_ATTACH_FIELD_PREPEND_VALUE => self::ERROR_ATTACH_FIELD_PREPEND_LABEL,
         self::ERROR_ATTACH_FIELD_APPEND_VALUE => self::ERROR_ATTACH_FIELD_APPEND_LABEL,
     ];
+    public const NONCE = 'generate-funnel-url';
 }

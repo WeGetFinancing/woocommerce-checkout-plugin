@@ -7,7 +7,7 @@ namespace WeGetFinancing\Checkout;
 if (!defined( 'ABSPATH' )) exit;
 
 use Exception;
-use Service\Logger;
+use WeGetFinancing\Checkout\Service\Logger;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -62,8 +62,9 @@ class App implements ActionableInterface
                 }
             );
         } catch (Throwable $exception) {
+            Logger::log($exception);
             Logger::log(new AppException(
-            AppException::CONSTRUCT_ERROR_MESSAGE,
+            AppException::CONSTRUCT_ERROR_MESSAGE . Logger::getDecorativeData(),
             AppException::CONSTRUCT_ERROR_CODE
             ));
         }
@@ -96,7 +97,10 @@ class App implements ActionableInterface
                 $obj->init();
             } catch (Throwable $exception) {
                 Logger::log($exception);
-                throw new AppException(AppException::INIT_ERROR_MESSAGE, AppException::INIT_ERROR_CODE);
+                throw new AppException(
+                    AppException::INIT_ERROR_MESSAGE . Logger::getDecorativeData(),
+                    AppException::INIT_ERROR_CODE)
+                ;
             }
         }
     }

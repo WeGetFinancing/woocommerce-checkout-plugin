@@ -7,11 +7,11 @@ namespace WeGetFinancing\Checkout\Ajax\Admin;
 if (!defined( 'ABSPATH' )) exit;
 
 use Exception;
-use Service\Logger;
+use WeGetFinancing\Checkout\Page\Admin\PpeSettingsPage;
+use WeGetFinancing\Checkout\Service\Logger;
 use Throwable;
 use WeGetFinancing\Checkout\AbstractActionableWithClient;
 use WeGetFinancing\Checkout\Exception\PpeSettingsAjaxException;
-use WeGetFinancing\Checkout\Exception\WpEntityValidationException;
 use WeGetFinancing\Checkout\Service\RequestValidatorUtility;
 use WeGetFinancing\Checkout\ValueObject\GeneralDataRequest;
 use WeGetFinancing\Checkout\ValueObject\PpeSettings;
@@ -38,6 +38,7 @@ class PpeSettingsAjax extends AbstractActionableWithClient
     public function execute(): void
     {
         try {
+            $this->securityChecks();
             $this->initRequest();
 
             if (false === empty($this->violations)) {
@@ -155,6 +156,22 @@ class PpeSettingsAjax extends AbstractActionableWithClient
             if (
                 RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
                     $_POST[GeneralDataRequest::DATA],
+                    PpeSettings::FONT_SIZE_ID
+                )
+            ) {
+                $this->violations[] = [
+                    'field' => PpeSettings::FONT_SIZE_ID,
+                    'message' => '<b>' . PpeSettings::FONT_SIZE_NAME . '</b> cannot be empty.',
+                ];
+            } else {
+                $this->data[PpeSettings::FONT_SIZE_ID] = sanitize_text_field(
+                    $_POST[GeneralDataRequest::DATA][PpeSettings::FONT_SIZE_ID]
+                );
+            }
+
+            if (
+                RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
+                    $_POST[GeneralDataRequest::DATA],
                     PpeSettings::POSITION_ID
                 )
             ) {
@@ -201,11 +218,31 @@ class PpeSettingsAjax extends AbstractActionableWithClient
             $this->data[PpeSettings::IS_APPLY_NOW_ID] =
                 true === isset($_POST[GeneralDataRequest::DATA][PpeSettings::IS_APPLY_NOW_ID]) &&
                 "true" === sanitize_text_field($_POST[GeneralDataRequest::DATA][PpeSettings::IS_APPLY_NOW_ID]);
+
+            $this->data[PpeSettings::IS_HOVER_ID] =
+                true === isset($_POST[GeneralDataRequest::DATA][PpeSettings::IS_HOVER_ID]) &&
+                "true" === sanitize_text_field($_POST[GeneralDataRequest::DATA][PpeSettings::IS_HOVER_ID]);
         } catch (Throwable $exception) {
             Logger::log($exception);
             throw new PpeSettingsAjaxException(
-                PpeSettingsAjaxException::VALIDATE_REQUEST_UNEXPECTED_MESSAGE,
+                PpeSettingsAjaxException::VALIDATE_REQUEST_UNEXPECTED_MESSAGE . Logger::getDecorativeData(),
                 PpeSettingsAjaxException::VALIDATE_REQUEST_UNEXPECTED_CODE
+            );
+        }
+    }
+
+    /**
+     * @return void
+     * @throws PpeSettingsAjaxException
+     */
+    protected function securityChecks(): void
+    {
+        check_admin_referer(PpeSettingsPage::NONCE);
+
+        if (false === current_user_can('administrator')) {
+            throw new PpeSettingsAjaxException(
+                PpeSettingsAjaxException::NOT_ADMIN_MESSAGE . Logger::getDecorativeData(),
+                PpeSettingsAjaxException::NOT_ADMIN_CODE
             );
         }
     }
@@ -255,6 +292,16 @@ class PpeSettingsAjax extends AbstractActionableWithClient
         PpeSettingsRepository::setOption(
             PpeSettings::IS_APPLY_NOW_ID,
             $this->data[PpeSettings::IS_APPLY_NOW_ID]
+        );
+
+        PpeSettingsRepository::setOption(
+            PpeSettings::IS_HOVER_ID,
+            $this->data[PpeSettings::IS_HOVER_ID]
+        );
+
+        PpeSettingsRepository::setOption(
+            PpeSettings::FONT_SIZE_ID,
+            $this->data[PpeSettings::FONT_SIZE_ID]
         );
 
         PpeSettingsRepository::setOption(

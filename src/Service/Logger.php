@@ -2,23 +2,34 @@
 
 declare(strict_types=1);
 
-namespace Service;
+namespace WeGetFinancing\Checkout\Service;
 
-use ReflectionException;
-use ReflectionObject;
+if (!defined( 'ABSPATH' )) exit;
+
 use Throwable;
 use WeGetFinancing\Checkout\App;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
+use function Sentry\captureException;
+use function Sentry\init;
 
 class Logger
 {
+    protected const DSN = 'https://1757ae63ca464acc93a7bca35ed049f5@sentry.dev.wegetfinancing.com/25';
+
     static public function log(Throwable $exception): void
     {
         self::wpLog($exception);
-        if ("yes" === WeGetFinancing::getOption(WeGetFinancingValueObject::IS_SENTRY_FIELD_ID)) {
+        if (
+            "yes" === WeGetFinancing::getOption(
+            WeGetFinancingValueObject::IS_SENTRY_FIELD_ID,
+            "yes"
+            )
+        ) {
             self::sentryLog($exception);
         }
+
+
     }
 
     static public function wpLog(Throwable $exception): void
@@ -30,19 +41,11 @@ class Logger
 
     static public function sentryLog(Throwable $exception): void
     {
-        try {
-            $reflectionObject = new ReflectionObject($exception);
-            $reflectionObjectProp = $reflectionObject->getProperty('message');
-            $reflectionObjectProp->setAccessible(true);
-            $reflectionObjectProp->setValue($exception, $exception->getMessage() . self::getDecorativeSentryData());
-        } catch (Throwable $throwable) {
-            self::wpLog($throwable);
-        }
-
-
+        init(['dsn' => self::DSN ]);
+        captureException($exception);
     }
 
-    static public function getDecorativeSentryData(): string
+    static public function getDecorativeData(): string
     {
         return
             " - PGV: " . App::PLUGIN_VERSION . " - INT: " . App::INTEGRATION_NAME . " " . App::getIntegrationVersion();

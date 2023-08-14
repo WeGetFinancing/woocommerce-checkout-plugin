@@ -1,7 +1,7 @@
 {
   "name": "wegetfinancing/woocommerce-checkout-plugin",
   "description": "Woocommerce checkout plugin",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "homepage": "https://wegetfinancing.com",
   "type": "software",
   "license": "LGPL-3.0-only",
@@ -17,12 +17,13 @@
     "twig/twig": "^3.0",
     "wegetfinancing/php-sdk": "=v2.4.0",
     "symfony/config": "^6.0",
-    "twbs/bootstrap": "5.3.1"
+    "sentry/sdk": "^3.5"
   },
   "require-dev": {
     "phpstan/phpstan": "@stable",
     "squizlabs/php_codesniffer": "@stable",
-    "friendsofphp/php-cs-fixer": "@stable"
+    "friendsofphp/php-cs-fixer": "@stable",
+    "twbs/bootstrap": "5.3.1"
   },
   "autoload": {
     "psr-4": {
@@ -45,5 +46,10 @@
     "deploy-assets": [
       "cp vendor/twbs/bootstrap/dist/css/bootstrap.min.css dist/bootstrap.min.css && cp vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js dist/bootstrap.bundle.min.js"
     ]
+  },
+  "config": {
+    "allow-plugins": {
+      "php-http/discovery": true
+    }
   }
 }
