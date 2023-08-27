@@ -35,7 +35,7 @@
             <parameter>onOrderStatusChangeToShipped</parameter>
             <parameter>ppeSettingsAdminPage</parameter>
             <parameter>ppeSettingsAjax</parameter>
-            <parameter>ppeShortcode</parameter>
+            <parameter>ppeFooter</parameter>
         </parameter>
     </parameters>
 
@@ -69,7 +69,7 @@
             <argument>%app.bootstrap.js%</argument>
             <argument>%app.bootstrap.css%</argument>
         </service>
-        <service id="ppeShortcode" class="WeGetFinancing\Checkout\Shortcode\PpeShortcode">
+        <service id="ppeFooter" class="WeGetFinancing\Checkout\Page\Public\FooterPpe">
             <argument type="service" id="twig"/>
             <argument>%app.ppe.js.prod%</argument>
             <argument>%app.ppe.js.sandbox%</argument>

@@ -10,6 +10,9 @@ interface PpeSettings
 {
     public const NOT_CONFIGURED_LABEL =
         'WeGetFinancing Checkout is not configured, please configure it via WooCommerce > Settings > Payments.';
+    public const IS_PPE_ACTIVE_ID = 'wgf_ppe_settings_is_ppe_active_id';
+    public const IS_PPE_ACTIVE_NAME = 'If checked, PPE is Active';
+    public const IS_PPE_ACTIVE_DEFAULT_VALUE = true;
     public const PRICE_SELECTOR_ID = 'wgf_ppe_settings_selector_id';
     public const PRICE_SELECTOR_NAME = 'Price Selector';
     public const PRICE_SELECTOR_LABEL = 'Class to find the prices on the page';

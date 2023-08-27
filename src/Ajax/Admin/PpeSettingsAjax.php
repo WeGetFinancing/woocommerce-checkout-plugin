@@ -207,21 +207,21 @@ class PpeSettingsAjax extends AbstractActionableWithClient
                     ? ''
                     : sanitize_text_field($_POST[GeneralDataRequest::DATA][PpeSettings::CUSTOM_TEXT_ID]);
 
-            $this->data[PpeSettings::IS_DEBUG_ID] =
-                true === isset($_POST[GeneralDataRequest::DATA][PpeSettings::IS_DEBUG_ID]) &&
-                "true" === sanitize_text_field($_POST[GeneralDataRequest::DATA][PpeSettings::IS_DEBUG_ID]);
-
-            $this->data[PpeSettings::IS_BRANDED_ID] =
-                true === isset($_POST[GeneralDataRequest::DATA][PpeSettings::IS_BRANDED_ID]) &&
-                "true" === sanitize_text_field($_POST[GeneralDataRequest::DATA][PpeSettings::IS_BRANDED_ID]);
-
-            $this->data[PpeSettings::IS_APPLY_NOW_ID] =
-                true === isset($_POST[GeneralDataRequest::DATA][PpeSettings::IS_APPLY_NOW_ID]) &&
-                "true" === sanitize_text_field($_POST[GeneralDataRequest::DATA][PpeSettings::IS_APPLY_NOW_ID]);
-
-            $this->data[PpeSettings::IS_HOVER_ID] =
-                true === isset($_POST[GeneralDataRequest::DATA][PpeSettings::IS_HOVER_ID]) &&
-                "true" === sanitize_text_field($_POST[GeneralDataRequest::DATA][PpeSettings::IS_HOVER_ID]);
+            $this->data[PpeSettings::IS_PPE_ACTIVE_ID] = $this->getBooleanFromRequestData(
+                PpeSettings::IS_PPE_ACTIVE_ID
+            );
+            $this->data[PpeSettings::IS_DEBUG_ID] = $this->getBooleanFromRequestData(
+                PpeSettings::IS_DEBUG_ID
+            );
+            $this->data[PpeSettings::IS_BRANDED_ID] = $this->getBooleanFromRequestData(
+                PpeSettings::IS_BRANDED_ID
+            );
+            $this->data[PpeSettings::IS_APPLY_NOW_ID] = $this->getBooleanFromRequestData(
+                PpeSettings::IS_APPLY_NOW_ID
+            );
+            $this->data[PpeSettings::IS_HOVER_ID] = $this->getBooleanFromRequestData(
+                PpeSettings::IS_HOVER_ID
+            );
         } catch (Throwable $exception) {
             Logger::log($exception);
             throw new PpeSettingsAjaxException(
@@ -249,6 +249,11 @@ class PpeSettingsAjax extends AbstractActionableWithClient
 
     protected function setOptions(): void
     {
+        PpeSettingsRepository::setOption(
+            PpeSettings::IS_PPE_ACTIVE_ID,
+            $this->data[PpeSettings::IS_PPE_ACTIVE_ID]
+        );
+
         PpeSettingsRepository::setOption(
             PpeSettings::PRICE_SELECTOR_ID,
             $this->data[PpeSettings::PRICE_SELECTOR_ID]
@@ -308,5 +313,11 @@ class PpeSettingsAjax extends AbstractActionableWithClient
             PpeSettings::PPE_IS_CONFIGURED,
             true
         );
+    }
+
+    protected function getBooleanFromRequestData(string $name): bool
+    {
+        return true === isset($_POST[GeneralDataRequest::DATA][$name]) &&
+            "true" === sanitize_text_field($_POST[GeneralDataRequest::DATA][$name]);
     }
 }

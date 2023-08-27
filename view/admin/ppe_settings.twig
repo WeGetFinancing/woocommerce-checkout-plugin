@@ -8,9 +8,6 @@
         <div class="card">
             <div class="card-body">
                 <h1>WeGetFinancing PPE Configuration Page</h1>
-                <div class="row">
-                    <h5>Your Shortcode is:<code>[wegetfinancing-ppe]</code></h5>
-                </div>
             </div>
         </div>
     </div>
@@ -25,6 +22,10 @@
         <div class="card">
             <div class="card-body">
                 <form id="wegetfinancing-ppe-config-form">
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="{{ ppeIsActiveId }}" {% if ppeIsActiveValue %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ ppeIsActiveId }}">{{ ppeIsActiveName }}</label>
+                    </div>
                     <div class="mb-3">
                         <label for="{{ ppePriceSelectorId }}" class="form-label">{{ ppePriceSelectorName }}</label>
                         <input
@@ -181,7 +182,9 @@
     jQuery('#{{ ppeSaveButtonId }}').click((e) => {
         wgf_ppe_clean_input_data();
 
-        let isDebug = jQuery('#{{ ppeIsDebugId }}').is(':checked')
+        let isActive = jQuery('#{{ ppeIsActiveId }}').is(':checked')
+                ? "true" : "false",
+            isDebug = jQuery('#{{ ppeIsDebugId }}').is(':checked')
                 ? "true" : "false",
             isApplyNow = jQuery('#{{ ppeIsApplyNowId }}').is(':checked')
                 ? "true" : "false",
@@ -191,6 +194,7 @@
                 ? "true" : "false";
 
         let settings = {
+            {{ ppeIsActiveId }}: isActive,
             {{ ppePriceSelectorId }}: jQuery('#{{ ppePriceSelectorId }}').val(),
             {{ ppeProductNameSelectorId }}: jQuery('#{{ ppeProductNameSelectorId }}').val(),
             {{ ppeIsDebugId }}: isDebug,

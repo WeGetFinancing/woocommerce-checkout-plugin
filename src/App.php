@@ -54,6 +54,7 @@ class App implements ActionableInterface
                 $this->init();
                 return;
             }
+
             add_action(
                 'admin_notices',
                 function() {

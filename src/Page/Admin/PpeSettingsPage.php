@@ -102,6 +102,12 @@ class PpeSettingsPage implements ActionableInterface
                 'isConfigured' => (false === empty($auth['username']) &&
                     false === empty($auth['password']) &&
                     false === empty($auth['merchantId'])),
+                'ppeIsActiveId' => PpeSettings::IS_PPE_ACTIVE_ID,
+                'ppeIsActiveName' => PpeSettings::IS_PPE_ACTIVE_NAME,
+                'ppeIsActiveValue' => PpeSettingsRepository::getOptionOrDefault(
+                    PpeSettings::IS_PPE_ACTIVE_ID,
+                    PpeSettings::IS_PPE_ACTIVE_DEFAULT_VALUE
+                ),
                 'notConfiguredLabel' => PpeSettings::NOT_CONFIGURED_LABEL,
                 'ppePriceSelectorId' => PpeSettings::PRICE_SELECTOR_ID,
                 'ppePriceSelectorName' => PpeSettings::PRICE_SELECTOR_NAME,
