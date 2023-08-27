@@ -41,3 +41,6 @@
 * Implemented nonce on all of our ajax call
 * Removed multi-language support
 * Update ppe to the latest settings
+* Removed shortcode support
+* Loaded ppe from footer
+* Added settings to disable ppe
