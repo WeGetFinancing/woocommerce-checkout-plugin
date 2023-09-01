@@ -11,13 +11,6 @@ services:
     environment:
       - PHP_CS_FIXER_IGNORE_ENV=1
 
-  npm:
-    image: node:20-alpine
-    restart: "no"
-    volumes:
-      - ./:/app
-    working_dir: /app
-
   db:
     image: mariadb:10.7.7-focal
     container_name: db
@@ -30,7 +23,7 @@ services:
   wp:
     depends_on:
       - db
-    image: wordpress:6.2.2-php8.0-fpm-alpine
+    image: wordpress:6.3-php8.0-fpm-alpine
     container_name: wp
     restart: always
     user: "root:root"

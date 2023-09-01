@@ -28,6 +28,14 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
     public const GATEWAY_ID = "wegetfinancing";
     public const INIT_NAME = 'woocommerce_update_options_payment_gateways_';
     public const FUNCTION_NAME = 'process_admin_options';
+    public const METHOD_TITLE = 'WeGetFinancing';
+    public const METHOD_DESCRIPTION = 'Boost your sales by adding WeGetFinancing to your checkout. ' .
+    'Offer affordable monthly payments to your existing customers while you receive the money ' .
+    'directly into your account, in one lump sum.';
+    public const TITLE = 'WeGetFinancing';
+    public const DESCRIPTION = 'Pay monthly, obtain instant approval with no extensive paperwork.' .
+    ' Get credit approval in just seconds, so you can complete your purchase immediately, hassle-free.';
+    public const SUPPORTS = ['products', 'refunds'];
 
     protected Environment $twig;
 
@@ -37,28 +45,15 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
         $this->id = static::GATEWAY_ID;
         $this->has_fields = false;
         $this->icon = '';
-        $this->method_title = __('WeGetFinancing', 'wegetfinancing-payment-gateway');
-        $this->method_description = __(
-            "Boost your sales by adding WeGetFinancing to your checkout. " .
-            "Offer affordable monthly payments to your existing customers while you receive the money" .
-            " directly into your account, in one lump sum.",
-            'wegetfinancing-payment-gateway'
-        );
-        $this->title = __('WeGetFinancing', 'wegetfinancing-payment-gateway');
-        $this->description = __(
-            "Pay monthly, obtain instant approval with no extensive paperwork." .
-            " Get credit approval in just seconds, so you can complete your purchase immediately, hassle-free.",
-            'wegetfinancing-payment-gateway'
-        );
-        $this->supports    = [
-            'products',
-            'refunds',
-        ];
-        // Load the settings.
+        $this->method_title = self::METHOD_TITLE;
+        $this->method_description = self::METHOD_DESCRIPTION;
+        $this->title = self::TITLE;
+        $this->description = self::DESCRIPTION;
+        $this->supports = self::SUPPORTS;
+
         $this->init_form_fields();
         $this->init_settings();
 
-        // Define user set variables
         $this->{WeGetFinancingValueObject::IS_SANDBOX_FIELD_ID} =
             $this->get_option(WeGetFinancingValueObject::IS_SANDBOX_FIELD_ID, true);
         $this->{WeGetFinancingValueObject::USERNAME_FIELD_ID} =
@@ -92,6 +87,12 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                     'label' => WeGetFinancingValueObject::IS_SANDBOX_FIELD_LABEL,
                     'default' => 'yes',
                 ],
+                WeGetFinancingValueObject::IS_SENTRY_FIELD_ID => [
+                    'title' => WeGetFinancingValueObject::IS_SENTRY_FIELD_TITLE,
+                    'type' => 'checkbox',
+                    'label' => WeGetFinancingValueObject::IS_SENTRY_FIELD_LABEL,
+                    'default' => 'yes',
+                ],
                 WeGetFinancingValueObject::USERNAME_FIELD_ID => [
                     'title' => WeGetFinancingValueObject::USERNAME_FIELD_TITLE,
                     'type' => 'text',
@@ -100,25 +101,25 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                     'desc_tip' => true,
                 ],
                 WeGetFinancingValueObject::PASSWORD_FIELD_ID => [
-                    'title'   => WeGetFinancingValueObject::PASSWORD_FIELD_TITLE,
-                    'type'        => 'password',
-                    'description'   => WeGetFinancingValueObject::PASSWORD_FIELD_LABEL,
-                    'default'     => '',
-                    'desc_tip'    => true,
+                    'title' => WeGetFinancingValueObject::PASSWORD_FIELD_TITLE,
+                    'type' => 'password',
+                    'description' => WeGetFinancingValueObject::PASSWORD_FIELD_LABEL,
+                    'default' => '',
+                    'desc_tip' => true,
                 ],
                 WeGetFinancingValueObject::MERCHANT_ID_FIELD_ID => [
-                    'title'   => WeGetFinancingValueObject::MERCHANT_ID_FIELD_TITLE,
-                    'type'        => 'text',
-                    'description'   => WeGetFinancingValueObject::MERCHANT_ID_FIELD_LABEL,
-                    'default'     => '',
-                    'desc_tip'    => true,
+                    'title' => WeGetFinancingValueObject::MERCHANT_ID_FIELD_TITLE,
+                    'type' => 'text',
+                    'description' => WeGetFinancingValueObject::MERCHANT_ID_FIELD_LABEL,
+                    'default' => '',
+                    'desc_tip' => true,
                 ],
                 WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_ID => [
                     'title' => WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_TITLE,
                     'type' => 'text',
                     'description' => WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_LABEL,
                     'default' => WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_DEFAULT,
-                    'desc_tip'    => true,
+                    'desc_tip' => true,
                 ],
                 WeGetFinancingValueObject::ERROR_ATTACH_FIELD_ID => [
                     'title' => WeGetFinancingValueObject::ERROR_ATTACH_FIELD_TITLE,
@@ -126,7 +127,7 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                     'description' => WeGetFinancingValueObject::ERROR_ATTACH_FIELD_LABEL,
                     'default' => WeGetFinancingValueObject::ERROR_ATTACH_FIELD_DEFAULT,
                     'options' => WeGetFinancingValueObject::ERROR_ATTACH_FIELD_VALUES,
-                    'desc_tip'    => true,
+                    'desc_tip' => true,
                 ],
             ]
         );
@@ -142,9 +143,7 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
     {
         echo $this->twig->render(
             'admin/payment_settings.twig',
-            [
-                'form' => $this->generate_settings_html([], false),
-            ]
+            ['form' => $this->generate_settings_html([], false)]
         );
     }
 
@@ -187,6 +186,7 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                 'error_display_selector' => htmlspecialchars_decode(
                     self::getOption(WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_ID),
                 ),
+                'nonce' => wp_create_nonce(WeGetFinancingValueObject::NONCE)
             ]
         );
     }
@@ -200,16 +200,16 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
     public function process_payment($order_id): array
     {
         $order = wc_get_order($order_id);
-        // Mark as on-hold (we're awaiting the payment)
+
         $order->update_status(
             WeGetFinancingValueObject::ON_HOLD_STATUS_ID,
             WeGetFinancingValueObject::ON_HOLD_STATUS_LABEL
         );
-        // Reduce stock levels
+
         wc_reduce_stock_levels($order->get_id());
-        // Remove cart
+
         WC()->cart->empty_cart();
-        // Return thank you redirect
+
         return [
             'result' => WeGetFinancingValueObject::PROCESS_PAYMENT_SUCCESS_ID,
             'redirect' => $this->get_return_url($order),

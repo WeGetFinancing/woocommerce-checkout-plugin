@@ -6,10 +6,14 @@ namespace WeGetFinancing\Checkout\Ajax\Public;
 
 if (!defined( 'ABSPATH' )) exit;
 
+use Throwable;
 use WeGetFinancing\Checkout\AbstractActionableWithClient;
 use WeGetFinancing\Checkout\App;
-use WeGetFinancing\Checkout\Exception\GenerateClientException;
+use WeGetFinancing\Checkout\Exception\AbstractActionableWithClientException;
+use WeGetFinancing\Checkout\Exception\GenerateFunnelUrlException;
 use WeGetFinancing\Checkout\Exception\GetFunnelRequestException;
+use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
+use WeGetFinancing\Checkout\Service\Logger;
 use WeGetFinancing\Checkout\Service\RequestValidatorUtility;
 use WeGetFinancing\Checkout\ValueObject\GeneralDataRequest;
 use WeGetFinancing\Checkout\ValueObject\GenerateFunnelUrlRequest;
@@ -69,12 +73,8 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
         ]
     ];
 
-    public function __construct(
-        protected string $apiVersion,
-        protected string $softwareName,
-        protected $softwarePluginVersion
-    ) {
-    }
+    public function __construct(protected string $apiVersion)
+    {}
 
     public function init(): void
     {
@@ -84,6 +84,8 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
     public function execute(): void
     {
         try {
+            check_ajax_referer(WeGetFinancingValueObject::NONCE);
+
             $client = $this->generateClient();
             $request = $this->getRequest();
             $loanRequest = $this->getLoanRequest($request);
@@ -101,8 +103,14 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 );
             }
 
-            error_log(self::class . "::execute() Remote error requesting new loan url. Request:");
-            error_log(print_r($data, true));
+            Logger::log(new AbstractActionableWithClientException(
+                AbstractActionableWithClientException::REMOTE_ERROR_MESSAGE,
+                AbstractActionableWithClientException::REMOTE_ERROR_CODE
+            ));
+            Logger::log(new AbstractActionableWithClientException(
+                print_r($data, true),
+                AbstractActionableWithClientException::REMOTE_ERROR_REQUEST_CODE
+            ));
 
             wp_send_json(
                 [
@@ -111,7 +119,20 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 ],
                 200
             );
-        } catch (EntityValidationException $exception) {
+        } catch (AbstractActionableWithClientException $exception) {
+            Logger::log($exception);
+            $message = AbstractActionableWithClientException::VALIDATION_ERROR_CODE === $exception->getCode()
+                ? GenerateFunnelUrlException::ERROR_GENERATING_CLIENT_MESSAGE
+                : GenerateFunnelUrlException::UNEXPECTED_NETWORK_ERROR_MESSAGE;
+
+            wp_send_json(
+                [
+                    'isSuccess' => false,
+                    'message' => '<strong>' . $message . '</strong>',
+                ],
+                200
+            );
+        } catch (GenerateFunnelUrlException $exception) {
             $violations = [];
             foreach ($exception->getViolations() as $violation) {
                 if (false === array_key_exists($violation['field'], self::GENERATE_FUNNEL_ERROR_TABLE)) {
@@ -136,28 +157,12 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 ],
                 200
             );
-        } catch (GenerateClientException | GetFunnelRequestException $exception) {
+        } catch (Throwable $exception) {
+            Logger::log($exception);
             wp_send_json(
                 [
                     'isSuccess' => false,
-                    'message' => '<strong>' . __(
-                        'Unexpected network error',
-                        'wegetfinancing-payment-gateway'
-                    ) . '</strong>',
-                ],
-                200
-            );
-        } catch (\Throwable $exception) {
-            error_log(self::class . "::execute unexpected error.");
-            error_log($exception->getCode() . ' - ' . $exception->getMessage());
-            error_log(print_r($exception->getTraceAsString(), true));
-            wp_send_json(
-                [
-                    'isSuccess' => false,
-                    'message' => '<strong>' . __(
-                            'Unexpected error',
-                            'wegetfinancing-payment-gateway'
-                        ) . '</strong>',
+                    'message' => '<strong>' . GenerateFunnelUrlException::UNEXPECTED_ERROR_MESSAGE . '</strong>',
                 ],
                 200
             );
@@ -175,12 +180,19 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
         $addressData = $this->getAddressDataFromRequest();
 
         if (false === empty($this->violations)) {
-            throw new EntityValidationException(
-                'Invalid generate funnel request',
-                11,
+            $exception = new GenerateFunnelUrlException(
+                GenerateFunnelUrlException::REQUEST_VALIDATION_ERROR_MESSAGE,
+                GenerateFunnelUrlException::REQUEST_VALIDATION_ERROR_CODE,
                 null,
                 $this->violations
             );
+
+            Logger::log($exception);
+            Logger::log(new GenerateFunnelUrlException(
+                json_encode($exception->getViolations()),
+                GenerateFunnelUrlException::REQUEST_VALIDATION_JSON_CODE
+            ));
+            throw $exception;
         }
 
         return array_merge($generalData, $addressData);
@@ -407,9 +419,9 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 'success_url' => '',
                 'failure_url' => '',
                 'postback_url' => PostbackUpdate::getPostbackUpdateUrl(),
-                'software_name' => $this->softwareName,
-                'software_version' => $this->getSoftwareVersion(),
-                'software_plugin_version' => $this->softwarePluginVersion,
+                'software_name' => App::INTEGRATION_NAME,
+                'software_version' => App::getIntegrationVersion(),
+                'software_plugin_version' => App::PLUGIN_VERSION,
                 'billing_address' => $request['billingAddress'],
                 'shipping_address' => $request['shippingAddress'],
                 'cart_items' => $cartItems,
@@ -417,25 +429,17 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
 
             return LoanRequestEntity::make($requestArray);
         } catch (EntityValidationException $exception) {
-            error_log(self::class . "::getLoanRequest() entity validation error");
-            error_log($exception->getCode() . ' - ' . $exception->getMessage());
-            error_log(print_r($exception->getTraceAsString(), true));
-            error_log(json_encode($exception->getViolations()));
-            throw $exception;
-        } catch (\Throwable $exception) {
-            error_log(self::class . "::getLoanRequest() unexpected error");
-            error_log($exception->getCode() . ' - ' . $exception->getMessage());
-            error_log(print_r($exception->getTraceAsString(), true));
-            throw new GetFunnelRequestException(
-                GetFunnelRequestException::GET_POST_REQUEST_ERROR_MESSAGE,
-                GetFunnelRequestException::GET_POST_REQUEST_ERROR_CODE
+            Logger::log($exception);
+            Logger::log(new GenerateFunnelUrlException(
+                json_encode($exception->getViolations()),
+                GenerateFunnelUrlException::LOAN_REQUEST_VALIDATION_JSON_CODE
+            ));
+            throw new GenerateFunnelUrlException(
+                GenerateFunnelUrlException::LOAN_REQUEST_VALIDATION_ERROR_MESSAGE,
+                GenerateFunnelUrlException::LOAN_REQUEST_VALIDATION_ERROR_CODE,
+                null,
+                $exception->getViolations()
             );
         }
-    }
-
-    protected function getSoftwareVersion(): string
-    {
-        global $wp_version;
-        return $wp_version . '-' . constant('WOOCOMMERCE_VERSION');
     }
 }

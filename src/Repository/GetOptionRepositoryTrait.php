@@ -6,6 +6,9 @@ namespace WeGetFinancing\Checkout\Repository;
 
 if (!defined( 'ABSPATH' )) exit;
 
+use WeGetFinancing\Checkout\Service\Logger;
+use WeGetFinancing\Checkout\Exception\GetOptionRepositoryTraitException;
+
 trait GetOptionRepositoryTrait
 {
     public static function getOptions(): false|array
@@ -13,11 +16,15 @@ trait GetOptionRepositoryTrait
         return get_option(self::getOptionsName(), []);
     }
 
+    /**
+     * @param string $optionName
+     * @param mixed|null $default
+     * @return mixed
+     */
     public static function getOption(string $optionName, mixed $default = null): mixed
     {
         $options = self::getOptions();
         if (false === array_key_exists($optionName, $options)) {
-            error_log(self::class . "::getOption config option name doesn't exists: " . $optionName);
             return $default;
         }
         return $options[$optionName];

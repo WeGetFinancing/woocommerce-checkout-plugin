@@ -12,6 +12,10 @@ class WeGetFinancingValueObject
     public const IS_SANDBOX_FIELD_ID = "wgf_is_sandbox";
     public const IS_SANDBOX_FIELD_TITLE = "Sandbox Environment";
     public const IS_SANDBOX_FIELD_LABEL = "Enable/Disable Sandbox Environment";
+    public const IS_SENTRY_FIELD_ID = "wgf_is_sentry";
+    public const IS_SENTRY_FIELD_TITLE = "Use Sentry Log System";
+    public const IS_SENTRY_FIELD_LABEL = "If enabled, each error other than logged into your wordpress will be sent ".
+        "to our centralised log system.";
     public const USERNAME_FIELD_ID = "wgf_username";
     public const USERNAME_FIELD_TITLE = "Username";
     public const USERNAME_FIELD_LABEL = "WeGetFinancing Username";
@@ -44,4 +48,5 @@ class WeGetFinancingValueObject
         self::ERROR_ATTACH_FIELD_PREPEND_VALUE => self::ERROR_ATTACH_FIELD_PREPEND_LABEL,
         self::ERROR_ATTACH_FIELD_APPEND_VALUE => self::ERROR_ATTACH_FIELD_APPEND_LABEL,
     ];
+    public const NONCE = 'generate-funnel-url';
 }

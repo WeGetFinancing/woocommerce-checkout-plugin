@@ -35,3 +35,12 @@
 * Calling files remotely limited to oEmbed calls only
 * Internationalization without variables
 * Disallowed direct file access to plugin files
+
+= 1.3.0 =
+* Implemented Sentry log, which allows to centralize all of our installation logs on our Sentry monitor
+* Implemented nonce on all of our ajax call
+* Removed multi-language support
+* Update ppe to the latest settings
+* Removed shortcode support
+* Loaded ppe from footer
+* Added settings to disable ppe
