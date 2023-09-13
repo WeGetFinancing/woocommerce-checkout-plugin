@@ -22,7 +22,14 @@ Our plugin allow you to offer:
 
 ## 2. How to install
 
-### 2.1. Via the plugin.zip file
+### 2.1. Via the WordPress Market
+
+1. Download the plugin, it's called "WeGetFinancing Payment Gateway", from the WordPress Market and install.
+2. Once installed go to Plugins > Installed Plugins.
+3. Find the plugin, and click on the "Activate" button.
+   ![Plugin Activation](./assets/install-1.png)
+
+### 2.2. Via the plugin.zip file
 
 1. Download the github zip as shown in the next image.
    ![Plugin Activation](./assets/github_zip_file_download.jpg)
