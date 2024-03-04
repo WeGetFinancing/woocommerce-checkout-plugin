@@ -25,6 +25,7 @@
 
         <parameter key="app.init_list" type="collection">
             <parameter>addPaymentGateway</parameter>
+            <parameter>addPaymentGatewayBlockSupport</parameter>
             <parameter>getOrderInvIdField</parameter>
             <parameter>printToCheckoutOrderInvIdField</parameter>
             <parameter>saveOrUpdateOrderInvIdField</parameter>
@@ -49,6 +50,7 @@
         </service>
 
         <service id="addPaymentGateway" class="WeGetFinancing\Checkout\PaymentGateway\AddWeGetFinancingPaymentMethod"/>
+        <service id="addPaymentGatewayBlockSupport" class="WeGetFinancing\Checkout\PaymentGateway\AddWeGetFinancingBlockSupport"/>
         <service id="getOrderInvIdField" class="WeGetFinancing\Checkout\PostMeta\GetOrderInvIdField"/>
         <service id="printToCheckoutOrderInvIdField" class="WeGetFinancing\Checkout\PostMeta\PrintToCheckoutOrderInvIdField">
             <argument type="service" id="twig"/>

@@ -37,7 +37,7 @@ services:
     volumes:
       - ./env/wp/custom.ini:/usr/local/etc/php/conf.d/custom.ini
       - ./var/wp:/var/www/html
-#      - ./:/var/www/html/wp-content/plugins/wegetfinancing-checkout
+      - ./:/var/www/html/wp-content/plugins/wegetfinancing-checkout
       - ./env/empty:/var/www/html/wp-content/plugins/wegetfinancing-checkout/var/wp:ro
 
   lb:
