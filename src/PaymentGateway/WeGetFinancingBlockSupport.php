@@ -10,35 +10,38 @@ use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodTyp
 use WeGetFinancing\Checkout\Ajax\Public\GenerateFunnelUrl;
 use WeGetFinancing\Checkout\App;
 use WeGetFinancing\Checkout\PostMeta\OrderInvIdValueObject;
-use WeGetFinancing\Checkout\Repository\GetOptionRepositoryTrait;
 use WeGetFinancing\Checkout\ValueObject\GenerateFunnelUrlRequest;
 
 final class WeGetFinancingBlockSupport extends AbstractPaymentMethodType
 {
-    use GetOptionRepositoryTrait;
     public const HANDLE = 'wc-wegetfinancing-blocks-integration';
-
+    public const INIT_NAME = 'woocommerce_blocks_payment_method_type_registration';
     private mixed $gateway;
-
     protected $name = WeGetFinancing::GATEWAY_ID;
+
+    public function __construct()
+    {
+        error_log("WeGetFinancingBlockSupport::__construct");
+//        $this->name = WeGetFinancing::GATEWAY_ID;
+    }
+
     
     public function initialize(): void
     {
+        error_log("WeGetFinancingBlockSupport::initialize");
         // get payment gateway settings
-        $this->settings = self::getOptions();
-
-        // you can also initialize your payment gateway here
-        // $gateways = WC()->payment_gateways->payment_gateways();
-        // $this->gateway  = $gateways[ $this->name ];
+        $this->gateway = new WeGetFinancing();
+        $this->settings = WeGetFinancing::getOptions();
     }
 
     public function is_active(): bool
     {
-        return ! empty( $this->settings[ 'enabled' ] ) && 'yes' === $this->settings[ 'enabled' ];
+        return $this->gateway->is_available();
     }
 
     public function get_payment_method_script_handles(): array
     {
+        error_log("WeGetFinancingBlockSupport::get_payment_method_script_handles");
         wp_register_script(
             self::HANDLE,
             plugin_dir_url( __DIR__ ) . 'dist/build/index.js',
@@ -76,16 +79,11 @@ final class WeGetFinancingBlockSupport extends AbstractPaymentMethodType
             'ajax_url' => admin_url('admin-ajax.php'),
             'ajax_action' => GenerateFunnelUrl::ACTION_NAME,
             'order_inv_id_field_id' => OrderInvIdValueObject::ORDER_INV_ID_FIELD_ID,
-            'error_display_method' => self::getOption(WeGetFinancingValueObject::ERROR_ATTACH_FIELD_ID),
+            'error_display_method' => WeGetFinancing::getOption(WeGetFinancingValueObject::ERROR_ATTACH_FIELD_ID),
             'error_display_selector' => htmlspecialchars_decode(
-                self::getOption(WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_ID),
+                WeGetFinancing::getOption(WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_ID),
             ),
             'nonce' => wp_create_nonce(WeGetFinancingValueObject::NONCE)
         ];
-    }
-
-    protected static function getOptionsName(): string
-    {
-        return WeGetFinancing::PREFIX . App::ID . WeGetFinancing::SUFFIX;
     }
 }
