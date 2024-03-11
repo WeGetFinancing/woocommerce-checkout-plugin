@@ -143,3 +143,17 @@ To regenerate optimised vendors for your version of php, use the following comma
 ```
 docker-compose run --rm composer install
 ```
+
+### 4.3. Compile Gutenberg plugin
+
+Install the latest version of the javascript dependencies
+
+```
+npm install
+```
+
+Build the latest version
+
+```
+npm run build
+```

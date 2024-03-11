@@ -23,6 +23,33 @@
 
 require __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
+use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
+use Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry;
+use Automattic\WooCommerce\Utilities\FeaturesUtil;
 use WeGetFinancing\Checkout\App;
+use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingBlockSupport;
 
 new App(__DIR__, __FILE__);
+
+add_action('before_woocommerce_init', function () {
+    if (true === class_exists(FeaturesUtil::class)) {
+        error_log('before_woocommerce_init action fired');
+        FeaturesUtil::declare_compatibility(
+            'cart_checkout_blocks',
+            __FILE__,
+            true // true (compatible, default) or false (not compatible)
+        );
+    }
+});
+
+add_action('woocommerce_blocks_loaded', function () {
+    if (true === class_exists(AbstractPaymentMethodType::class)) {
+        add_action(
+            'woocommerce_blocks_payment_method_type_registration',
+            function (PaymentMethodRegistry $payment_method_registry) {
+                error_log('woocommerce_blocks_loaded action fired');
+                $payment_method_registry->register(new WeGetFinancingBlockSupport());
+            }
+        );
+    }
+});
