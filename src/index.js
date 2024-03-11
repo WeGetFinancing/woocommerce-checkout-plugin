@@ -3,12 +3,14 @@ import { decodeEntities } from "@wordpress/html-entities";
 const { registerPaymentMethod } = window.wc.wcBlocksRegistry;
 const { getSetting } = window.wc.wcSettings;
 
-const settings = getSetting("woocommerce_wegetfinancing_settings", {});
+const settings = getSetting("wegetfinancing_data", {});
 
-const label = decodeEntities(settings.title);
+console.log(settings);
+
+const label = "TEST";
 
 const Content = () => {
-    return decodeEntities(settings.description || "");
+    return decodeEntities("TEST DESC");
 };
 
 const Label = (props) => {
@@ -22,8 +24,5 @@ registerPaymentMethod({
     content: <Content />,
     edit: <Content />,
     canMakePayment: () => true,
-    ariaLabel: label,
-    supports: {
-        features: settings.supports,
-    },
+    ariaLabel: label
 });

@@ -22,8 +22,8 @@ final class WeGetFinancingBlockSupport extends AbstractPaymentMethodType
     public function initialize(): void
     {
         error_log("WeGetFinancingBlockSupport::initialize");
-        $gateways = WC()->payment_gateways->payment_gateways();
-        error_log(json_encode(array_keys($gateways)));
+//        $gateways = WC()->payment_gateways->payment_gateways();
+//        error_log(json_encode(array_keys($gateways)));
 //        $this->gateway  = new WeGetFinancing();
         $this->settings = WeGetFinancing::getOptions();
     }
@@ -38,9 +38,9 @@ final class WeGetFinancingBlockSupport extends AbstractPaymentMethodType
     public function get_payment_method_script_handles(): array
     {
         error_log("WeGetFinancingBlockSupport::get_payment_method_script_handles");
-        wp_register_script(
+        wp_enqueue_script(
             self::HANDLE,
-            plugin_dir_url( __DIR__ ) . 'build/index.js',
+            plugin_dir_url( dirname(__DIR__, 1) ) . 'build/index.js',
             [
                 'wc-blocks-registry',
                 'wc-settings',
@@ -57,6 +57,7 @@ final class WeGetFinancingBlockSupport extends AbstractPaymentMethodType
 
     public function get_payment_method_data(): array
     {
+        error_log("get payment data");
 //        return [
 //            GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID => GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID,
 //            GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID => GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID,

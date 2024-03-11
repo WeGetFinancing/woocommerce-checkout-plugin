@@ -42,6 +42,7 @@ add_action('before_woocommerce_init', function () {
     }
 });
 
+
 add_action('woocommerce_blocks_loaded', function () {
     if (true === class_exists(AbstractPaymentMethodType::class)) {
         add_action(
