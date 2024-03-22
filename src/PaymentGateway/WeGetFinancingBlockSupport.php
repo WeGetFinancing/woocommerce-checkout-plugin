@@ -83,8 +83,38 @@ final class WeGetFinancingBlockSupport extends AbstractPaymentMethodType
 //            'nonce' => wp_create_nonce(WeGetFinancingValueObject::NONCE)
 //        ];
         return [
-            'title' => 'test',
-            'description' => 'description'
+            'title' => WeGetFinancing::TITLE,
+            'payment_method_id' => WeGetFinancing::GATEWAY_ID,
+            'description' => WeGetFinancing::DESCRIPTION,
+            'checkout_button_image_url' => $GLOBALS[App::ID][App::CHECKOUT_BUTTON_URL],
+            'checkout_button_alt' => WeGetFinancingValueObject::CHECKOUT_BUTTON_ALT,
+            'supports' => WeGetFinancing::SUPPORTS,
+            'ajax_action' => GenerateFunnelUrl::ACTION_NAME,
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce(WeGetFinancingValueObject::NONCE),
+
+            GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID => GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID,
+            GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID => GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID,
+            GenerateFunnelUrlRequest::BILLING_COUNTRY_ID => GenerateFunnelUrlRequest::BILLING_COUNTRY_ID,
+            GenerateFunnelUrlRequest::BILLING_ADDRESS_1_ID => GenerateFunnelUrlRequest::BILLING_ADDRESS_1_ID,
+            GenerateFunnelUrlRequest::BILLING_ADDRESS_2_ID => GenerateFunnelUrlRequest::BILLING_ADDRESS_2_ID,
+            GenerateFunnelUrlRequest::BILLING_CITY_ID => GenerateFunnelUrlRequest::BILLING_CITY_ID,
+            GenerateFunnelUrlRequest::BILLING_STATE_ID => GenerateFunnelUrlRequest::BILLING_STATE_ID,
+            GenerateFunnelUrlRequest::BILLING_POSTCODE_ID => GenerateFunnelUrlRequest::BILLING_POSTCODE_ID,
+            GenerateFunnelUrlRequest::BILLING_PHONE_ID => GenerateFunnelUrlRequest::BILLING_PHONE_ID,
+            GenerateFunnelUrlRequest::BILLING_EMAIL_ID => GenerateFunnelUrlRequest::BILLING_EMAIL_ID,
+
+            GenerateFunnelUrlRequest::SHIPPING_DIFFERENT_ID => GenerateFunnelUrlRequest::SHIPPING_DIFFERENT_ID,
+
+            GenerateFunnelUrlRequest::SHIPPING_FIRST_NAME_ID => GenerateFunnelUrlRequest::SHIPPING_FIRST_NAME_ID,
+            GenerateFunnelUrlRequest::SHIPPING_LAST_NAME_ID => GenerateFunnelUrlRequest::SHIPPING_LAST_NAME_ID,
+            GenerateFunnelUrlRequest::SHIPPING_COUNTRY_ID => GenerateFunnelUrlRequest::SHIPPING_COUNTRY_ID,
+            GenerateFunnelUrlRequest::SHIPPING_ADDRESS_1_ID => GenerateFunnelUrlRequest::SHIPPING_ADDRESS_1_ID,
+            GenerateFunnelUrlRequest::SHIPPING_ADDRESS_2_ID => GenerateFunnelUrlRequest::SHIPPING_ADDRESS_2_ID,
+            GenerateFunnelUrlRequest::SHIPPING_CITY_ID => GenerateFunnelUrlRequest::SHIPPING_CITY_ID,
+            GenerateFunnelUrlRequest::SHIPPING_STATE_ID => GenerateFunnelUrlRequest::SHIPPING_STATE_ID,
+            GenerateFunnelUrlRequest::SHIPPING_POSTCODE_ID => GenerateFunnelUrlRequest::SHIPPING_POSTCODE_ID,
+            GenerateFunnelUrlRequest::SHIPPING_PHONE_ID => GenerateFunnelUrlRequest::SHIPPING_PHONE_ID,
         ];
     }
 }
