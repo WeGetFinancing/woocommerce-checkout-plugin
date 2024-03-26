@@ -20,6 +20,7 @@
         <parameter key="app.ppe.css.prod">https://ppe.wegetfinancing.com/index.css</parameter>
         <parameter key="app.ppe.css.sandbox">https://ppe.sandbox.dev.wegetfinancing.com/index.css</parameter>
         <parameter key="app.checkout_button.url">/dist/logoCircular.svg</parameter>
+        <parameter key="app.checkout_logo_url">/dist/logo.svg</parameter>
         <parameter key="app.bootstrap.css">/dist/bootstrap.min.css</parameter>
         <parameter key="app.bootstrap.js">/dist/bootstrap.bundle.min.js</parameter>
 

@@ -1,10 +1,14 @@
 import { decodeEntities } from "@wordpress/html-entities";
-// import { useEffect } from '@wordpress/element';
+
+let sheet = document.createElement('style')
+sheet.innerHTML = ".wgf_checkout_button:hover {opacity: 0.85;}";
+sheet.innerHTML += ".wgf_checkout_button_disabled { opacity: 0.5; cursor: wait; }";
+sheet.innerHTML += ".wgf_checkout_button_img { width: 100%; max-width: 320px; }";
+document.head.appendChild(sheet);
 
 const script = document.createElement('script');
 script.src = "https://cdn.wegetfinancing.com/libs/1.0/getfinancing.js";
 document.head.appendChild(script)
-
 
 let billData = null, shipData = null;
 
@@ -16,37 +20,23 @@ const settings = getSetting("wegetfinancing_data", {});
 const label = settings.title;
 const description = settings.description;
 
-// console.log(settings);
-
 const Content = (props) => {
     const billing = props.billing;
     const shippingData = props.shippingData;
     billData = billing;
     shipData = shippingData;
-
-    // const { onCheckoutValidation } = props.eventRegistration;
-    // useEffect( () => {
-    //     const unsubscribe = onCheckoutValidation( () => false );
-    //     console.log(unsubscribe)
-    //     return unsubscribe;
-    // }, [ onCheckoutValidation ] );
-
     return decodeEntities(description);
 };
 
 const WgfIcon = () => {
-    return <img src={settings.checkout_button_image_url}
-                style={{ float: 'right', marginRight: '20px' }}
+    return <img src={settings.checkout_logo_image_url}
+                style={{ float: 'left' }}
                 alt={settings.checkout_button_alt}
     />
 }
 
 const Label = () => {
-    return (<span style={{ width: '100%' }}>
-            {label}
-            <WgfIcon />
-        </span>
-        )
+    return (<WgfIcon />)
 }
 
 registerPaymentMethod({
@@ -65,7 +55,9 @@ wgfBtn.className = "wgf_checkout_button";
 wgfBtn.href = "#wgf_checkout";
 wgfBtn.style.display = "none";
 wgfBtn.onclick = () => {
-
+    const wgfBtnElement = document.querySelector("#wgf_checkout_button");
+    wgfBtnElement.classList.add("wgf_checkout_button_disabled");
+    wgfBtnElement.disabled = true;
     wgfFetch();
 }
 
@@ -73,7 +65,7 @@ const wgfBtnImage = document.createElement("img");
 wgfBtnImage.src = settings.checkout_button_image_url;
 wgfBtnImage.alt = settings.checkout_button_alt;
 wgfBtnImage.style.maxWidth = "320px";
-wgfBtnImage.className = "wc-block-components-checkout-place-order-button";
+wgfBtnImage.className = "wgf_checkout_button_img";
 
 wgfBtn.append(wgfBtnImage);
 
@@ -124,9 +116,6 @@ const wgfFetch = () => {
     wgfFunnelData[settings.billing_postcode] = billData.billingData.postcode;
     wgfFunnelData[settings.billing_phone] = billData.billingData.phone;
     wgfFunnelData[settings.billing_email] = billData.billingData.email;
-
-    wgfFunnelData[settings['ship-to-different-address-checkbox']] = false;
-
     wgfFunnelData[settings.shipping_first_name] = shipData.shippingAddress.first_name;
     wgfFunnelData[settings.shipping_last_name] = shipData.shippingAddress.last_name;
     wgfFunnelData[settings.shipping_country] = shipData.shippingAddress.country;
@@ -150,7 +139,9 @@ const wgfFetch = () => {
     })
         .then(response => response.json())
         .then(resp => {
-            console.log(resp)
+            const wgfBtnElement = document.querySelector("#wgf_checkout_button");
+            wgfBtnElement.classList.remove("wgf_checkout_button_disabled");
+            wgfBtnElement.disabled = false;
             if ("isSuccess" in resp) {
                 false === resp.isSuccess ? WgfUnSuccess(resp) : WgfSuccess(resp)
             }
@@ -171,22 +162,24 @@ const WgfUnSuccess = (resp) => {
                         elem = document.getElementById(elemId)
                     ;
 
-                    if (elem) {
-                        let div = elem.closest("div"),
-                            divErrorMsg = div.querySelector(".wc-block-components-validation-error")
-                        if (!divErrorMsg) {
-                            let divError = generateDivError();
-                            div.append(divError);
-                            divErrorMsg = div.querySelector(".wc-block-components-validation-error")
-                        }
-
-                        divErrorMsg.innerHTML = `<p>${msg}</p>`;
-                        div.classList.add("has-error");
-                    }
+                    elem ? WgfValidatorMessageOnField(elem, msg) : WgfErrorList(msg);
                 }
             }
         }
     }
+}
+
+const WgfValidatorMessageOnField = (elem, msg) => {
+    let div = elem.closest("div"),
+        divErrorMsg = div.querySelector(".wc-block-components-validation-error")
+    if (!divErrorMsg) {
+        let divError = generateDivError();
+        div.append(divError);
+        divErrorMsg = div.querySelector(".wc-block-components-validation-error")
+    }
+
+    divErrorMsg.innerHTML = `<p>${msg}</p>`;
+    div.classList.add("has-error");
 }
 
 const generateDivError = () => {
@@ -206,26 +199,32 @@ const WgfSuccess = (resp) => {
             function () {}
         )
     }
-    /*
- jQuery('#{{ order_inv_id_field_id }}').val(response.invId);
-                new GetFinancing(
-                    response.href,
-                    function() {
-                        checkoutButton.click();
-                    }.bind(self),
-                    function() {}
-                );
- */
 }
 
-/*
-<div class="woocommerce-notices-wrapper">
-	<div class="wc-block-components-notice-banner is-error" role="alert">
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
-			<path d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"></path>
-		</svg>
-		<div class="wc-block-components-notice-banner__content">
-			<a href="https://localhost/?page_id=8" tabindex="1" class="button wc-forward wp-element-button">View cart</a> “test product” has been added to your cart.		</div>
-	</div>
-</div>
- */
+
+const WgfErrorList = (msg) => {
+    let checkWgfErrorsBlockContent = document.getElementById("wgf-errors-block-content");
+    if (!checkWgfErrorsBlockContent) {
+        let wgfErrorsCont = document.createElement("div");
+        wgfErrorsCont.className = "woocommerce-notices-wrapper";
+
+        let wgfErrorsBlock = document.createElement("div");
+        wgfErrorsBlock.className = "wc-block-components-notice-banner is-error";
+        wgfErrorsBlock.role = "alert";
+        wgfErrorsBlock.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+        <path d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"></path>
+    </svg>`;
+        let wgfErrorsBlockContent = document.createElement("div");
+        wgfErrorsBlockContent.className = "wc-block-components-notice-banner__content";
+        wgfErrorsBlockContent.id = "wgf-errors-block-content";
+        wgfErrorsBlock.append(wgfErrorsBlockContent)
+        wgfErrorsCont.append(wgfErrorsBlock);
+
+        const placeOrderBtn = document.querySelector(".wc-block-components-checkout-place-order-button");
+        const form = placeOrderBtn.closest("form");
+        form.prepend(wgfErrorsCont)
+    }
+
+    const wgfErrorsBlockContent = document.getElementById("wgf-errors-block-content");
+    wgfErrorsBlockContent.innerHTML += `<li>${msg}</li>`
+}

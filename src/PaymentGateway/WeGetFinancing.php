@@ -33,8 +33,8 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
     'Offer affordable monthly payments to your existing customers while you receive the money ' .
     'directly into your account, in one lump sum.';
     public const TITLE = 'WeGetFinancing';
-    public const DESCRIPTION = 'Pay monthly, obtain instant approval with no extensive paperwork.' .
-    ' Get credit approval in just seconds, so you can complete your purchase immediately, hassle-free.';
+    public const DESCRIPTION = 'Purchase now and pay later with customized financing choices. ' .
+        'All credit types are welcome. No hard inquiry needed.';
     public const SUPPORTS = ['products', 'refunds'];
 
     protected Environment $twig;

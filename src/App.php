@@ -28,6 +28,7 @@ class App implements ActionableInterface
     public const INIT_LIST_PARAMS = 'app.init_list';
     public const RENDER = 'twig';
     public const FUNNEL_JS = 'app.funnel.js';
+    public const CHECKOUT_LOGO_URL = 'app.checkout_logo_url';
     public const CHECKOUT_BUTTON_URL = 'app.checkout_button.url';
     public const INIT_NAME = 'init';
     public const FUNCTION_NAME = 'execute';
@@ -86,6 +87,10 @@ class App implements ActionableInterface
             self::FUNNEL_JS => $this->container->getParameter(self::FUNNEL_JS),
             self::CHECKOUT_BUTTON_URL => plugins_url(
                 $this->container->getParameter(self::CHECKOUT_BUTTON_URL),
+                $this->filePath
+            ),
+            self::CHECKOUT_LOGO_URL => plugins_url(
+                $this->container->getParameter(self::CHECKOUT_LOGO_URL),
                 $this->filePath
             )
         ];
