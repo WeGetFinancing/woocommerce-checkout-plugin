@@ -353,27 +353,27 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
             'zipcode' => $billingZipcode,
         ];
 
-        if (
-            RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
-                $_POST[GeneralDataRequest::DATA],
-                GenerateFunnelUrlRequest::SHIPPING_DIFFERENT_ID
-            )
-        ) {
-            $this->violations[] = [
-                'field' => 'shipping_different',
-                'message' => 'Invalid request, please contact our customer support.',
-            ];
-        }
-
-        $shippingToDifferent = sanitize_text_field(
-            $_POST[GeneralDataRequest::DATA][GenerateFunnelUrlRequest::SHIPPING_DIFFERENT_ID]
-        );
-        if ('true' === $shippingToDifferent) {
-            $this->violations[] = [
-                'field' => 'shipping_different',
-                'message' => 'shipping_different has to be the same of billing one.',
-            ];
-        }
+//        if (
+//            RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
+//                $_POST[GeneralDataRequest::DATA],
+//                GenerateFunnelUrlRequest::SHIPPING_DIFFERENT_ID
+//            )
+//        ) {
+//            $this->violations[] = [
+//                'field' => 'shipping_different',
+//                'message' => 'Invalid request, please contact our customer support.',
+//            ];
+//        }
+//
+//        $shippingToDifferent = sanitize_text_field(
+//            $_POST[GeneralDataRequest::DATA][GenerateFunnelUrlRequest::SHIPPING_DIFFERENT_ID]
+//        );
+//        if ('true' === $shippingToDifferent) {
+//            $this->violations[] = [
+//                'field' => 'shipping_different',
+//                'message' => 'shipping_different has to be the same of billing one.',
+//            ];
+//        }
 
         return $request;
     }
