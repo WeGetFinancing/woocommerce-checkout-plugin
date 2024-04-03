@@ -61,6 +61,7 @@ final class WeGetFinancingBlockSupport extends AbstractPaymentMethodType
             'ajax_action' => GenerateFunnelUrl::ACTION_NAME,
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce(WeGetFinancingValueObject::NONCE),
+            'order_inv_id_field_id' => OrderInvIdValueObject::ORDER_INV_ID_FIELD_ID,
 
             GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID => GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID,
             GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID => GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID,

@@ -1,4 +1,5 @@
 import { decodeEntities } from "@wordpress/html-entities";
+import {useEffect} from "@wordpress/element";
 
 let sheet = document.createElement('style')
 sheet.innerHTML = ".wgf_checkout_button:hover {opacity: 0.85;}";
@@ -25,6 +26,45 @@ const Content = (props) => {
     const shippingData = props.shippingData;
     billData = billing;
     shipData = shippingData;
+
+
+    const { eventRegistration, emitResponse } = props;
+    const { onPaymentProcessing } = eventRegistration;
+    useEffect( () => {
+        const unsubscribe = onPaymentProcessing( async () => {
+            // Here we can do any processing we need, and then emit a response.
+            // For example, we might validate a custom field, or perform an AJAX request, and then emit a response indicating it is valid or not.
+            let invIdElem = document.getElementById(settings.order_inv_id_field_id);
+            const inv_id = invIdElem ? invIdElem.value : null;
+            const customDataIsValid = !!inv_id.length;
+
+            if ( customDataIsValid ) {
+                return {
+                    type: emitResponse.responseTypes.SUCCESS,
+                    meta: {
+                        paymentMethodData: {
+                            inv_id,
+                        },
+                    },
+                };
+            }
+
+            return {
+                type: emitResponse.responseTypes.ERROR,
+                message: 'There was an error',
+            };
+        } );
+        // Unsubscribes when this component is unmounted.
+        return () => {
+            unsubscribe();
+        };
+    }, [
+        emitResponse.responseTypes.ERROR,
+        emitResponse.responseTypes.SUCCESS,
+        onPaymentProcessing,
+    ] );
+
+
     return decodeEntities(description);
 };
 
@@ -142,6 +182,12 @@ const wgfFetch = () => {
             const wgfBtnElement = document.querySelector("#wgf_checkout_button");
             wgfBtnElement.classList.remove("wgf_checkout_button_disabled");
             wgfBtnElement.disabled = false;
+
+            let checkWgfErrorsBlockContent = document.getElementById("wgf-errors-block-content");
+            if (checkWgfErrorsBlockContent) {
+                checkWgfErrorsBlockContent.innerHTML = "";
+            }
+
             if ("isSuccess" in resp) {
                 false === resp.isSuccess ? WgfUnSuccess(resp) : WgfSuccess(resp)
             }
@@ -189,6 +235,20 @@ const generateDivError = () => {
 }
 
 const WgfSuccess = (resp) => {
+    let invIdElem = document.getElementById(settings.order_inv_id_field_id);
+    if (!invIdElem) {
+        invIdElem = document.createElement("input");
+        invIdElem.id = settings.order_inv_id_field_id;
+        invIdElem.name = settings.order_inv_id_field_id;
+        invIdElem.type = "hidden";
+
+        const placeOrderBtn = document.querySelector(".wc-block-components-checkout-place-order-button");
+        const form = placeOrderBtn.closest("form");
+        form.append(invIdElem)
+    }
+
+    invIdElem.value = resp.invId;
+
     if (GetFinancing) {
         new GetFinancing(
             resp.href,
@@ -200,7 +260,6 @@ const WgfSuccess = (resp) => {
         )
     }
 }
-
 
 const WgfErrorList = (msg) => {
     let checkWgfErrorsBlockContent = document.getElementById("wgf-errors-block-content");

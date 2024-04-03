@@ -15,6 +15,7 @@ use WeGetFinancing\Checkout\Ajax\Public\GenerateFunnelUrl;
 use WeGetFinancing\Checkout\App;
 use WeGetFinancing\Checkout\PostMeta\OrderInvIdValueObject;
 use WeGetFinancing\Checkout\Repository\GetOptionRepositoryTrait;
+use WeGetFinancing\Checkout\Service\Logger;
 use WeGetFinancing\Checkout\ValueObject\GenerateFunnelUrlRequest;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 
@@ -199,6 +200,8 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
      */
     public function process_payment($order_id): array
     {
+        $this->setOrderInvId($order_id);
+
         $order = wc_get_order($order_id);
 
         $order->update_status(
@@ -214,6 +217,21 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
             'result' => WeGetFinancingValueObject::PROCESS_PAYMENT_SUCCESS_ID,
             'redirect' => $this->get_return_url($order),
         ];
+    }
+
+    protected function setOrderInvId(int $orderId): void
+    {
+        if (false === array_key_exists("inv_id", $_POST)) {
+            Logger::log(new \Exception("Payment process error: Inv Id not set for order id " . $orderId));
+            return;
+        }
+
+        $update = update_post_meta($orderId, OrderInvIdValueObject::ORDER_META, $_POST["inv_id"]);
+        if (false === $update) {
+            Logger::log(new \Exception(
+                "Payment process error updating post meta for order id " . $orderId . " - " . $_POST["inv_id"]
+            ));
+        }
     }
 
     protected static function getOptionsName(): string
