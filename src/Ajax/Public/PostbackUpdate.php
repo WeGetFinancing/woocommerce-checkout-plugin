@@ -7,13 +7,13 @@ namespace WeGetFinancing\Checkout\Ajax\Public;
 if (!defined( 'ABSPATH' )) exit;
 
 use Exception;
-use Service\Logger;
 use Throwable;
 use WeGetFinancing\Checkout\ActionableInterface;
 use WeGetFinancing\Checkout\Exception\PostbackUpdateException;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
 use WeGetFinancing\Checkout\PostMeta\OrderInvIdValueObject;
+use WeGetFinancing\Checkout\Service\Logger;
 use WeGetFinancing\Checkout\Service\RequestValidatorUtility;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 use WP_REST_Request;
