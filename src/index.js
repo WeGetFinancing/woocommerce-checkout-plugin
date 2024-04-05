@@ -27,7 +27,6 @@ const Content = (props) => {
     billData = billing;
     shipData = shippingData;
 
-
     const { eventRegistration, emitResponse } = props;
     const { onPaymentProcessing } = eventRegistration;
     useEffect( () => {
@@ -64,7 +63,6 @@ const Content = (props) => {
         onPaymentProcessing,
     ] );
 
-
     return decodeEntities(description);
 };
 
@@ -86,7 +84,6 @@ registerPaymentMethod({
     edit: <Content />,
     canMakePayment: () => true,
     ariaLabel: label,
-    placeOrderButtonLabel: "TEST"
 });
 
 const wgfBtn = document.createElement("a");
@@ -120,6 +117,18 @@ document.addEventListener('input',(e)=> {
         wgfBtnElement.style.display = isWgfActive ? 'block' : 'none';
     }
 })
+
+window.onload = (event) => {
+    const placeOrderBtn = document.querySelector(".wc-block-components-checkout-place-order-button");
+
+    placeOrderBtn.closest("div").append(wgfBtn);
+    const wgfBtnElement = document.querySelector("#wgf_checkout_button");
+    const radioSelected = document.querySelector('input[name="radio-control-wc-payment-method-options"]:checked');
+    if(radioSelected && "value" in radioSelected && radioSelected.value === settings.payment_method_id) {
+        placeOrderBtn.style.display = 'none';
+        wgfBtnElement.style.display = 'block';
+    }
+};
 
 const matrixField = {
     billing_first_name: "billing-first_name",
