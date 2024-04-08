@@ -81,7 +81,7 @@ class PostbackUpdate implements ActionableInterface
                 'meta_value' => $array[self::INV_ID_FIELD],
                 'post_type' => 'shop_order',
                 'post_status' => 'any',
-                'posts_per_page' => 1,
+                'numberposts' => 1,
             ];
             $posts = get_posts($args);
 
