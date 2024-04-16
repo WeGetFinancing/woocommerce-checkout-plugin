@@ -47,6 +47,7 @@ class PostbackUpdate implements ActionableInterface
     public const WC_FAILED_STATUS = "wc-failed";
     public const WC_REFUNDED_STATUS = "refunded";
     public const SIGNATURE_ALGO = "sha256";
+    public const QUERY_COLUMN = 'post_id';
 
     public function init(): void
     {
@@ -76,16 +77,52 @@ class PostbackUpdate implements ActionableInterface
         try {
             $data = $this->getSignedData($request);
             $array = $this->getValidData($data);
-            $args = [
-                'meta_key' => OrderInvIdValueObject::ORDER_META,
-                'meta_value' => $array[self::INV_ID_FIELD],
-                'post_type' => 'shop_order',
-                'post_status' => 'any',
-                'posts_per_page' => 1,
-            ];
-            $posts = get_posts($args);
 
-            $order = wc_get_order($posts[0]->ID);
+            global $wpdb;
+            $sql = $wpdb->prepare(
+                "SELECT post_id FROM {$wpdb->prefix}postmeta WHERE meta_key = '" .
+                    OrderInvIdValueObject::ORDER_META . "' AND meta_value = %s",
+                $array[self::INV_ID_FIELD]
+            );
+
+            $results = $wpdb->get_results($sql);
+            if (false === is_array($results)) {
+                throw new PostbackUpdateException(
+                    PostbackUpdateException::INVALID_SQL_RESULT_ERROR_MESSAGE,
+                    PostbackUpdateException::INVALID_SQL_RESULT_ERROR_CODE
+                );
+            }
+
+            $found = count($results);
+            if (0 === $found) {
+                throw new PostbackUpdateException(
+                    PostbackUpdateException::ORDER_NOT_FOUND_ERROR_MESSAGE . $array[self::INV_ID_FIELD],
+                    PostbackUpdateException::ORDER_NOT_FOUND_ERROR_CODE
+                );
+            }
+
+            if (1 < $found) {
+                throw new PostbackUpdateException(
+                    PostbackUpdateException::MULTIPLE_ORDERS_FOUND_ERROR_MESSAGE . $array[self::INV_ID_FIELD],
+                    PostbackUpdateException::MULTIPLE_ORDERS_FOUND_ERROR_CODE
+                );
+            }
+
+            if (false === property_exists($results[0], self::QUERY_COLUMN)) {
+                throw new PostbackUpdateException(
+                    PostbackUpdateException::INVALID_RESULT_ORDER_ERROR_MESSAGE . $array[self::INV_ID_FIELD],
+                    PostbackUpdateException::INVALID_RESULT_ORDER_ERROR_CODE
+                );
+            }
+
+            $order = wc_get_order($results[0]->{self::QUERY_COLUMN});
+
+            if (false === $order instanceof \WC_Order) {
+                throw new PostbackUpdateException(
+                    PostbackUpdateException::INVALID_POST_ID_ERROR_MESSAGE . $results[0]->{self::QUERY_COLUMN},
+                    PostbackUpdateException::INVALID_POST_ID_ERROR_CODE
+                );
+            }
 
             $order->update_status($this->getStatus($array[self::STATUS_FIELD]));
 
