@@ -129,7 +129,7 @@ This part is intent only for skilled technical people.
    ```
 3. Delete any content inside the folders "./var/wp" but not the folders itself
    ```
-   rm -rf ./wp/*
+   rm -rf ./var/wp/*
    ```
 4. Start docker-compose
    ```
