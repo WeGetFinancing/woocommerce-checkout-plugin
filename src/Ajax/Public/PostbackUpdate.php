@@ -78,6 +78,8 @@ class PostbackUpdate implements ActionableInterface
     public function action(WP_REST_Request $request): void
     {
         try {
+            set_time_limit(60);
+
             $data = $this->getSignedData($request);
             $array = $this->getValidData($data);
 
