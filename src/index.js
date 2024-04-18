@@ -91,6 +91,7 @@ wgfBtn.id = "wgf_checkout_button";
 wgfBtn.className = "wgf_checkout_button";
 wgfBtn.href = "#wgf_checkout";
 wgfBtn.style.display = "none";
+wgfBtn.style.width = "250px";
 wgfBtn.onclick = () => {
     const wgfBtnElement = document.querySelector("#wgf_checkout_button");
     wgfBtnElement.classList.add("wgf_checkout_button_disabled");
@@ -119,16 +120,25 @@ document.addEventListener('input',(e)=> {
 })
 
 window.onload = (event) => {
+    OnLoadFn();
+};
+
+const OnLoadFn = function () {
     const placeOrderBtn = document.querySelector(".wc-block-components-checkout-place-order-button");
 
     placeOrderBtn.closest("div").append(wgfBtn);
     const wgfBtnElement = document.querySelector("#wgf_checkout_button");
     const radioSelected = document.querySelector('input[name="radio-control-wc-payment-method-options"]:checked');
+
+    radioSelected ? ShowHideButtons(radioSelected, placeOrderBtn, wgfBtnElement) : setTimeout(OnLoadFn, 50);
+}
+
+const ShowHideButtons = function (radioSelected, placeOrderBtn, wgfBtnElement) {
     if(radioSelected && "value" in radioSelected && radioSelected.value === settings.payment_method_id) {
         placeOrderBtn.style.display = 'none';
         wgfBtnElement.style.display = 'block';
     }
-};
+}
 
 const matrixField = {
     billing_first_name: "billing-first_name",
