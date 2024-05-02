@@ -1,10 +1,9 @@
 <script>
+    document.querySelector("main").style.display = "none";
     window.onload = () => {
-        document.querySelector("main").style.display = "none";
-
         if (GetFinancing) {
             new GetFinancing(
-                {{ wgf_href }},
+                "{{ wgf_href }}",
                 function () {
                     document.querySelector("main").style.display = "block";
                 }.bind(self),
