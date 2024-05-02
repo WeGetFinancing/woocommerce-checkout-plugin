@@ -7,9 +7,9 @@ sheet.innerHTML += ".wgf_checkout_button_disabled { opacity: 0.5; cursor: wait; 
 sheet.innerHTML += ".wgf_checkout_button_img { width: 100%; max-width: 320px; }";
 document.head.appendChild(sheet);
 
-const script = document.createElement('script');
-script.src = "https://cdn.wegetfinancing.com/libs/1.0/getfinancing.js";
-document.head.appendChild(script)
+// const script = document.createElement('script');
+// script.src = "https://cdn.wegetfinancing.com/libs/1.0/getfinancing.js";
+// document.head.appendChild(script)
 
 let billData = null, shipData = null;
 
@@ -33,9 +33,11 @@ const Content = (props) => {
         const unsubscribe = onPaymentProcessing( async () => {
             // Here we can do any processing we need, and then emit a response.
             // For example, we might validate a custom field, or perform an AJAX request, and then emit a response indicating it is valid or not.
-            let invIdElem = document.getElementById(settings.order_inv_id_field_id);
+            let invIdElem = document.getElementById(settings.order_inv_id_field_id),
+                wgfHrefElem = document.getElementById("order_wgf_href");
             const inv_id = invIdElem ? invIdElem.value : null;
-            const customDataIsValid = !!inv_id.length;
+            const wgf_href = wgfHrefElem ? wgfHrefElem.value : null;
+            const customDataIsValid = !!inv_id.length && !!wgf_href.length;
 
             if ( customDataIsValid ) {
                 return {
@@ -43,6 +45,7 @@ const Content = (props) => {
                     meta: {
                         paymentMethodData: {
                             inv_id,
+                            wgf_href,
                         },
                     },
                 };
@@ -254,30 +257,43 @@ const generateDivError = () => {
 }
 
 const WgfSuccess = (resp) => {
+    const placeOrderBtn = document.querySelector(".wc-block-components-checkout-place-order-button");
+    const form = placeOrderBtn.closest("form");
+
     let invIdElem = document.getElementById(settings.order_inv_id_field_id);
     if (!invIdElem) {
         invIdElem = document.createElement("input");
         invIdElem.id = settings.order_inv_id_field_id;
         invIdElem.name = settings.order_inv_id_field_id;
         invIdElem.type = "hidden";
-
-        const placeOrderBtn = document.querySelector(".wc-block-components-checkout-place-order-button");
-        const form = placeOrderBtn.closest("form");
         form.append(invIdElem)
     }
 
     invIdElem.value = resp.invId;
 
-    if (GetFinancing) {
-        new GetFinancing(
-            resp.href,
-            function () {
-                const placeOrderBtn = document.querySelector(".wc-block-components-checkout-place-order-button");
-                placeOrderBtn.click();
-            }.bind(self),
-            function () {}
-        )
+    let wgfHrefElem = document.getElementById("order_wgf_href");
+    if (!wgfHrefElem) {
+        wgfHrefElem = document.createElement("input");
+        wgfHrefElem.id = "order_wgf_href";
+        wgfHrefElem.name = "order_wgf_href";
+        wgfHrefElem.type = "hidden";
+        form.append(wgfHrefElem)
     }
+
+    wgfHrefElem.value = resp.href;
+
+    placeOrderBtn.click();
+
+    // if (GetFinancing) {
+    //     new GetFinancing(
+    //         resp.href,
+    //         function () {
+    //             const placeOrderBtn = document.querySelector(".wc-block-components-checkout-place-order-button");
+    //             placeOrderBtn.click();
+    //         }.bind(self),
+    //         function () {}
+    //     )
+    // }
 }
 
 const WgfErrorList = (msg) => {

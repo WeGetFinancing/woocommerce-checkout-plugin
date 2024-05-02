@@ -37,6 +37,7 @@
             <parameter>ppeSettingsAdminPage</parameter>
             <parameter>ppeSettingsAjax</parameter>
             <parameter>ppeFooter</parameter>
+            <parameter>checkoutThankyou</parameter>
         </parameter>
     </parameters>
 
@@ -76,6 +77,9 @@
             <argument>%app.ppe.js.sandbox%</argument>
             <argument>%app.ppe.css.prod%</argument>
             <argument>%app.ppe.css.sandbox%</argument>
+        </service>
+        <service id="checkoutThankyou" class="WeGetFinancing\Checkout\Page\Public\CheckoutThankyou">
+            <argument type="service" id="twig"/>
         </service>
         <service id="ppeSettingsAjax" class="WeGetFinancing\Checkout\Ajax\Admin\PpeSettingsAjax"/>
     </services>

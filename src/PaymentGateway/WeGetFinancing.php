@@ -156,13 +156,6 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
      */
     public function payment_fields(): void
     {
-        wp_enqueue_script(
-            WeGetFinancingValueObject::HANDLE_FUNNEL_SCRIPT, $GLOBALS[App::ID][App::FUNNEL_JS],
-            ['jquery'],
-            null,
-            true
-        );
-
         echo $this->twig->render(
             'store/checkout_button.twig',
             [
@@ -200,7 +193,7 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
      */
     public function process_payment($order_id): array
     {
-        $this->setOrderInvId($order_id);
+        $this->setOrderInvIdAndHref($order_id);
 
         $order = wc_get_order($order_id);
 
@@ -219,17 +212,29 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
         ];
     }
 
-    protected function setOrderInvId(int $orderId): void
+    protected function setOrderInvIdAndHref(int $orderId): void
     {
         if (false === array_key_exists("inv_id", $_POST)) {
             Logger::log(new \Exception("Payment process error: Inv Id not set for order id " . $orderId));
             return;
         }
 
-        $update = update_post_meta($orderId, OrderInvIdValueObject::ORDER_META, $_POST["inv_id"]);
-        if (false === $update) {
+        $updateInvId = update_post_meta($orderId, OrderInvIdValueObject::ORDER_META, $_POST["inv_id"]);
+        if (false === $updateInvId) {
             Logger::log(new \Exception(
-                "Payment process error updating post meta for order id " . $orderId . " - " . $_POST["inv_id"]
+                "Payment process error updating Inv Id post meta for order id " . $orderId . " - " . $_POST["inv_id"]
+            ));
+        }
+
+        if (false === array_key_exists("wgf_href", $_POST)) {
+            Logger::log(new \Exception("Payment process error: HREF not set for order id " . $orderId));
+            return;
+        }
+
+        $updateHref = update_post_meta($orderId, "wgf_href", $_POST["wgf_href"]);
+        if (false === $updateHref) {
+            Logger::log(new \Exception(
+                "Payment process error updating HREF post meta for order id " . $orderId . " - " . $_POST["wgf_href"]
             ));
         }
     }
