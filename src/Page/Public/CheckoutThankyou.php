@@ -11,11 +11,10 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use WeGetFinancing\Checkout\ActionableInterface;
+use WeGetFinancing\Checkout\Ajax\Public\DeleteOrderByOrderId;
+use WeGetFinancing\Checkout\Ajax\Public\GenerateFunnelUrl;
 use WeGetFinancing\Checkout\App;
-use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
-use WeGetFinancing\Checkout\Repository\PpeSettingsRepository;
-use WeGetFinancing\Checkout\ValueObject\PpeSettings;
 
 class CheckoutThankyou implements ActionableInterface
 {
@@ -52,6 +51,10 @@ class CheckoutThankyou implements ActionableInterface
             self::PAGE_TEMPLATE,
             [
                 'wgf_href' => get_post_meta($order_id, 'wgf_href', true),
+                'order_id' => $order_id,
+                'nonce' => wp_create_nonce(DeleteOrderByOrderId::NONCE),
+                'ajax_url' => admin_url('admin-ajax.php'),
+                'ajax_action' => DeleteOrderByOrderId::ACTION_NAME,
             ]
         );
     }
