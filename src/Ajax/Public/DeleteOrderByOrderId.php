@@ -32,13 +32,9 @@ class DeleteOrderByOrderId extends AbstractActionableWithClient
         try {
             check_ajax_referer(self::NONCE);
 
-            if (
-                RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
-                    $_POST,
-                    self::ORDER_ID_FIELD
-                )
-            ) {
-                $delete = wp_delete_post($_POST[self::ORDER_ID_FIELD], false);
+            if (true === array_key_exists(self::ORDER_ID_FIELD, $_POST) &&
+                false === empty($_POST[self::ORDER_ID_FIELD])) {
+                $delete = wp_delete_post($_POST[self::ORDER_ID_FIELD]);
                 if (null === $delete || false === $delete) {
                     Logger::log(new \Exception(
                         self::class . " unsuccessfully deletion.",
