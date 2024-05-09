@@ -6,9 +6,9 @@ namespace WeGetFinancing\Checkout\Ajax\Public;
 
 if (!defined( 'ABSPATH' )) exit;
 
-use Automattic\WooCommerce\Admin\Overrides\Order;
 use Exception;
 use Throwable;
+use WC_Order;
 use WeGetFinancing\Checkout\ActionableInterface;
 use WeGetFinancing\Checkout\Exception\PostbackUpdateException;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing;
@@ -47,6 +47,7 @@ class PostbackUpdate implements ActionableInterface
     public const WC_PROCESSING_STATUS = "wc-processing";
     public const WC_FAILED_STATUS = "wc-failed";
     public const WC_REFUNDED_STATUS = "refunded";
+    public const REFUND_REASON = "Order refunded from WeGetFinancing";
     public const SIGNATURE_ALGO = "sha256";
     public const QUERY_COLUMN = 'post_id';
 
@@ -80,15 +81,17 @@ class PostbackUpdate implements ActionableInterface
         try {
             set_time_limit(60);
 
-            $data = $this->getSignedData($request);
-            $array = $this->getValidData($data);
+            $raw = $this->getSignedData($request);
+            $data = $this->getValidData($raw);
 
             global $wpdb;
             $this->wpdb = $wpdb;
 
-            $order = $this->getOrderWhereInvId($array[self::INV_ID_FIELD]);
+            $order = $this->getOrderWhereInvId($data[self::INV_ID_FIELD]);
 
-            $order->update_status($this->getStatus($array[self::STATUS_FIELD]));
+            $status = $this->getStatus($data[self::STATUS_FIELD]);
+
+            $this->updateOrderStatus($order, $status);
 
             echo "OK";
             die();
@@ -256,7 +259,7 @@ class PostbackUpdate implements ActionableInterface
     /**
      * @throws PostbackUpdateException
      */
-    protected function getOrderWhereInvId(string $invId): \WC_Order
+    protected function getOrderWhereInvId(string $invId): WC_Order
     {
         $results = $this->selectOrderIdWhereInvId($invId);
         $found = count($results);
@@ -295,7 +298,7 @@ class PostbackUpdate implements ActionableInterface
         }
 
         $order = wc_get_order($results[0]->{self::QUERY_COLUMN});
-        if (false === $order instanceof \WC_Order) {
+        if (false === $order instanceof WC_Order) {
             throw new PostbackUpdateException(
                 PostbackUpdateException::INVALID_POST_ID_ERROR_MESSAGE . $results[0]->{self::QUERY_COLUMN},
                 PostbackUpdateException::INVALID_POST_ID_ERROR_CODE
@@ -303,5 +306,57 @@ class PostbackUpdate implements ActionableInterface
         }
 
         return $order;
+    }
+
+    protected function updateOrderStatus(WC_Order $order, string $status): void
+    {
+        if (self::WC_REFUNDED_STATUS === $status) {
+            $this->refundOrder($order);
+            return;
+        }
+
+        $order->update_status($status);
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function refundOrder(WC_Order $order): void
+    {
+        if( self::WC_REFUNDED_STATUS == $order->get_status() ) {
+            return;
+        }
+
+        $orderItems = $order->get_items();
+        $amount = 0;
+        $lineItems = [];
+
+        if ($orderItems) {
+            foreach ($orderItems as $itemId => $item) {
+                $taxData = $item->get_meta( '_line_tax_data' );
+                $refundTax = 0;
+
+                if (true === is_array($taxData)) {
+                    $refundTax = array_map('wc_format_decimal', $taxData);
+                }
+
+                $total = wc_format_decimal($item->get_meta('_line_total'));
+                $amount = wc_format_decimal($amount) + $total;
+
+                $lineItems[$itemId] = [
+                    'qty' => $item->get_meta('_qty'),
+                    'refund_total' => $total,
+                    'refund_tax' =>  $refundTax
+                ];
+            }
+        }
+
+        wc_create_refund([
+            'amount'         => $amount,
+            'reason'         => self::REFUND_REASON,
+            'order_id'       => $order->get_id(),
+            'line_items'     => $lineItems,
+            'refund_payment' => true
+        ]);
     }
 }
