@@ -252,20 +252,20 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
             }
         }
 
-        if (
-            RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
-                $_POST[GeneralDataRequest::DATA],
-                GenerateFunnelUrlRequest::BILLING_PHONE_ID
-            )
-        ) {
-            $this->violations[] = [
-                'field' => 'phone',
-                'message' => 'phone cannot be empty.',
-            ];
-        }
-        $result[GenerateFunnelUrlRequest::BILLING_PHONE_ID] = sanitize_text_field(
-            $_POST[GeneralDataRequest::DATA][GenerateFunnelUrlRequest::BILLING_PHONE_ID]
-        );
+//        if (
+//            RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
+//                $_POST[GeneralDataRequest::DATA],
+//                GenerateFunnelUrlRequest::BILLING_PHONE_ID
+//            )
+//        ) {
+//            $this->violations[] = [
+//                'field' => 'phone',
+//                'message' => 'phone cannot be empty.',
+//            ];
+//        }
+//        $result[GenerateFunnelUrlRequest::BILLING_PHONE_ID] = sanitize_text_field(
+//            $_POST[GeneralDataRequest::DATA][GenerateFunnelUrlRequest::BILLING_PHONE_ID]
+//        );
 
         return $result;
     }
