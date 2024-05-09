@@ -22,9 +22,6 @@ class DeleteOrderByOrderId extends AbstractActionableWithClient
     public const NONCE = 'wgf-delete-order-by-order-id';
     public const ORDER_ID_FIELD = 'order_id';
 
-    public function __construct(protected string $apiVersion)
-    {}
-
     public function init(): void
     {
         $this->addAction();

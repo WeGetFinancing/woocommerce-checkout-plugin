@@ -308,6 +308,9 @@ class PostbackUpdate implements ActionableInterface
         return $order;
     }
 
+    /**
+     * @throws Exception
+     */
     protected function updateOrderStatus(WC_Order $order, string $status): void
     {
         if (self::WC_REFUNDED_STATUS === $status) {

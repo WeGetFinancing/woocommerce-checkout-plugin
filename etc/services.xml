@@ -37,7 +37,8 @@
             <parameter>ppeSettingsAdminPage</parameter>
             <parameter>ppeSettingsAjax</parameter>
             <parameter>ppeFooter</parameter>
-            <parameter>checkoutThankyou</parameter>
+            <parameter>checkoutThankyou</parameter>¡
+            <parameter>deleteOrderByOrderId</parameter>
         </parameter>
     </parameters>
 
@@ -62,6 +63,7 @@
         <service id="generateFunnelUrl" class="WeGetFinancing\Checkout\Ajax\Public\GenerateFunnelUrl">
             <argument>%app.api.version%</argument>
         </service>
+        <service id="deleteOrderByOrderId" class="WeGetFinancing\Checkout\Ajax\Public\DeleteOrderByOrderId"/>
         <service id="postbackUpdate" class="WeGetFinancing\Checkout\Ajax\Public\PostbackUpdate"/>
         <service id="registerShippedOrderStatus" class="WeGetFinancing\Checkout\PostStatus\RegisterShippedOrderStatus"/>
         <service id="onOrderStatusChangeToShipped" class="WeGetFinancing\Checkout\PostStatus\OnOrderStatusChangeToShipped"/>
