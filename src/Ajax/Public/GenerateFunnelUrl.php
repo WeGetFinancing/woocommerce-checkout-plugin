@@ -263,9 +263,9 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
 //                'message' => 'phone cannot be empty.',
 //            ];
 //        }
-//        $result[GenerateFunnelUrlRequest::BILLING_PHONE_ID] = sanitize_text_field(
-//            $_POST[GeneralDataRequest::DATA][GenerateFunnelUrlRequest::BILLING_PHONE_ID]
-//        );
+        $result[GenerateFunnelUrlRequest::BILLING_PHONE_ID] = sanitize_text_field(
+            $_POST[GeneralDataRequest::DATA][GenerateFunnelUrlRequest::BILLING_PHONE_ID]
+        );
 
         return $result;
     }
