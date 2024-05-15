@@ -343,19 +343,19 @@ class PostbackUpdate implements ActionableInterface
                     $refundTax = array_map('wc_format_decimal', $taxData);
                 }
 
-                $total = wc_format_decimal($item->get_meta('_line_total'));
-                $amount = wc_format_decimal($amount) + $total;
+                $total = $item->get_meta('_line_total');
+                $amount = (float)($amount) + (float)$total;
 
                 $lineItems[$itemId] = [
                     'qty' => $item->get_meta('_qty'),
-                    'refund_total' => $total,
+                    'refund_total' => wc_format_decimal($total),
                     'refund_tax' =>  $refundTax
                 ];
             }
         }
 
         wc_create_refund([
-            'amount'         => $amount,
+            'amount'         => wc_format_decimal($amount),
             'reason'         => self::REFUND_REASON,
             'order_id'       => $order->get_id(),
             'line_items'     => $lineItems,
