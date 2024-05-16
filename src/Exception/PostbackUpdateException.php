@@ -36,4 +36,6 @@ class PostbackUpdateException extends Exception
         "The order found is invalid, please check the database integrity. InvId: ";
     public const INVALID_POST_ID_ERROR_CODE = 13;
     public const INVALID_POST_ID_ERROR_MESSAGE = "The post id found is invalid, id: ";
+    public const INVALID_REFUND_REQUEST_EMPTY_AMOUNT_ERROR_MESSAGE = 'Amount field is empty.';
+    public const INVALID_REFUND_REQUEST_EMPTY_AMOUNT_ERROR_CODE = 14;
 }

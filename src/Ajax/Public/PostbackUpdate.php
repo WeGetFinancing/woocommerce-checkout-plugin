@@ -33,6 +33,7 @@ class PostbackUpdate implements ActionableInterface
     public const INV_ID_FIELD = "request_token";
     public const UPDATES_FIELD = "updates";
     public const STATUS_FIELD = "status";
+    public const AMOUNT_FIELD = "amount";
     public const TRANSACTION_ID_FIELD = "merchant_transaction_id";
     public const WGF_APPROVED_STATUS = "approved";
     public const WGF_PREAPPROVED_STATUS = "preapproved";
@@ -91,7 +92,11 @@ class PostbackUpdate implements ActionableInterface
 
             $status = $this->getStatus($data[self::STATUS_FIELD]);
 
-            $this->updateOrderStatus($order, $status);
+            if (self::WC_REFUNDED_STATUS === $status) {
+                $this->refundOrder($order, $raw);
+            } else {
+                $order->update_status($status);
+            }
 
             echo "OK";
             die();
@@ -160,7 +165,6 @@ class PostbackUpdate implements ActionableInterface
                 PostbackUpdateException::INVALID_REQUEST_INVALID_STATUS_ERROR_CODE
             );
         }
-
 
         if (RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty($data, self::TRANSACTION_ID_FIELD)) {
             throw new PostbackUpdateException(
@@ -311,55 +315,32 @@ class PostbackUpdate implements ActionableInterface
     /**
      * @throws Exception
      */
-    protected function updateOrderStatus(WC_Order $order, string $status): void
-    {
-        if (self::WC_REFUNDED_STATUS === $status) {
-            $this->refundOrder($order);
-            return;
-        }
-
-        $order->update_status($status);
-    }
-
-    /**
-     * @throws Exception
-     */
-    protected function refundOrder(WC_Order $order): void
+    protected function refundOrder(WC_Order $order, array $raw): void
     {
         if( self::WC_REFUNDED_STATUS == $order->get_status() ) {
             return;
         }
 
-        $orderItems = $order->get_items();
-        $amount = 0;
-        $lineItems = [];
-
-        if ($orderItems) {
-            foreach ($orderItems as $itemId => $item) {
-                $taxData = $item->get_meta( '_line_tax_data' );
-                $refundTax = 0;
-
-                if (true === is_array($taxData)) {
-                    $refundTax = array_map('wc_format_decimal', $taxData);
-                }
-
-                $total = $item->get_meta('_line_total');
-                $amount = (float)($amount) + (float)$total;
-
-                $lineItems[$itemId] = [
-                    'qty' => $item->get_meta('_qty'),
-                    'refund_total' => wc_format_decimal($total),
-                    'refund_tax' =>  $refundTax
-                ];
-            }
+        if (
+            RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
+                $raw[self::UPDATES_FIELD],
+                self::AMOUNT_FIELD
+            )
+        ) {
+            throw new PostbackUpdateException(
+                PostbackUpdateException::INVALID_REFUND_REQUEST_EMPTY_AMOUNT_ERROR_MESSAGE,
+                PostbackUpdateException::INVALID_REFUND_REQUEST_EMPTY_AMOUNT_ERROR_CODE
+            );
         }
+        $amount = sanitize_text_field($raw[self::UPDATES_FIELD][self::AMOUNT_FIELD]);
 
         wc_create_refund([
             'amount'         => wc_format_decimal($amount),
             'reason'         => self::REFUND_REASON,
             'order_id'       => $order->get_id(),
-            'line_items'     => $lineItems,
-            'refund_payment' => true
+            'line_items'     => [],
+            'refund_payment' => false,
+            'restock_items'  => true,
         ]);
     }
 }
