@@ -313,53 +313,10 @@ class PostbackUpdate implements ActionableInterface
      */
     protected function updateOrderStatus(WC_Order $order, string $status): void
     {
-        if (self::WC_REFUNDED_STATUS === $status) {
-            $this->refundOrder($order);
+        if (self::WC_REFUNDED_STATUS === $status && self::WC_REFUNDED_STATUS == $order->get_status()) {
             return;
         }
 
         $order->update_status($status);
-    }
-
-    /**
-     * @throws Exception
-     */
-    protected function refundOrder(WC_Order $order): void
-    {
-        if( self::WC_REFUNDED_STATUS == $order->get_status() ) {
-            return;
-        }
-
-        $orderItems = $order->get_items();
-        $amount = 0;
-        $lineItems = [];
-
-        if ($orderItems) {
-            foreach ($orderItems as $itemId => $item) {
-                $taxData = $item->get_meta( '_line_tax_data' );
-                $refundTax = 0;
-
-                if (true === is_array($taxData)) {
-                    $refundTax = array_map('wc_format_decimal', $taxData);
-                }
-
-                $total = $item->get_meta('_line_total');
-                $amount = (float)($amount) + (float)$total;
-
-                $lineItems[$itemId] = [
-                    'qty' => $item->get_meta('_qty'),
-                    'refund_total' => wc_format_decimal($total),
-                    'refund_tax' =>  $refundTax
-                ];
-            }
-        }
-
-        wc_create_refund([
-            'amount'         => wc_format_decimal($amount),
-            'reason'         => self::REFUND_REASON,
-            'order_id'       => $order->get_id(),
-            'line_items'     => $lineItems,
-            'refund_payment' => false
-        ]);
     }
 }
