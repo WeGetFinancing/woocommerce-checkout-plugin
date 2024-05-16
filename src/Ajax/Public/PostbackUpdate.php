@@ -359,7 +359,7 @@ class PostbackUpdate implements ActionableInterface
             'reason'         => self::REFUND_REASON,
             'order_id'       => $order->get_id(),
             'line_items'     => $lineItems,
-            'refund_payment' => false
+            'refund_payment' => true
         ]);
     }
 }
