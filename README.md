@@ -79,7 +79,17 @@ Our plugin allow you to offer:
 11. In the main payment table, switch to "ON" the button under the "Enabled" section as per following screenshot
     ![Plugin Activation](./assets/setup-7.png)
 
-### 3.2 Configure PPE
+### 3.2 Cart and Checkout Gutenberg Blocks
+
+Starting with WooCommerce version 8.3, the Cart and Checkout Blocks are the default for new installations. These blocks are part of a ground-up rebuild of the checkout flow, based on industry best practices which offer conversion-optimized features and a simplified shopper flow. With easy customization options, you can maintain your brand identity and provide a visually appealing and consistent checkout journey for your customers.
+
+These new blocks are fully functional and most extensions developed by WooCommerce fully support the block-based cart/checkout at this time. However, a plugin/extension running on your store may not work as expected. The cart and checkout shortcodes will continue to be available in WooCommerce Core for existing stores that have customized checkout flows requiring them, and for any new stores that have specific needs not yet possible with the Cart and Checkout blocks.
+
+WeGetFinancing Checkout Plugin support both traditional (legacy) templates accessed through shortcodes and modern Gutenberg blocks.
+
+For more information on how to switch between the two, please follow the [Official WooCommerce Documentation](https://woocommerce.com/document/cart-checkout-blocks-status/).
+
+### 3.3 Configure PPE
 
 1. Take the Merchant Token ID:
    1. Connect into our partner portal, the url depends on the environment: 
@@ -107,7 +117,7 @@ Our plugin allow you to offer:
 9. The PPE widget should appear in the selected page
    ![Plugin Activation](./assets/setup-14.png)
 
-### 3.3 Test the plugin
+### 3.4 Test the plugin
 
 1. Open an incognito windows, or another browser, or be sure you're not logged in into the WordPress. The plugin doesn't work if you have a logged-in session.
 2. Add one or more products in the cart

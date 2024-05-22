@@ -218,11 +218,11 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
             Logger::log(new \Exception("Payment process error: Inv Id not set for order id " . $orderId));
             return;
         }
-
-        $updateInvId = update_post_meta($orderId, OrderInvIdValueObject::ORDER_META, $_POST["inv_id"]);
+        $invId = sanitize_text_field($_POST["inv_id"]);
+        $updateInvId = update_post_meta($orderId, OrderInvIdValueObject::ORDER_META, $invId);
         if (false === $updateInvId) {
             Logger::log(new \Exception(
-                "Payment process error updating Inv Id post meta for order id " . $orderId . " - " . $_POST["inv_id"]
+                "Payment process error updating Inv Id post meta for order id " . $orderId . " - " . $invId
             ));
         }
 
@@ -230,11 +230,11 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
             Logger::log(new \Exception("Payment process error: HREF not set for order id " . $orderId));
             return;
         }
-
-        $updateHref = update_post_meta($orderId, "wgf_href", $_POST["wgf_href"]);
+        $href = sanitize_text_field($_POST["wgf_href"]);
+        $updateHref = update_post_meta($orderId, "wgf_href", $href);
         if (false === $updateHref) {
             Logger::log(new \Exception(
-                "Payment process error updating HREF post meta for order id " . $orderId . " - " . $_POST["wgf_href"]
+                "Payment process error updating HREF post meta for order id " . $orderId . " - " . $href
             ));
         }
     }

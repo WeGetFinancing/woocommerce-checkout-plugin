@@ -11,7 +11,6 @@ use WeGetFinancing\Checkout\AbstractActionableWithClient;
 use WeGetFinancing\Checkout\App;
 use WeGetFinancing\Checkout\Exception\AbstractActionableWithClientException;
 use WeGetFinancing\Checkout\Exception\GenerateFunnelUrlException;
-use WeGetFinancing\Checkout\Exception\GetFunnelRequestException;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
 use WeGetFinancing\Checkout\Service\Logger;
 use WeGetFinancing\Checkout\Service\RequestValidatorUtility;
@@ -252,17 +251,6 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
             }
         }
 
-//        if (
-//            RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
-//                $_POST[GeneralDataRequest::DATA],
-//                GenerateFunnelUrlRequest::BILLING_PHONE_ID
-//            )
-//        ) {
-//            $this->violations[] = [
-//                'field' => 'phone',
-//                'message' => 'phone cannot be empty.',
-//            ];
-//        }
         $result[GenerateFunnelUrlRequest::BILLING_PHONE_ID] = sanitize_text_field(
             $_POST[GeneralDataRequest::DATA][GenerateFunnelUrlRequest::BILLING_PHONE_ID]
         );
@@ -353,36 +341,13 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
             'zipcode' => $billingZipcode,
         ];
 
-//        if (
-//            RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
-//                $_POST[GeneralDataRequest::DATA],
-//                GenerateFunnelUrlRequest::SHIPPING_DIFFERENT_ID
-//            )
-//        ) {
-//            $this->violations[] = [
-//                'field' => 'shipping_different',
-//                'message' => 'Invalid request, please contact our customer support.',
-//            ];
-//        }
-//
-//        $shippingToDifferent = sanitize_text_field(
-//            $_POST[GeneralDataRequest::DATA][GenerateFunnelUrlRequest::SHIPPING_DIFFERENT_ID]
-//        );
-//        if ('true' === $shippingToDifferent) {
-//            $this->violations[] = [
-//                'field' => 'shipping_different',
-//                'message' => 'shipping_different has to be the same of billing one.',
-//            ];
-//        }
-
         return $request;
     }
 
     /**
      * @param array $request
-     * @throws EntityValidationException
-     * @throws GetFunnelRequestException
      * @return LoanRequestEntity
+     * @throws GenerateFunnelUrlException
      */
     protected function getLoanRequest(array $request): LoanRequestEntity
     {

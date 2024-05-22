@@ -22,7 +22,7 @@ services:
   wp:
     depends_on:
       - db
-    image: wordpress:beta-6.5-RC4-php8.1-fpm-alpine
+    image: wordpress:6.5.3-php8.1-fpm-alpine
     container_name: wp
     restart: always
     user: "root:root"

@@ -49,4 +49,4 @@
 * Updated Readme.txt with installation, configuration and documentation of 3rd Party usage
 
 = 1.4.0 =
-* Updated to woocommerce payment gutenberg block support
+* Updated support to Woocommerce => 8.3 Cart and Checkout Gutenberg Blocks
