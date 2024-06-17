@@ -21,13 +21,14 @@ class App implements ActionableInterface
     use AddableTrait;
 
     public const ID = 'wegetfinancing';
-    public const PLUGIN_VERSION = '1.3.1';
+    public const PLUGIN_VERSION = '1.4.1';
     public const INTEGRATION_NAME = 'WordPress-WooCommerce';
     public const CONFIG_DIR = 'etc';
     public const DEFAULT_SERVICE_XML_FILE = 'services.xml';
     public const INIT_LIST_PARAMS = 'app.init_list';
     public const RENDER = 'twig';
     public const FUNNEL_JS = 'app.funnel.js';
+    public const CHECKOUT_LOGO_URL = 'app.checkout_logo_url';
     public const CHECKOUT_BUTTON_URL = 'app.checkout_button.url';
     public const INIT_NAME = 'init';
     public const FUNCTION_NAME = 'execute';
@@ -86,6 +87,10 @@ class App implements ActionableInterface
             self::FUNNEL_JS => $this->container->getParameter(self::FUNNEL_JS),
             self::CHECKOUT_BUTTON_URL => plugins_url(
                 $this->container->getParameter(self::CHECKOUT_BUTTON_URL),
+                $this->filePath
+            ),
+            self::CHECKOUT_LOGO_URL => plugins_url(
+                $this->container->getParameter(self::CHECKOUT_LOGO_URL),
                 $this->filePath
             )
         ];

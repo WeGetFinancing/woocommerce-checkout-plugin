@@ -1,0 +1,28 @@
+<script>
+    document.querySelector("main").style.display = "none";
+    window.onload = () => {
+        if (GetFinancing) {
+            new GetFinancing(
+                "{{ wgf_href }}",
+                function () {
+                    document.querySelector("main").style.display = "block";
+                }.bind(self),
+                function () {
+                    let requestData = new FormData();
+                    requestData.append("order_id", {{ order_id }});
+                    requestData.append("_wpnonce", "{{ nonce }}");
+                    requestData.append("action", "{{ ajax_action }}");
+
+                    fetch("{{ ajax_url }}", {
+                        method: "POST",
+                        body: requestData,
+                    })
+                        .then(response => response.json())
+                        .then(resp => {})
+                        .catch(err => console.log(err));
+
+                }.bind(self)
+            )
+        }
+    }
+</script>

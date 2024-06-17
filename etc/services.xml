@@ -20,6 +20,7 @@
         <parameter key="app.ppe.css.prod">https://ppe.wegetfinancing.com/index.css</parameter>
         <parameter key="app.ppe.css.sandbox">https://ppe.sandbox.dev.wegetfinancing.com/index.css</parameter>
         <parameter key="app.checkout_button.url">/dist/logoCircular.svg</parameter>
+        <parameter key="app.checkout_logo_url">/dist/logo.svg</parameter>
         <parameter key="app.bootstrap.css">/dist/bootstrap.min.css</parameter>
         <parameter key="app.bootstrap.js">/dist/bootstrap.bundle.min.js</parameter>
 
@@ -36,6 +37,8 @@
             <parameter>ppeSettingsAdminPage</parameter>
             <parameter>ppeSettingsAjax</parameter>
             <parameter>ppeFooter</parameter>
+            <parameter>checkoutThankyou</parameter>¡
+            <parameter>deleteOrderByOrderId</parameter>
         </parameter>
     </parameters>
 
@@ -60,6 +63,7 @@
         <service id="generateFunnelUrl" class="WeGetFinancing\Checkout\Ajax\Public\GenerateFunnelUrl">
             <argument>%app.api.version%</argument>
         </service>
+        <service id="deleteOrderByOrderId" class="WeGetFinancing\Checkout\Ajax\Public\DeleteOrderByOrderId"/>
         <service id="postbackUpdate" class="WeGetFinancing\Checkout\Ajax\Public\PostbackUpdate"/>
         <service id="registerShippedOrderStatus" class="WeGetFinancing\Checkout\PostStatus\RegisterShippedOrderStatus"/>
         <service id="onOrderStatusChangeToShipped" class="WeGetFinancing\Checkout\PostStatus\OnOrderStatusChangeToShipped"/>
@@ -75,6 +79,9 @@
             <argument>%app.ppe.js.sandbox%</argument>
             <argument>%app.ppe.css.prod%</argument>
             <argument>%app.ppe.css.sandbox%</argument>
+        </service>
+        <service id="checkoutThankyou" class="WeGetFinancing\Checkout\Page\Public\CheckoutThankyou">
+            <argument type="service" id="twig"/>
         </service>
         <service id="ppeSettingsAjax" class="WeGetFinancing\Checkout\Ajax\Admin\PpeSettingsAjax"/>
     </services>

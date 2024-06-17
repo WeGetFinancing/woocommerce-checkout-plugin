@@ -47,3 +47,9 @@
 
 = 1.3.1 =
 * Updated Readme.txt with installation, configuration and documentation of 3rd Party usage
+
+= 1.4.0 =
+* Updated support to Woocommerce => 8.3 Cart and Checkout Gutenberg Blocks
+
+= 1.4.1 =
+* Updated support to php 8.0

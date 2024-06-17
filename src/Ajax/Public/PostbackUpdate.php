@@ -7,13 +7,14 @@ namespace WeGetFinancing\Checkout\Ajax\Public;
 if (!defined( 'ABSPATH' )) exit;
 
 use Exception;
-use Service\Logger;
 use Throwable;
+use WC_Order;
 use WeGetFinancing\Checkout\ActionableInterface;
 use WeGetFinancing\Checkout\Exception\PostbackUpdateException;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
 use WeGetFinancing\Checkout\PostMeta\OrderInvIdValueObject;
+use WeGetFinancing\Checkout\Service\Logger;
 use WeGetFinancing\Checkout\Service\RequestValidatorUtility;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 use WP_REST_Request;
@@ -32,6 +33,7 @@ class PostbackUpdate implements ActionableInterface
     public const INV_ID_FIELD = "request_token";
     public const UPDATES_FIELD = "updates";
     public const STATUS_FIELD = "status";
+    public const AMOUNT_FIELD = "amount";
     public const TRANSACTION_ID_FIELD = "merchant_transaction_id";
     public const WGF_APPROVED_STATUS = "approved";
     public const WGF_PREAPPROVED_STATUS = "preapproved";
@@ -46,7 +48,11 @@ class PostbackUpdate implements ActionableInterface
     public const WC_PROCESSING_STATUS = "wc-processing";
     public const WC_FAILED_STATUS = "wc-failed";
     public const WC_REFUNDED_STATUS = "refunded";
+    public const REFUND_REASON = "Order refunded from WeGetFinancing";
     public const SIGNATURE_ALGO = "sha256";
+    public const QUERY_COLUMN = 'post_id';
+
+    protected object $wpdb;
 
     public function init(): void
     {
@@ -74,20 +80,23 @@ class PostbackUpdate implements ActionableInterface
     public function action(WP_REST_Request $request): void
     {
         try {
-            $data = $this->getSignedData($request);
-            $array = $this->getValidData($data);
-            $args = [
-                'meta_key' => OrderInvIdValueObject::ORDER_META,
-                'meta_value' => $array[self::INV_ID_FIELD],
-                'post_type' => 'shop_order',
-                'post_status' => 'any',
-                'posts_per_page' => 1,
-            ];
-            $posts = get_posts($args);
+            set_time_limit(60);
 
-            $order = wc_get_order($posts[0]->ID);
+            $raw = $this->getSignedData($request);
+            $data = $this->getValidData($raw);
 
-            $order->update_status($this->getStatus($array[self::STATUS_FIELD]));
+            global $wpdb;
+            $this->wpdb = $wpdb;
+
+            $order = $this->getOrderWhereInvId($data[self::INV_ID_FIELD]);
+
+            $status = $this->getStatus($data[self::STATUS_FIELD]);
+
+            if (self::WC_REFUNDED_STATUS === $status) {
+                $this->refundOrder($order, $raw);
+            } else {
+                $order->update_status($status);
+            }
 
             echo "OK";
             die();
@@ -157,7 +166,6 @@ class PostbackUpdate implements ActionableInterface
             );
         }
 
-
         if (RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty($data, self::TRANSACTION_ID_FIELD)) {
             throw new PostbackUpdateException(
                 PostbackUpdateException::INVALID_REQUEST_EMPTY_TRANSACTION_ID_ERROR_MESSAGE,
@@ -226,5 +234,113 @@ class PostbackUpdate implements ActionableInterface
             self::WGF_REFUND_STATUS => self::WC_REFUNDED_STATUS,
             default => false,
         };
+    }
+
+    /**
+     * @param string $invId
+     * @return array
+     * @throws PostbackUpdateException
+     */
+    protected function selectOrderIdWhereInvId(string $invId): array
+    {
+        $sql = $this->wpdb->prepare(
+            "SELECT post_id FROM {$this->wpdb->prefix}postmeta WHERE meta_key = '" .
+            OrderInvIdValueObject::ORDER_META . "' AND meta_value = %s",
+            $invId
+        );
+
+        $results = $this->wpdb->get_results($sql);
+        if (false === is_array($results)) {
+            throw new PostbackUpdateException(
+                PostbackUpdateException::INVALID_SQL_RESULT_ERROR_MESSAGE,
+                PostbackUpdateException::INVALID_SQL_RESULT_ERROR_CODE
+            );
+        }
+
+        return $results;
+    }
+
+    /**
+     * @throws PostbackUpdateException
+     */
+    protected function getOrderWhereInvId(string $invId): WC_Order
+    {
+        $results = $this->selectOrderIdWhereInvId($invId);
+        $found = count($results);
+
+        if (0 === $found) {
+            sleep(15);
+            $results = $this->selectOrderIdWhereInvId($invId);
+            $found = count($results);
+
+            if (0 === $found) {
+                sleep(30);
+                $results = $this->selectOrderIdWhereInvId($invId);
+                $found = count($results);
+
+                if (0 === $found) {
+                    throw new PostbackUpdateException(
+                        PostbackUpdateException::ORDER_NOT_FOUND_ERROR_MESSAGE . $invId,
+                        PostbackUpdateException::ORDER_NOT_FOUND_ERROR_CODE
+                    );
+                }
+            }
+        }
+
+        if (1 < $found) {
+            throw new PostbackUpdateException(
+                PostbackUpdateException::MULTIPLE_ORDERS_FOUND_ERROR_MESSAGE . $invId,
+                PostbackUpdateException::MULTIPLE_ORDERS_FOUND_ERROR_CODE
+            );
+        }
+
+        if (false === property_exists($results[0], self::QUERY_COLUMN)) {
+            throw new PostbackUpdateException(
+                PostbackUpdateException::INVALID_RESULT_ORDER_ERROR_MESSAGE . $invId,
+                PostbackUpdateException::INVALID_RESULT_ORDER_ERROR_CODE
+            );
+        }
+
+        $order = wc_get_order($results[0]->{self::QUERY_COLUMN});
+        if (false === $order instanceof WC_Order) {
+            throw new PostbackUpdateException(
+                PostbackUpdateException::INVALID_POST_ID_ERROR_MESSAGE . $results[0]->{self::QUERY_COLUMN},
+                PostbackUpdateException::INVALID_POST_ID_ERROR_CODE
+            );
+        }
+
+        return $order;
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function refundOrder(WC_Order $order, array $raw): void
+    {
+        if( self::WC_REFUNDED_STATUS == $order->get_status() ) {
+            return;
+        }
+
+        if (
+            RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
+                $raw[self::UPDATES_FIELD],
+                self::AMOUNT_FIELD
+            )
+        ) {
+            throw new PostbackUpdateException(
+                PostbackUpdateException::INVALID_REFUND_REQUEST_EMPTY_AMOUNT_ERROR_MESSAGE,
+                PostbackUpdateException::INVALID_REFUND_REQUEST_EMPTY_AMOUNT_ERROR_CODE
+            );
+        }
+        $amount = sanitize_text_field($raw[self::UPDATES_FIELD][self::AMOUNT_FIELD]);
+
+        wc_create_refund([
+            'amount'         => wc_format_decimal($amount),
+            'reason'         => self::REFUND_REASON,
+            'order_id'       => $order->get_id(),
+            'line_items'     => [],
+            'refund_payment' => false,
+            'restock_items'  => true,
+        ]);
     }
 }

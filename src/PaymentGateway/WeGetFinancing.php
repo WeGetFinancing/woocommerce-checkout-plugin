@@ -15,6 +15,7 @@ use WeGetFinancing\Checkout\Ajax\Public\GenerateFunnelUrl;
 use WeGetFinancing\Checkout\App;
 use WeGetFinancing\Checkout\PostMeta\OrderInvIdValueObject;
 use WeGetFinancing\Checkout\Repository\GetOptionRepositoryTrait;
+use WeGetFinancing\Checkout\Service\Logger;
 use WeGetFinancing\Checkout\ValueObject\GenerateFunnelUrlRequest;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 
@@ -33,8 +34,8 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
     'Offer affordable monthly payments to your existing customers while you receive the money ' .
     'directly into your account, in one lump sum.';
     public const TITLE = 'WeGetFinancing';
-    public const DESCRIPTION = 'Pay monthly, obtain instant approval with no extensive paperwork.' .
-    ' Get credit approval in just seconds, so you can complete your purchase immediately, hassle-free.';
+    public const DESCRIPTION = 'Purchase now and pay later with customized financing choices. ' .
+        'All credit types are welcome. No hard inquiry needed.';
     public const SUPPORTS = ['products', 'refunds'];
 
     protected Environment $twig;
@@ -155,13 +156,6 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
      */
     public function payment_fields(): void
     {
-        wp_enqueue_script(
-            WeGetFinancingValueObject::HANDLE_FUNNEL_SCRIPT, $GLOBALS[App::ID][App::FUNNEL_JS],
-            ['jquery'],
-            null,
-            true
-        );
-
         echo $this->twig->render(
             'store/checkout_button.twig',
             [
@@ -199,6 +193,8 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
      */
     public function process_payment($order_id): array
     {
+        $this->setOrderInvIdAndHref($order_id);
+
         $order = wc_get_order($order_id);
 
         $order->update_status(
@@ -214,6 +210,33 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
             'result' => WeGetFinancingValueObject::PROCESS_PAYMENT_SUCCESS_ID,
             'redirect' => $this->get_return_url($order),
         ];
+    }
+
+    protected function setOrderInvIdAndHref(int $orderId): void
+    {
+        if (false === array_key_exists("inv_id", $_POST)) {
+            Logger::log(new \Exception("Payment process error: Inv Id not set for order id " . $orderId));
+            return;
+        }
+        $invId = sanitize_text_field($_POST["inv_id"]);
+        $updateInvId = update_post_meta($orderId, OrderInvIdValueObject::ORDER_META, $invId);
+        if (false === $updateInvId) {
+            Logger::log(new \Exception(
+                "Payment process error updating Inv Id post meta for order id " . $orderId . " - " . $invId
+            ));
+        }
+
+        if (false === array_key_exists("wgf_href", $_POST)) {
+            Logger::log(new \Exception("Payment process error: HREF not set for order id " . $orderId));
+            return;
+        }
+        $href = sanitize_text_field($_POST["wgf_href"]);
+        $updateHref = update_post_meta($orderId, "wgf_href", $href);
+        if (false === $updateHref) {
+            Logger::log(new \Exception(
+                "Payment process error updating HREF post meta for order id " . $orderId . " - " . $href
+            ));
+        }
     }
 
     protected static function getOptionsName(): string

@@ -31,7 +31,7 @@ interface PpeSettings
     public const MERCHANT_TOKEN_DEFAULT_VALUE = '';
     public const IS_APPLY_NOW_ID = 'wgf_ppe_settings_is_apply_now_id';
     public const IS_APPLY_NOW_NAME = 'Apply Now';
-    public const IS_APPLY_NOW_DEFAULT_VALUE = true;
+    public const IS_APPLY_NOW_DEFAULT_VALUE = false;
     public const IS_BRANDED_ID = 'wgf_ppe_settings_is_branded_id';
     public const IS_BRANDED_NAME = 'Branded';
     public const IS_BRANDED_DEFAULT_VALUE = true;
