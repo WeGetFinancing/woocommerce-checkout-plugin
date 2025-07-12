@@ -1,28 +1,82 @@
 <script>
-    document.querySelector("main").style.display = "none";
-    window.onload = () => {
-        if (GetFinancing) {
-            new GetFinancing(
-                "{{ wgf_href }}",
-                function () {
-                    document.querySelector("main").style.display = "block";
-                }.bind(self),
-                function () {
-                    let requestData = new FormData();
-                    requestData.append("order_id", {{ order_id }});
-                    requestData.append("_wpnonce", "{{ nonce }}");
-                    requestData.append("action", "{{ ajax_action }}");
+    let mainSelector = document.querySelector("main")
+    if(mainSelector) {
+        mainSelector.style.display = "none";
+    }
 
-                    fetch("{{ ajax_url }}", {
-                        method: "POST",
-                        body: requestData,
-                    })
-                        .then(response => response.json())
-                        .then(resp => {})
-                        .catch(err => console.log(err));
-
-                }.bind(self)
-            )
+    function mainFallback() {
+        let entryTitle = document.querySelector(".entry-header .entry-title");
+        if (entryTitle) {
+            entryTitle.textContent = "Order Received but not processed";
         }
+
+        let noticeElement = document.querySelector(".entry-content .woocommerce .woocommerce-order p.woocommerce-notice");
+        if (noticeElement) {
+            noticeElement.innerHTML = "<p>Your order was sent to us, but we were unable to confirm your order due to unexpected internal error.</p>" +
+                "<p>Our customer service is being alerted and will review your case promptly.</p>" +
+                "<p>Please save your order number <b>{{ order_id }}</b> for future review.</p>";
+        }
+
+        let orderOverview = document.querySelector(".entry-content .woocommerce-order-overview")
+        if (orderOverview) {
+            orderOverview.style.display = "none";
+        }
+
+        let customerDetails = document.querySelector(".entry-content .woocommerce-customer-details")
+        if (customerDetails) {
+            customerDetails.style.display = "none";
+        }
+
+        let orderDetails = document.querySelector(".entry-content .woocommerce-order-details")
+        if (orderDetails) {
+            orderDetails.style.display = "none";
+        }
+
+        let mainSelector = document.querySelector("main")
+        if(mainSelector) {
+            mainSelector.style.display = "block";
+        }
+    }
+
+    function initializeFinancing() {
+        try {
+            if (typeof GetFinancing !== 'undefined' && GetFinancing) {
+                new GetFinancing(
+                    "{{ wgf_href }}",
+                    function () {
+                        document.querySelector("main").style.display = "block";
+                    }.bind(self),
+                    function () {
+                        console.log("Error function");
+                        let requestData = new FormData();
+                        requestData.append("order_id", {{ order_id }});
+                        requestData.append("_wpnonce", "{{ nonce }}");
+                        requestData.append("action", "{{ ajax_action }}");
+
+                        fetch("{{ ajax_url }}", {
+                            method: "POST",
+                            body: requestData,
+                        })
+                            .then(response => response.json())
+                            .then(resp => {
+                            })
+                            .catch(err => console.log(err));
+                        document.querySelector("main").style.display = "block";
+                    }.bind(self)
+                )
+            } else {
+                mainFallback();
+            }
+        } catch (error) {
+            mainFallback();
+        }
+
+    }
+
+    // Check if page is already loaded and ensure all resources are loaded
+    if (document.readyState === 'complete') {
+        initializeFinancing();
+    } else {
+        window.addEventListener('load', initializeFinancing);
     }
 </script>

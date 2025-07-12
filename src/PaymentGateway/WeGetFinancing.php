@@ -77,7 +77,7 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
         $this->addAction();
     }
 
-    public function init_form_fields()
+    public function init_form_fields(): void
     {
         $this->form_fields = apply_filters(
             WeGetFinancingValueObject::FIELDSET_ID,

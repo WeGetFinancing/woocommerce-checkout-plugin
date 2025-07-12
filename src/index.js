@@ -28,9 +28,9 @@ const Content = (props) => {
     shipData = shippingData;
 
     const { eventRegistration, emitResponse } = props;
-    const { onPaymentProcessing } = eventRegistration;
+    const { onPaymentSetup } = eventRegistration;
     useEffect( () => {
-        const unsubscribe = onPaymentProcessing( async () => {
+        const unsubscribe = onPaymentSetup( async () => {
             // Here we can do any processing we need, and then emit a response.
             // For example, we might validate a custom field, or perform an AJAX request, and then emit a response indicating it is valid or not.
             let invIdElem = document.getElementById(settings.order_inv_id_field_id),
@@ -63,7 +63,7 @@ const Content = (props) => {
     }, [
         emitResponse.responseTypes.ERROR,
         emitResponse.responseTypes.SUCCESS,
-        onPaymentProcessing,
+        onPaymentSetup,
     ] );
 
     return decodeEntities(description);
@@ -128,6 +128,13 @@ window.onload = (event) => {
 
 const OnLoadFn = function () {
     const placeOrderBtn = document.querySelector(".wc-block-components-checkout-place-order-button");
+
+    // Check if the place order button exists before proceeding
+    if (!placeOrderBtn) {
+        setTimeout(OnLoadFn, 50);
+        return;
+    }
+
 
     placeOrderBtn.closest("div").append(wgfBtn);
     const wgfBtnElement = document.querySelector("#wgf_checkout_button");

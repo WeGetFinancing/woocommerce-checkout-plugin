@@ -53,3 +53,7 @@
 
 = 1.4.1 =
 * Updated support to php 8.0
+
+= 1.4.2 =
+* Updated support to WordPress 6.6 and WooCommerce 9.x
+* PPE: Pointing test environment to sandbox instead of sandbox.dev

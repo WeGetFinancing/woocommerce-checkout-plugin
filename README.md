@@ -12,7 +12,7 @@ Our payment gateway offers different financing options to your customers at chec
 
 This can help to increase your sales and customer satisfaction by providing an easy and accessible way for customers to finance their purchases.
 
-Our plugin allow you to offer:
+Our plugin allows you to offer:
 
 * Multiple lenders: More lenders, more approvals for your customers.
 * Real-time instant approval: Allow your customers to access financing easily.
@@ -130,12 +130,18 @@ For more information on how to switch between the two, please follow the [Offici
 
 This part is intent only for skilled technical people.
 
+### 4.1 Prepare your development environment
+
+1. If this is the first time you've cloned this repository, please ensure that 
+   1. You have been installed apg and make, in a debian environment: `sudp apt install -y apg make`
+   2. 
+
 ### 4.1. Install a fresh version of WordPress:
 
 1. Configure your .env file
-2. Ensure that all the container are down
+2. Ensure that all the containers are down
    ```
-   docker-compose down -v --remove-orphans
+   docker compose down -v --remove-orphans
    ```
 3. Delete any content inside the folders "./var/wp" but not the folders itself
    ```
@@ -143,20 +149,20 @@ This part is intent only for skilled technical people.
    ```
 4. Start docker-compose
    ```
-   docker-compose up -d
+   docker compose up -d
    ```
    
 ### 4.2. Regenerate vendors
 
-To regenerate optimised vendors for your version of php, use the following command:
+To regenerate optimized vendors for your version of php, use the following command:
 
 ```
-docker-compose run --rm composer install
+docker compose run --rm composer install
 ```
 
 ### 4.3. Compile Gutenberg plugin
 
-Install the latest version of the javascript dependencies
+Install the latest version of the JavaScript dependencies
 
 ```
 npm install
