@@ -85,6 +85,13 @@ class PostbackUpdate implements ActionableInterface
             $raw = $this->getSignedData($request);
             $data = $this->getValidData($raw);
 
+            $filename = '/var/www/html/wgf_append.log';
+            $headers = $request->get_headers();
+            $body = $request->get_body();
+            file_put_contents($filename, "OrderPostback CALLED" . PHP_EOL, FILE_APPEND | LOCK_EX);
+            file_put_contents($filename, json_encode([ 'headers' => $headers, 'body' => $body ], JSON_PRETTY_PRINT) . PHP_EOL, FILE_APPEND | LOCK_EX);
+
+
             global $wpdb;
             $this->wpdb = $wpdb;
 

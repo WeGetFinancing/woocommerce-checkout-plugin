@@ -59,7 +59,10 @@ class OrderSuccess implements ActionableInterface
 
             $headers = $request->get_headers();
             $body = $request->get_body();
-            throw new Exception(json_encode([ 'headers' => $headers, 'body' => $body ], JSON_PRETTY_PRINT));
+            $filename = '/var/www/html/wgf_append.log';
+            file_put_contents($filename, "OrderSuccess CALLED" . PHP_EOL, FILE_APPEND | LOCK_EX);
+            file_put_contents($filename, json_encode([ 'headers' => $headers, 'body' => $body ], JSON_PRETTY_PRINT) . PHP_EOL, FILE_APPEND | LOCK_EX);
+
             echo "OK";
             die();
         } catch (Throwable $exception) {
