@@ -119,6 +119,14 @@ document.addEventListener('input',(e)=> {
         const isWgfActive = e.target.value === settings.payment_method_id;
         placeOrderBtn.style.display = isWgfActive ? 'none' : 'block';
         wgfBtnElement.style.display = isWgfActive ? 'block' : 'none';
+    } else {
+        // Check if radio-control-wc-payment-method-options do not exist
+        const radioElement = document.querySelector('input[name="radio-control-wc-payment-method-options"]');
+        if (!radioElement) {
+            const isWgfActive = true; // or whatever logic you want when the element doesn't exist
+            placeOrderBtn.style.display = isWgfActive ? 'none' : 'block';
+            wgfBtnElement.style.display = isWgfActive ? 'block' : 'none';
+        }
     }
 })
 

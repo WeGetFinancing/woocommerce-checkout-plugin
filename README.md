@@ -162,6 +162,15 @@ docker compose run --rm composer install
 
 ### 4.3. Compile Gutenberg plugin
 
+Install node on debian machine
+
+```
+sudo apt-get install -y curl && \
+   curl -fsSL https://deb.nodesource.com/setup_23.x -o nodesource_setup.sh && \
+   sudo -E bash nodesource_setup.sh && \
+   sudo apt-get install -y nodejs
+```
+
 Install the latest version of the JavaScript dependencies
 
 ```
