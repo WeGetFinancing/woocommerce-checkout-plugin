@@ -88,6 +88,11 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
             $client = $this->generateClient();
             $request = $this->getRequest();
             $loanRequest = $this->getLoanRequest($request);
+
+            $filename = '/var/www/html/wgf_append.log';
+            file_put_contents($filename, "GetFunnelUrl CALLED" . PHP_EOL, FILE_APPEND | LOCK_EX);
+            file_put_contents($filename, json_encode($loanRequest->getWeGetFinancingRequest(), JSON_PRETTY_PRINT) . PHP_EOL, FILE_APPEND | LOCK_EX);
+
             $response = $client->requestNewLoan($loanRequest);
             $data = $response->getData();
 
