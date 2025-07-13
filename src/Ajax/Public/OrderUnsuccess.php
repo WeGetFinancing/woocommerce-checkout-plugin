@@ -59,7 +59,7 @@ class OrderUnsuccess implements ActionableInterface
 
             $headers = $request->get_headers();
             $body = $request->get_body();
-            throw new Exception(json_encode([ 'headers' => $headers, 'body' => $body ], JSON_PRETTY_PRINT));;
+            throw new Exception(json_encode([ 'headers' => $headers, 'body' => $body ], JSON_PRETTY_PRINT));
             echo "OK";
             die();
         } catch (Throwable $exception) {
