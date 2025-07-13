@@ -48,19 +48,19 @@
                     }.bind(self),
                     function () {
                         console.log("Error function");
-                        let requestData = new FormData();
-                        requestData.append("order_id", {{ order_id }});
-                        requestData.append("_wpnonce", "{{ nonce }}");
-                        requestData.append("action", "{{ ajax_action }}");
+                        {#let requestData = new FormData();#}
+                        {#requestData.append("order_id", {{ order_id }});#}
+                        {#requestData.append("_wpnonce", "{{ nonce }}");#}
+                        {#requestData.append("action", "{{ ajax_action }}");#}
 
-                        fetch("{{ ajax_url }}", {
-                            method: "POST",
-                            body: requestData,
-                        })
-                            .then(response => response.json())
-                            .then(resp => {
-                            })
-                            .catch(err => console.log(err));
+                        {#fetch("{{ ajax_url }}", {#}
+                        {#    method: "POST",#}
+                        {#    body: requestData,#}
+                        {#})#}
+                        {#    .then(response => response.json())#}
+                        {#    .then(resp => {#}
+                        {#    })#}
+                        {#    .catch(err => console.log(err));#}
                         document.querySelector("main").style.display = "block";
                     }.bind(self)
                 )

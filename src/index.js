@@ -298,17 +298,6 @@ const WgfSuccess = (resp) => {
     wgfHrefElem.value = resp.href;
 
     placeOrderBtn.click();
-
-    // if (GetFinancing) {
-    //     new GetFinancing(
-    //         resp.href,
-    //         function () {
-    //             const placeOrderBtn = document.querySelector(".wc-block-components-checkout-place-order-button");
-    //             placeOrderBtn.click();
-    //         }.bind(self),
-    //         function () {}
-    //     )
-    // }
 }
 
 const WgfErrorList = (msg) => {
