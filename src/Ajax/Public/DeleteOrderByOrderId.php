@@ -9,7 +9,6 @@ if (!defined( 'ABSPATH' )) exit;
 use Throwable;
 use WeGetFinancing\Checkout\AbstractActionableWithClient;
 use WeGetFinancing\Checkout\Service\Logger;
-use WeGetFinancing\Checkout\Service\RequestValidatorUtility;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 
 class DeleteOrderByOrderId extends AbstractActionableWithClient

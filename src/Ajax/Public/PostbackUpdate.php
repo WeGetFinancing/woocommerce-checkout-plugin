@@ -59,7 +59,7 @@ class PostbackUpdate implements ActionableInterface
         $this->addAction();
     }
 
-    public function execute()
+    public function execute(): void
     {
         register_rest_route(
             self::REST_NAMESPACE,

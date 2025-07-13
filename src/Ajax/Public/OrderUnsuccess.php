@@ -14,7 +14,7 @@ use WeGetFinancing\Checkout\Service\Logger;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 use WP_REST_Request;
 
-class OrderSuccess implements ActionableInterface
+class OrderUnsuccess implements ActionableInterface
 {
     use AddableTrait;
 
@@ -22,7 +22,7 @@ class OrderSuccess implements ActionableInterface
     public const FUNCTION_NAME = 'execute';
     public const REST_PREFIX = "/?rest_route=/";
     public const REST_NAMESPACE = 'wegetfinancing/v1';
-    public const REST_ROUTE = '/order-success/';
+    public const REST_ROUTE = '/order-unsuccess/';
     public const METHOD = 'POST';
     public const VERSION_FIELD = "version";
     public const INV_ID_FIELD = "request_token";
@@ -69,7 +69,7 @@ class OrderSuccess implements ActionableInterface
         }
     }
 
-    public static function getOrderSuccessUrl(): string
+    public static function getOrderUnsuccessUrl(): string
     {
         return get_site_url() . self::REST_PREFIX . self::REST_NAMESPACE . self::REST_ROUTE;
     }

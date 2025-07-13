@@ -68,7 +68,7 @@ abstract class AbstractActionableWithClient implements ActionableInterface
     /**
      * @throws EntityValidationException
      */
-    protected function validateGeneralDataRequest()
+    protected function validateGeneralDataRequest(): void
     {
         $this->violations = [];
 

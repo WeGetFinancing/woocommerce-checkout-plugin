@@ -77,37 +77,17 @@ class PpeSettingsAjax extends AbstractActionableWithClient
 
             $this->validateGeneralDataRequest();
 
-            if (
-                RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
-                    $_POST[GeneralDataRequest::DATA],
-                    PpeSettings::PRICE_SELECTOR_ID
-                )
-            ) {
-                $this->violations[] = [
-                    'field' => PpeSettings::PRICE_SELECTOR_ID,
-                    'message' => '<b>' . PpeSettings::PRICE_SELECTOR_NAME . '</b> cannot be empty.',
-                ];
-            } else {
-                $this->data[PpeSettings::PRICE_SELECTOR_ID] = sanitize_text_field(
-                    $_POST[GeneralDataRequest::DATA][PpeSettings::PRICE_SELECTOR_ID]
-                );
-            }
+            $this->initFieldIfNotEmpty(
+                $_POST[GeneralDataRequest::DATA],
+                PpeSettings::PRICE_SELECTOR_ID,
+                PpeSettings::PRICE_SELECTOR_NAME
+            );
 
-            if (
-                RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
-                    $_POST[GeneralDataRequest::DATA],
-                    PpeSettings::PRODUCT_NAME_SELECTOR_ID
-                )
-            ) {
-                $this->violations[] = [
-                    'field' => PpeSettings::PRODUCT_NAME_SELECTOR_ID,
-                    'message' => '<b>' . PpeSettings::PRODUCT_NAME_SELECTOR_NAME . '</b> cannot be empty.',
-                ];
-            } else {
-                $this->data[PpeSettings::PRODUCT_NAME_SELECTOR_ID] = sanitize_text_field(
-                    $_POST[GeneralDataRequest::DATA][PpeSettings::PRODUCT_NAME_SELECTOR_ID]
-                );
-            }
+            $this->initFieldIfNotEmpty(
+                $_POST[GeneralDataRequest::DATA],
+                PpeSettings::PRODUCT_NAME_SELECTOR_ID,
+                PpeSettings::PRODUCT_NAME_SELECTOR_NAME
+            );
 
             if (
                 RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
@@ -137,37 +117,17 @@ class PpeSettingsAjax extends AbstractActionableWithClient
                 }
             }
 
-            if (
-                RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
-                    $_POST[GeneralDataRequest::DATA],
-                    PpeSettings::MINIMUM_AMOUNT_ID
-                )
-            ) {
-                $this->violations[] = [
-                    'field' => PpeSettings::MINIMUM_AMOUNT_ID,
-                    'message' => '<b>' . PpeSettings::MINIMUM_AMOUNT_NAME . '</b> cannot be empty.',
-                ];
-            } else {
-                $this->data[PpeSettings::MINIMUM_AMOUNT_ID] = sanitize_text_field(
-                    $_POST[GeneralDataRequest::DATA][PpeSettings::MINIMUM_AMOUNT_ID]
-                );
-            }
+            $this->initFieldIfNotEmpty(
+                $_POST[GeneralDataRequest::DATA],
+                PpeSettings::MINIMUM_AMOUNT_ID,
+                PpeSettings::MINIMUM_AMOUNT_NAME
+            );
 
-            if (
-                RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
-                    $_POST[GeneralDataRequest::DATA],
-                    PpeSettings::FONT_SIZE_ID
-                )
-            ) {
-                $this->violations[] = [
-                    'field' => PpeSettings::FONT_SIZE_ID,
-                    'message' => '<b>' . PpeSettings::FONT_SIZE_NAME . '</b> cannot be empty.',
-                ];
-            } else {
-                $this->data[PpeSettings::FONT_SIZE_ID] = sanitize_text_field(
-                    $_POST[GeneralDataRequest::DATA][PpeSettings::FONT_SIZE_ID]
-                );
-            }
+            $this->initFieldIfNotEmpty(
+                $_POST[GeneralDataRequest::DATA],
+                PpeSettings::FONT_SIZE_ID,
+                PpeSettings::FONT_SIZE_NAME
+            );
 
             if (
                 RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty(
@@ -216,9 +176,11 @@ class PpeSettingsAjax extends AbstractActionableWithClient
             $this->data[PpeSettings::IS_BRANDED_ID] = $this->getBooleanFromRequestData(
                 PpeSettings::IS_BRANDED_ID
             );
-            $this->data[PpeSettings::IS_APPLY_NOW_ID] = $this->getBooleanFromRequestData(
-                PpeSettings::IS_APPLY_NOW_ID
-            );
+//            PPE Is apply now is disabled till further development
+//            $this->data[PpeSettings::IS_APPLY_NOW_ID] = $this->getBooleanFromRequestData(
+//                PpeSettings::IS_APPLY_NOW_ID
+//            );
+            $this->data[PpeSettings::IS_APPLY_NOW_ID] = false;
             $this->data[PpeSettings::IS_HOVER_ID] = $this->getBooleanFromRequestData(
                 PpeSettings::IS_HOVER_ID
             );
@@ -228,6 +190,18 @@ class PpeSettingsAjax extends AbstractActionableWithClient
                 PpeSettingsAjaxException::VALIDATE_REQUEST_UNEXPECTED_MESSAGE . Logger::getDecorativeData(),
                 PpeSettingsAjaxException::VALIDATE_REQUEST_UNEXPECTED_CODE
             );
+        }
+    }
+
+    protected function initFieldIfNotEmpty(array $data, string $field, string $fieldName):void
+    {
+        if (RequestValidatorUtility::checkIfArrayKeyNotExistsOrEmpty($data, $field)) {
+            $this->violations[] = [
+                'field' => $field,
+                'message' => '<b>' . $fieldName . '</b> cannot be empty.',
+            ];
+        } else {
+            $this->data[$field] = sanitize_text_field($data[$field]);
         }
     }
 
@@ -249,70 +223,27 @@ class PpeSettingsAjax extends AbstractActionableWithClient
 
     protected function setOptions(): void
     {
-        PpeSettingsRepository::setOption(
-            PpeSettings::IS_PPE_ACTIVE_ID,
-            $this->data[PpeSettings::IS_PPE_ACTIVE_ID]
-        );
+        $options = [
+            PpeSettings::IS_PPE_ACTIVE_ID => $this->data[PpeSettings::IS_PPE_ACTIVE_ID],
+            PpeSettings::PRICE_SELECTOR_ID => $this->data[PpeSettings::PRICE_SELECTOR_ID],
+            PpeSettings::PRODUCT_NAME_SELECTOR_ID => $this->data[PpeSettings::PRODUCT_NAME_SELECTOR_ID],
+            PpeSettings::MERCHANT_TOKEN_ID => $this->data[PpeSettings::MERCHANT_TOKEN_ID],
+            PpeSettings::MINIMUM_AMOUNT_ID => $this->data[PpeSettings::MINIMUM_AMOUNT_ID],
+            PpeSettings::POSITION_ID => $this->data[PpeSettings::POSITION_ID],
+            PpeSettings::CUSTOM_TEXT_ID => $this->data[PpeSettings::CUSTOM_TEXT_ID],
+            PpeSettings::IS_DEBUG_ID => $this->data[PpeSettings::IS_DEBUG_ID],
+            PpeSettings::IS_BRANDED_ID => $this->data[PpeSettings::IS_BRANDED_ID],
+//            Is Apply Now is currently disabled
+//            PpeSettings::IS_APPLY_NOW_ID => $this->data[PpeSettings::IS_APPLY_NOW_ID],
+            PpeSettings::IS_APPLY_NOW_ID => false,
+            PpeSettings::IS_HOVER_ID => $this->data[PpeSettings::IS_HOVER_ID],
+            PpeSettings::FONT_SIZE_ID => $this->data[PpeSettings::FONT_SIZE_ID],
+            PpeSettings::PPE_IS_CONFIGURED => true,
+        ];
 
-        PpeSettingsRepository::setOption(
-            PpeSettings::PRICE_SELECTOR_ID,
-            $this->data[PpeSettings::PRICE_SELECTOR_ID]
-        );
-
-        PpeSettingsRepository::setOption(
-            PpeSettings::PRODUCT_NAME_SELECTOR_ID,
-            $this->data[PpeSettings::PRODUCT_NAME_SELECTOR_ID]
-        );
-
-        PpeSettingsRepository::setOption(
-            PpeSettings::MERCHANT_TOKEN_ID,
-            $this->data[PpeSettings::MERCHANT_TOKEN_ID]
-        );
-
-        PpeSettingsRepository::setOption(
-            PpeSettings::MINIMUM_AMOUNT_ID,
-            $this->data[PpeSettings::MINIMUM_AMOUNT_ID]
-        );
-
-        PpeSettingsRepository::setOption(
-            PpeSettings::POSITION_ID,
-            $this->data[PpeSettings::POSITION_ID]
-        );
-
-        PpeSettingsRepository::setOption(
-            PpeSettings::CUSTOM_TEXT_ID,
-            $this->data[PpeSettings::CUSTOM_TEXT_ID]
-        );
-
-        PpeSettingsRepository::setOption(
-            PpeSettings::IS_DEBUG_ID,
-            $this->data[PpeSettings::IS_DEBUG_ID]
-        );
-
-        PpeSettingsRepository::setOption(
-            PpeSettings::IS_BRANDED_ID,
-            $this->data[PpeSettings::IS_BRANDED_ID]
-        );
-
-        PpeSettingsRepository::setOption(
-            PpeSettings::IS_APPLY_NOW_ID,
-            $this->data[PpeSettings::IS_APPLY_NOW_ID]
-        );
-
-        PpeSettingsRepository::setOption(
-            PpeSettings::IS_HOVER_ID,
-            $this->data[PpeSettings::IS_HOVER_ID]
-        );
-
-        PpeSettingsRepository::setOption(
-            PpeSettings::FONT_SIZE_ID,
-            $this->data[PpeSettings::FONT_SIZE_ID]
-        );
-
-        PpeSettingsRepository::setOption(
-            PpeSettings::PPE_IS_CONFIGURED,
-            true
-        );
+        foreach ($options as $key => $value) {
+            PpeSettingsRepository::setOption($key, $value);
+        }
     }
 
     protected function getBooleanFromRequestData(string $name): bool

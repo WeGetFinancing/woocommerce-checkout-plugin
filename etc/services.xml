@@ -33,6 +33,7 @@
             <parameter>generateFunnelUrl</parameter>
             <parameter>postbackUpdate</parameter>
             <parameter>orderSuccess</parameter>
+            <parameter>orderUnsuccess</parameter>
             <parameter>registerShippedOrderStatus</parameter>
             <parameter>onOrderStatusChangeToShipped</parameter>
             <parameter>ppeSettingsAdminPage</parameter>
@@ -67,6 +68,7 @@
         <service id="deleteOrderByOrderId" class="WeGetFinancing\Checkout\Ajax\Public\DeleteOrderByOrderId"/>
         <service id="postbackUpdate" class="WeGetFinancing\Checkout\Ajax\Public\PostbackUpdate"/>
         <service id="orderSuccess" class="WeGetFinancing\Checkout\Ajax\Public\OrderSuccess"/>
+        <service id="orderUnsuccess" class="WeGetFinancing\Checkout\Ajax\Public\OrderUnsuccess"/>
         <service id="registerShippedOrderStatus" class="WeGetFinancing\Checkout\PostStatus\RegisterShippedOrderStatus"/>
         <service id="onOrderStatusChangeToShipped" class="WeGetFinancing\Checkout\PostStatus\OnOrderStatusChangeToShipped"/>
         <service id="ppeSettingsAdminPage" class="WeGetFinancing\Checkout\Page\Admin\PpeSettingsPage">
