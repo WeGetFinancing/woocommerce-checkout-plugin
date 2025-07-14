@@ -258,6 +258,8 @@ class PostbackUpdate implements ActionableInterface
             );
         }
 
+
+
         return $results;
     }
 
@@ -270,22 +272,26 @@ class PostbackUpdate implements ActionableInterface
         $found = count($results);
 
         if (0 === $found) {
-            sleep(15);
-            $results = $this->selectOrderIdWhereInvId($invId);
+            $orders = wc_get_orders([
+                'meta_key' => OrderInvIdValueObject::ORDER_META,
+                'meta_value' => 1060,
+                'meta_compare' => '=',
+                'return'=> 'objects'
+            ]);
             $found = count($results);
-
             if (0 === $found) {
-                sleep(30);
-                $results = $this->selectOrderIdWhereInvId($invId);
-                $found = count($results);
-
-                if (0 === $found) {
-                    throw new PostbackUpdateException(
-                        PostbackUpdateException::ORDER_NOT_FOUND_ERROR_MESSAGE . $invId,
-                        PostbackUpdateException::ORDER_NOT_FOUND_ERROR_CODE
-                    );
-                }
+                throw new PostbackUpdateException(
+                    PostbackUpdateException::ORDER_NOT_FOUND_ERROR_MESSAGE . $invId,
+                    PostbackUpdateException::ORDER_NOT_FOUND_ERROR_CODE
+                );
             }
+            if (1 < $found) {
+                throw new PostbackUpdateException(
+                    PostbackUpdateException::MULTIPLE_ORDERS_FOUND_ERROR_MESSAGE . $invId,
+                    PostbackUpdateException::MULTIPLE_ORDERS_FOUND_ERROR_CODE
+                );
+            }
+            return $orders[0];
         }
 
         if (1 < $found) {
