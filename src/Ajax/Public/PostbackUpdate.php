@@ -274,7 +274,7 @@ class PostbackUpdate implements ActionableInterface
         if (0 === $found) {
             $orders = wc_get_orders([
                 'meta_key' => OrderInvIdValueObject::ORDER_META,
-                'meta_value' => 1060,
+                'meta_value' => $invId,
                 'meta_compare' => '=',
                 'return'=> 'objects'
             ]);
