@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WeGetFinancing\Checkout\PaymentGateway;
 
+use Automattic\WooCommerce\Enums\OrderInternalStatus;
+
 if (!defined( 'ABSPATH' )) exit;
 
 class WeGetFinancingValueObject
@@ -25,7 +27,7 @@ class WeGetFinancingValueObject
     public const MERCHANT_ID_FIELD_ID = "wgf_merchant_id";
     public const MERCHANT_ID_FIELD_TITLE = "Merchant ID";
     public const MERCHANT_ID_FIELD_LABEL = "WeGetFinancing Merchant ID";
-    public const ON_HOLD_STATUS_ID = "on-hold";
+    public const ON_HOLD_STATUS_ID = OrderInternalStatus::ON_HOLD;
     public const ON_HOLD_STATUS_LABEL = "Awaiting WeGetFinancing payment";
     public const PROCESS_PAYMENT_SUCCESS_ID = "success";
     public const HANDLE_FUNNEL_SCRIPT = "wgf-checkout-funnel";

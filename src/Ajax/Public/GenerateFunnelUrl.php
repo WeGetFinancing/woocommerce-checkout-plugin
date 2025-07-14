@@ -88,11 +88,6 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
             $client = $this->generateClient();
             $request = $this->getRequest();
             $loanRequest = $this->getLoanRequest($request);
-
-            $filename = '/var/www/html/wgf_append.log';
-            file_put_contents($filename, "GetFunnelUrl CALLED" . PHP_EOL, FILE_APPEND | LOCK_EX);
-            file_put_contents($filename, json_encode($loanRequest->getWeGetFinancingRequest(), JSON_PRETTY_PRINT) . PHP_EOL, FILE_APPEND | LOCK_EX);
-
             $response = $client->requestNewLoan($loanRequest);
             $data = $response->getData();
 
@@ -386,8 +381,8 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 'email' => $request[GenerateFunnelUrlRequest::BILLING_EMAIL_ID],
                 'phone' => $request[GenerateFunnelUrlRequest::BILLING_PHONE_ID],
                 'merchant_transaction_id' => '**',
-                'success_url' => OrderSuccess::getOrderSuccessUrl(),
-                'failure_url' => OrderUnsuccess::getOrderUnsuccessUrl(),
+                'success_url' => '',
+                'failure_url' => '',
                 'postback_url' => PostbackUpdate::getPostbackUpdateUrl(),
                 'software_name' => App::INTEGRATION_NAME,
                 'software_version' => App::getIntegrationVersion(),

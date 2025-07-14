@@ -6,6 +6,7 @@ namespace WeGetFinancing\Checkout\Ajax\Public;
 
 if (!defined( 'ABSPATH' )) exit;
 
+use Automattic\WooCommerce\Enums\OrderInternalStatus;
 use Exception;
 use Throwable;
 use WC_Order;
@@ -45,9 +46,9 @@ class PostbackUpdate implements ActionableInterface
         self::WGF_REJECTED_STATUS,
         self::WGF_REFUND_STATUS,
     ];
-    public const WC_PROCESSING_STATUS = "wc-processing";
-    public const WC_FAILED_STATUS = "wc-failed";
-    public const WC_REFUNDED_STATUS = "refunded";
+    public const WC_PROCESSING_STATUS = OrderInternalStatus::PROCESSING;
+    public const WC_FAILED_STATUS = OrderInternalStatus::FAILED;
+    public const WC_REFUNDED_STATUS = OrderInternalStatus::REFUNDED;
     public const REFUND_REASON = "Order refunded from WeGetFinancing";
     public const SIGNATURE_ALGO = "sha256";
     public const QUERY_COLUMN = 'post_id';
@@ -84,13 +85,6 @@ class PostbackUpdate implements ActionableInterface
 
             $raw = $this->getSignedData($request);
             $data = $this->getValidData($raw);
-
-            $filename = '/var/www/html/wgf_append.log';
-            $headers = $request->get_headers();
-            $body = $request->get_body();
-            file_put_contents($filename, "OrderPostback CALLED" . PHP_EOL, FILE_APPEND | LOCK_EX);
-            file_put_contents($filename, json_encode([ 'headers' => $headers, 'body' => $body ], JSON_PRETTY_PRINT) . PHP_EOL, FILE_APPEND | LOCK_EX);
-
 
             global $wpdb;
             $this->wpdb = $wpdb;
@@ -251,7 +245,7 @@ class PostbackUpdate implements ActionableInterface
     protected function selectOrderIdWhereInvId(string $invId): array
     {
         $sql = $this->wpdb->prepare(
-            "SELECT post_id FROM {$this->wpdb->prefix}postmeta WHERE meta_key = '" .
+            "SELECT post_id FROM {$this->wpdb->prefix} postmeta WHERE meta_key = '" .
             OrderInvIdValueObject::ORDER_META . "' AND meta_value = %s",
             $invId
         );

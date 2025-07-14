@@ -6,13 +6,13 @@ namespace WeGetFinancing\Checkout\Page\Public;
 
 if (!defined( 'ABSPATH' )) exit;
 
+use Automattic\WooCommerce\Enums\OrderInternalStatus;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use WeGetFinancing\Checkout\ActionableInterface;
-use WeGetFinancing\Checkout\Ajax\Public\DeleteOrderByOrderId;
-use WeGetFinancing\Checkout\Ajax\Public\GenerateFunnelUrl;
+use WeGetFinancing\Checkout\Ajax\Public\GetOrderStatusByOrderId;
 use WeGetFinancing\Checkout\App;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
 
@@ -52,9 +52,16 @@ class CheckoutThankyou implements ActionableInterface
             [
                 'wgf_href' => get_post_meta($order_id, 'wgf_href', true),
                 'order_id' => $order_id,
-                'nonce' => wp_create_nonce(DeleteOrderByOrderId::NONCE),
+                'nonce' => wp_create_nonce(GetOrderStatusByOrderId::NONCE),
                 'ajax_url' => admin_url('admin-ajax.php'),
-                'ajax_action' => DeleteOrderByOrderId::ACTION_NAME,
+                'ajax_action' => GetOrderStatusByOrderId::ACTION_NAME,
+                'oder_status_pending' => OrderInternalStatus::PENDING,
+                'order_status_on_hold' => OrderInternalStatus::ON_HOLD,
+                'order_status_processing' => OrderInternalStatus::PROCESSING,
+                'order_status_completed' => OrderInternalStatus::COMPLETED,
+                'order_status_cancelled' => OrderInternalStatus::CANCELLED,
+                'order_status_refunded' => OrderInternalStatus::REFUNDED,
+                'order_status_failed' => OrderInternalStatus::FAILED,
             ]
         );
     }
