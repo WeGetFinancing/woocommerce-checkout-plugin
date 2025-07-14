@@ -240,7 +240,7 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
 
         $order = wc_get_order($order_id);
 
-        $order->update_status(OrderInternalStatus::PROCESSING);
+        $order->update_status(OrderInternalStatus::PENDING);
 
         wc_reduce_stock_levels($order->get_id());
 
