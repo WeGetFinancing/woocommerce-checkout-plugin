@@ -6,6 +6,7 @@ namespace WeGetFinancing\Checkout\PaymentGateway;
 
 if (!defined( 'ABSPATH' )) exit;
 
+use Automattic\WooCommerce\Enums\OrderInternalStatus;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -238,6 +239,8 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
         $this->setOrderInvIdAndHref($order_id);
 
         $order = wc_get_order($order_id);
+
+        $order->update_status(OrderInternalStatus::PROCESSING);
 
         wc_reduce_stock_levels($order->get_id());
 
