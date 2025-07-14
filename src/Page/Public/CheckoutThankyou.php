@@ -55,13 +55,13 @@ class CheckoutThankyou implements ActionableInterface
                 'nonce' => wp_create_nonce(GetOrderStatusByOrderId::NONCE),
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'ajax_action' => GetOrderStatusByOrderId::ACTION_NAME,
-                'oder_status_pending' => OrderInternalStatus::PENDING,
-                'order_status_on_hold' => OrderInternalStatus::ON_HOLD,
-                'order_status_processing' => OrderInternalStatus::PROCESSING,
-                'order_status_completed' => OrderInternalStatus::COMPLETED,
-                'order_status_cancelled' => OrderInternalStatus::CANCELLED,
-                'order_status_refunded' => OrderInternalStatus::REFUNDED,
-                'order_status_failed' => OrderInternalStatus::FAILED,
+                'oder_status_pending' => "pending",
+                'order_status_on_hold' => "on-hold",
+                'order_status_processing' => "processing",
+                'order_status_completed' => "completed",
+                'order_status_cancelled' => "cancelled",
+                'order_status_refunded' => "refunded",
+                'order_status_failed' => "failed",
             ]
         );
     }
