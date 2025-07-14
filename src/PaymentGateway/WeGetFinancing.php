@@ -130,6 +130,48 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                     'options' => WeGetFinancingValueObject::ERROR_ATTACH_FIELD_VALUES,
                     'desc_tip' => true,
                 ],
+                WeGetFinancingValueObject::THANK_YOU_PAGE_MAIN_SELECTOR_FIELD_ID => [
+                    'title' => WeGetFinancingValueObject::THANK_YOU_PAGE_MAIN_SELECTOR_FIELD_TITLE,
+                    'type' => 'text',
+                    'description' => WeGetFinancingValueObject::THANK_YOU_PAGE_MAIN_SELECTOR_FIELD_LABEL,
+                    'default' => WeGetFinancingValueObject::THANK_YOU_PAGE_MAIN_SELECTOR_FIELD_DEFAULT,
+                    'desc_tip' => true,
+                ],
+                WeGetFinancingValueObject::THANK_YOU_PAGE_TITLE_SELECTOR_FIELD_ID => [
+                    'title' => WeGetFinancingValueObject::THANK_YOU_PAGE_TITLE_SELECTOR_FIELD_TITLE,
+                    'type' => 'text',
+                    'description' => WeGetFinancingValueObject::THANK_YOU_PAGE_TITLE_SELECTOR_FIELD_LABEL,
+                    'default' => WeGetFinancingValueObject::THANK_YOU_PAGE_TITLE_SELECTOR_FIELD_DEFAULT,
+                    'desc_tip' => true,
+                ],
+                WeGetFinancingValueObject::THANK_YOU_PAGE_NOTICE_SELECTOR_FIELD_ID => [
+                    'title' => WeGetFinancingValueObject::THANK_YOU_PAGE_NOTICE_SELECTOR_FIELD_TITLE,
+                    'type' => 'text',
+                    'description' => WeGetFinancingValueObject::THANK_YOU_PAGE_NOTICE_SELECTOR_FIELD_LABEL,
+                    'default' => WeGetFinancingValueObject::THANK_YOU_PAGE_NOTICE_SELECTOR_FIELD_DEFAULT,
+                    'desc_tip' => true,
+                ],
+                WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_OVERVIEW_SELECTOR_FIELD_ID => [
+                    'title' => WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_OVERVIEW_SELECTOR_FIELD_TITLE,
+                    'type' => 'text',
+                    'description' => WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_OVERVIEW_SELECTOR_FIELD_LABEL,
+                    'default' => WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_OVERVIEW_SELECTOR_FIELD_DEFAULT,
+                    'desc_tip' => true,
+                ],
+                WeGetFinancingValueObject::THANK_YOU_PAGE_CUSTOMER_DETAILS_SELECTOR_FIELD_ID => [
+                    'title' => WeGetFinancingValueObject::THANK_YOU_PAGE_CUSTOMER_DETAILS_SELECTOR_FIELD_TITLE,
+                    'type' => 'text',
+                    'description' => WeGetFinancingValueObject::THANK_YOU_PAGE_CUSTOMER_DETAILS_SELECTOR_FIELD_LABEL,
+                    'default' => WeGetFinancingValueObject::THANK_YOU_PAGE_CUSTOMER_DETAILS_SELECTOR_FIELD_DEFAULT,
+                    'desc_tip' => true,
+                ],
+                WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_ID => [
+                    'title' => WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_TITLE,
+                    'type' => 'text',
+                    'description' => WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_LABEL,
+                    'default' => WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_DEFAULT,
+                    'desc_tip' => true,
+                ],
             ]
         );
     }
@@ -196,12 +238,6 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
         $this->setOrderInvIdAndHref($order_id);
 
         $order = wc_get_order($order_id);
-
-//        @todo to be deleted
-//        $order->update_status(
-//            WeGetFinancingValueObject::ON_HOLD_STATUS_ID,
-//            WeGetFinancingValueObject::ON_HOLD_STATUS_LABEL
-//        );
 
         wc_reduce_stock_levels($order->get_id());
 
