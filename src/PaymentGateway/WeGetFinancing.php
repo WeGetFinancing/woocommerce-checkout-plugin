@@ -6,6 +6,7 @@ namespace WeGetFinancing\Checkout\PaymentGateway;
 
 if (!defined( 'ABSPATH' )) exit;
 
+use Automattic\WooCommerce\Enums\OrderInternalStatus;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -77,7 +78,7 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
         $this->addAction();
     }
 
-    public function init_form_fields()
+    public function init_form_fields(): void
     {
         $this->form_fields = apply_filters(
             WeGetFinancingValueObject::FIELDSET_ID,
@@ -128,6 +129,48 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                     'description' => WeGetFinancingValueObject::ERROR_ATTACH_FIELD_LABEL,
                     'default' => WeGetFinancingValueObject::ERROR_ATTACH_FIELD_DEFAULT,
                     'options' => WeGetFinancingValueObject::ERROR_ATTACH_FIELD_VALUES,
+                    'desc_tip' => true,
+                ],
+                WeGetFinancingValueObject::THANK_YOU_PAGE_MAIN_SELECTOR_FIELD_ID => [
+                    'title' => WeGetFinancingValueObject::THANK_YOU_PAGE_MAIN_SELECTOR_FIELD_TITLE,
+                    'type' => 'text',
+                    'description' => WeGetFinancingValueObject::THANK_YOU_PAGE_MAIN_SELECTOR_FIELD_LABEL,
+                    'default' => WeGetFinancingValueObject::THANK_YOU_PAGE_MAIN_SELECTOR_FIELD_DEFAULT,
+                    'desc_tip' => true,
+                ],
+                WeGetFinancingValueObject::THANK_YOU_PAGE_TITLE_SELECTOR_FIELD_ID => [
+                    'title' => WeGetFinancingValueObject::THANK_YOU_PAGE_TITLE_SELECTOR_FIELD_TITLE,
+                    'type' => 'text',
+                    'description' => WeGetFinancingValueObject::THANK_YOU_PAGE_TITLE_SELECTOR_FIELD_LABEL,
+                    'default' => WeGetFinancingValueObject::THANK_YOU_PAGE_TITLE_SELECTOR_FIELD_DEFAULT,
+                    'desc_tip' => true,
+                ],
+                WeGetFinancingValueObject::THANK_YOU_PAGE_NOTICE_SELECTOR_FIELD_ID => [
+                    'title' => WeGetFinancingValueObject::THANK_YOU_PAGE_NOTICE_SELECTOR_FIELD_TITLE,
+                    'type' => 'text',
+                    'description' => WeGetFinancingValueObject::THANK_YOU_PAGE_NOTICE_SELECTOR_FIELD_LABEL,
+                    'default' => WeGetFinancingValueObject::THANK_YOU_PAGE_NOTICE_SELECTOR_FIELD_DEFAULT,
+                    'desc_tip' => true,
+                ],
+                WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_OVERVIEW_SELECTOR_FIELD_ID => [
+                    'title' => WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_OVERVIEW_SELECTOR_FIELD_TITLE,
+                    'type' => 'text',
+                    'description' => WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_OVERVIEW_SELECTOR_FIELD_LABEL,
+                    'default' => WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_OVERVIEW_SELECTOR_FIELD_DEFAULT,
+                    'desc_tip' => true,
+                ],
+                WeGetFinancingValueObject::THANK_YOU_PAGE_CUSTOMER_DETAILS_SELECTOR_FIELD_ID => [
+                    'title' => WeGetFinancingValueObject::THANK_YOU_PAGE_CUSTOMER_DETAILS_SELECTOR_FIELD_TITLE,
+                    'type' => 'text',
+                    'description' => WeGetFinancingValueObject::THANK_YOU_PAGE_CUSTOMER_DETAILS_SELECTOR_FIELD_LABEL,
+                    'default' => WeGetFinancingValueObject::THANK_YOU_PAGE_CUSTOMER_DETAILS_SELECTOR_FIELD_DEFAULT,
+                    'desc_tip' => true,
+                ],
+                WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_ID => [
+                    'title' => WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_TITLE,
+                    'type' => 'text',
+                    'description' => WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_LABEL,
+                    'default' => WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_DEFAULT,
                     'desc_tip' => true,
                 ],
             ]
@@ -197,10 +240,7 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
 
         $order = wc_get_order($order_id);
 
-        $order->update_status(
-            WeGetFinancingValueObject::ON_HOLD_STATUS_ID,
-            WeGetFinancingValueObject::ON_HOLD_STATUS_LABEL
-        );
+        $order->update_status(OrderInternalStatus::PENDING);
 
         wc_reduce_stock_levels($order->get_id());
 

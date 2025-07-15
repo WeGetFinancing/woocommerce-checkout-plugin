@@ -16,9 +16,9 @@
         <parameter key="app.software.name" type="string">WordPress-WooCommerce</parameter>
         <parameter key="app.funnel.js">https://cdn.wegetfinancing.com/libs/1.0/getfinancing.js</parameter>
         <parameter key="app.ppe.js.prod">https://ppe.wegetfinancing.com/index.js</parameter>
-        <parameter key="app.ppe.js.sandbox">https://ppe.sandbox.dev.wegetfinancing.com/index.js</parameter>
+        <parameter key="app.ppe.js.sandbox">https://ppe.sandbox.wegetfinancing.com/index.js</parameter>
         <parameter key="app.ppe.css.prod">https://ppe.wegetfinancing.com/index.css</parameter>
-        <parameter key="app.ppe.css.sandbox">https://ppe.sandbox.dev.wegetfinancing.com/index.css</parameter>
+        <parameter key="app.ppe.css.sandbox">https://ppe.sandbox.wegetfinancing.com/index.css</parameter>
         <parameter key="app.checkout_button.url">/dist/logoCircular.svg</parameter>
         <parameter key="app.checkout_logo_url">/dist/logo.svg</parameter>
         <parameter key="app.bootstrap.css">/dist/bootstrap.min.css</parameter>
@@ -32,13 +32,13 @@
             <parameter>printToAdminOrderInvIdInField</parameter>
             <parameter>generateFunnelUrl</parameter>
             <parameter>postbackUpdate</parameter>
+            <parameter>getOrderStatusByOrderId</parameter>
             <parameter>registerShippedOrderStatus</parameter>
             <parameter>onOrderStatusChangeToShipped</parameter>
             <parameter>ppeSettingsAdminPage</parameter>
             <parameter>ppeSettingsAjax</parameter>
             <parameter>ppeFooter</parameter>
             <parameter>checkoutThankyou</parameter>¡
-            <parameter>deleteOrderByOrderId</parameter>
         </parameter>
     </parameters>
 
@@ -63,8 +63,8 @@
         <service id="generateFunnelUrl" class="WeGetFinancing\Checkout\Ajax\Public\GenerateFunnelUrl">
             <argument>%app.api.version%</argument>
         </service>
-        <service id="deleteOrderByOrderId" class="WeGetFinancing\Checkout\Ajax\Public\DeleteOrderByOrderId"/>
         <service id="postbackUpdate" class="WeGetFinancing\Checkout\Ajax\Public\PostbackUpdate"/>
+        <service id="getOrderStatusByOrderId" class="WeGetFinancing\Checkout\Ajax\Public\GetOrderStatusByOrderId"/>
         <service id="registerShippedOrderStatus" class="WeGetFinancing\Checkout\PostStatus\RegisterShippedOrderStatus"/>
         <service id="onOrderStatusChangeToShipped" class="WeGetFinancing\Checkout\PostStatus\OnOrderStatusChangeToShipped"/>
         <service id="ppeSettingsAdminPage" class="WeGetFinancing\Checkout\Page\Admin\PpeSettingsPage">

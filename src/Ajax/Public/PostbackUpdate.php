@@ -6,6 +6,7 @@ namespace WeGetFinancing\Checkout\Ajax\Public;
 
 if (!defined( 'ABSPATH' )) exit;
 
+use Automattic\WooCommerce\Enums\OrderInternalStatus;
 use Exception;
 use Throwable;
 use WC_Order;
@@ -45,9 +46,9 @@ class PostbackUpdate implements ActionableInterface
         self::WGF_REJECTED_STATUS,
         self::WGF_REFUND_STATUS,
     ];
-    public const WC_PROCESSING_STATUS = "wc-processing";
-    public const WC_FAILED_STATUS = "wc-failed";
-    public const WC_REFUNDED_STATUS = "refunded";
+    public const WC_PROCESSING_STATUS = OrderInternalStatus::PROCESSING;
+    public const WC_FAILED_STATUS = OrderInternalStatus::FAILED;
+    public const WC_REFUNDED_STATUS = OrderInternalStatus::REFUNDED;
     public const REFUND_REASON = "Order refunded from WeGetFinancing";
     public const SIGNATURE_ALGO = "sha256";
     public const QUERY_COLUMN = 'post_id';
@@ -59,7 +60,7 @@ class PostbackUpdate implements ActionableInterface
         $this->addAction();
     }
 
-    public function execute()
+    public function execute(): void
     {
         register_rest_route(
             self::REST_NAMESPACE,
@@ -244,8 +245,8 @@ class PostbackUpdate implements ActionableInterface
     protected function selectOrderIdWhereInvId(string $invId): array
     {
         $sql = $this->wpdb->prepare(
-            "SELECT post_id FROM {$this->wpdb->prefix}postmeta WHERE meta_key = '" .
-            OrderInvIdValueObject::ORDER_META . "' AND meta_value = %s",
+            "SELECT post_id FROM {$this->wpdb->prefix}postmeta WHERE meta_key = %s AND meta_value = %s",
+            OrderInvIdValueObject::ORDER_META,
             $invId
         );
 
@@ -256,6 +257,8 @@ class PostbackUpdate implements ActionableInterface
                 PostbackUpdateException::INVALID_SQL_RESULT_ERROR_CODE
             );
         }
+
+
 
         return $results;
     }
@@ -269,22 +272,31 @@ class PostbackUpdate implements ActionableInterface
         $found = count($results);
 
         if (0 === $found) {
-            sleep(15);
-            $results = $this->selectOrderIdWhereInvId($invId);
+            $orders = wc_get_orders([
+                'meta_query' => [
+                    [
+                        'key' => OrderInvIdValueObject::ORDER_META,
+                        'value' => $invId,
+                        'compare' => '='
+                    ]
+                ],
+                'return' => 'objects'
+            ]);
+
             $found = count($results);
-
             if (0 === $found) {
-                sleep(30);
-                $results = $this->selectOrderIdWhereInvId($invId);
-                $found = count($results);
-
-                if (0 === $found) {
-                    throw new PostbackUpdateException(
-                        PostbackUpdateException::ORDER_NOT_FOUND_ERROR_MESSAGE . $invId,
-                        PostbackUpdateException::ORDER_NOT_FOUND_ERROR_CODE
-                    );
-                }
+                throw new PostbackUpdateException(
+                    PostbackUpdateException::ORDER_NOT_FOUND_ERROR_MESSAGE . $invId,
+                    PostbackUpdateException::ORDER_NOT_FOUND_ERROR_CODE
+                );
             }
+            if (1 < $found) {
+                throw new PostbackUpdateException(
+                    PostbackUpdateException::MULTIPLE_ORDERS_FOUND_ERROR_MESSAGE . $invId,
+                    PostbackUpdateException::MULTIPLE_ORDERS_FOUND_ERROR_CODE
+                );
+            }
+            return $orders[0];
         }
 
         if (1 < $found) {

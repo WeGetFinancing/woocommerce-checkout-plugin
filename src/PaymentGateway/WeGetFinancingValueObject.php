@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace WeGetFinancing\Checkout\PaymentGateway;
 
+use Automattic\WooCommerce\Enums\OrderInternalStatus;
+
 if (!defined( 'ABSPATH' )) exit;
 
 class WeGetFinancingValueObject
@@ -25,7 +27,7 @@ class WeGetFinancingValueObject
     public const MERCHANT_ID_FIELD_ID = "wgf_merchant_id";
     public const MERCHANT_ID_FIELD_TITLE = "Merchant ID";
     public const MERCHANT_ID_FIELD_LABEL = "WeGetFinancing Merchant ID";
-    public const ON_HOLD_STATUS_ID = "on-hold";
+    public const ON_HOLD_STATUS_ID = OrderInternalStatus::ON_HOLD;
     public const ON_HOLD_STATUS_LABEL = "Awaiting WeGetFinancing payment";
     public const PROCESS_PAYMENT_SUCCESS_ID = "success";
     public const HANDLE_FUNNEL_SCRIPT = "wgf-checkout-funnel";
@@ -49,4 +51,42 @@ class WeGetFinancingValueObject
         self::ERROR_ATTACH_FIELD_APPEND_VALUE => self::ERROR_ATTACH_FIELD_APPEND_LABEL,
     ];
     public const NONCE = 'generate-funnel-url';
+
+    public const THANK_YOU_PAGE_MAIN_SELECTOR_FIELD_ID = "wgf_thank_you_main_selector";
+    public const THANK_YOU_PAGE_MAIN_SELECTOR_FIELD_TITLE = "Main thank you page selector";
+    public const THANK_YOU_PAGE_MAIN_SELECTOR_FIELD_LABEL =
+        "The selector used to find the main element that manages the thank you page.";
+    public const THANK_YOU_PAGE_MAIN_SELECTOR_FIELD_DEFAULT = 'main';
+
+    public const THANK_YOU_PAGE_TITLE_SELECTOR_FIELD_ID = "wgf_thank_you_title_selector";
+    public const THANK_YOU_PAGE_TITLE_SELECTOR_FIELD_TITLE = "Title thank you page selector";
+    public const THANK_YOU_PAGE_TITLE_SELECTOR_FIELD_LABEL =
+        "The selector used to find the title element that manages the thank you page.";
+    public const THANK_YOU_PAGE_TITLE_SELECTOR_FIELD_DEFAULT = '.entry-header .entry-title';
+
+    public const THANK_YOU_PAGE_NOTICE_SELECTOR_FIELD_ID = "wgf_thank_you_notice_selector";
+    public const THANK_YOU_PAGE_NOTICE_SELECTOR_FIELD_TITLE = "Notice thank you page selector";
+    public const THANK_YOU_PAGE_NOTICE_SELECTOR_FIELD_LABEL =
+        "The selector used to find the notice element that manages the thank you page.";
+    public const THANK_YOU_PAGE_NOTICE_SELECTOR_FIELD_DEFAULT =
+        '.entry-content .woocommerce .woocommerce-order p.woocommerce-notice';
+
+    public const THANK_YOU_PAGE_ORDER_OVERVIEW_SELECTOR_FIELD_ID = "wgf_thank_you_order_overview_selector";
+    public const THANK_YOU_PAGE_ORDER_OVERVIEW_SELECTOR_FIELD_TITLE = "Order Overview thank you page selector";
+    public const THANK_YOU_PAGE_ORDER_OVERVIEW_SELECTOR_FIELD_LABEL =
+        "The selector used to find the order overview element that manages the thank you page.";
+    public const THANK_YOU_PAGE_ORDER_OVERVIEW_SELECTOR_FIELD_DEFAULT = '.entry-content .woocommerce-order-overview';
+
+    public const THANK_YOU_PAGE_CUSTOMER_DETAILS_SELECTOR_FIELD_ID = "wgf_thank_you_customer_details_selector";
+    public const THANK_YOU_PAGE_CUSTOMER_DETAILS_SELECTOR_FIELD_TITLE = "Customer details thank you page selector";
+    public const THANK_YOU_PAGE_CUSTOMER_DETAILS_SELECTOR_FIELD_LABEL =
+        "The selector used to find the customer details element that manages the thank you page.";
+    public const THANK_YOU_PAGE_CUSTOMER_DETAILS_SELECTOR_FIELD_DEFAULT =
+        '.entry-content .woocommerce-customer-details';
+
+    public const THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_ID = "wgf_thank_you_order_details_selector";
+    public const THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_TITLE = "Order details thank you page selector";
+    public const THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_LABEL =
+        "The selector used to find the order details element that manages the thank you page.";
+    public const THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_DEFAULT = '.entry-content .woocommerce-order-details';
 }
