@@ -134,7 +134,7 @@
                     }
                     let noticeElement = document.querySelector("{{ thank_you_notice_selector }}");
                     if (noticeElement) {
-                        noticeElement.innerHTML = "{{ thank_you_message_order_pending }}";
+                        noticeElement.innerHTML = "{{ thank_you_message_order_pending|raw }}";
                     }
                 } else if (orderStatus === "{{ order_status_on_hold }}") {
                     let entryTitle = document.querySelector("{{ thank_you_title_selector }}");
@@ -143,7 +143,7 @@
                     }
                     let noticeElement = document.querySelector("{{ thank_you_notice_selector }}");
                     if (noticeElement) {
-                        noticeElement.innerHTML = "{{ thank_you_message_order_on_hold }}";
+                        noticeElement.innerHTML = "{{ thank_you_message_order_on_hold|raw }}";
                     }
                 } else if (orderStatus === "{{ order_status_processing }}") {
                     let entryTitle = document.querySelector("{{ thank_you_title_selector }}");
@@ -152,7 +152,7 @@
                     }
                     let noticeElement = document.querySelector("{{ thank_you_notice_selector }}");
                     if (noticeElement) {
-                        noticeElement.innerHTML = "{{ thank_you_message_order_processing }}";
+                        noticeElement.innerHTML = "{{ thank_you_message_order_processing|raw }}";
                     }
                 } else if (orderStatus === "{{ order_status_failed }}") {
                     let entryTitle = document.querySelector("{{ thank_you_title_selector }}");
@@ -161,7 +161,7 @@
                     }
                     let noticeElement = document.querySelector("{{ thank_you_notice_selector }}");
                     if (noticeElement) {
-                        noticeElement.innerHTML = "{{ thank_you_message_order_failed }}";
+                        noticeElement.innerHTML = "{{ thank_you_message_order_failed|raw }}";
                     }
                 } else {
                     let entryTitle = document.querySelector("{{ thank_you_title_selector }}");
@@ -192,7 +192,7 @@
 
                 let noticeElement = document.querySelector("{{ thank_you_notice_selector }}");
                 if (noticeElement) {
-                    noticeElement.innerHTML = "{{ thank_you_message_order_error }}";
+                    noticeElement.innerHTML = "{{ thank_you_message_order_error|raw }}";
                 }
 
                 let mainSelector = document.querySelector("{{ thank_you_main_selector }}")
