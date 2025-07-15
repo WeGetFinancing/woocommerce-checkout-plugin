@@ -65,9 +65,25 @@
                     wgfFunnelData['{{ billing_email }}'] = jQuery('#{{ billing_email }}').val();
 
                     if (jQuery('#ship-to-different-address-checkbox').is(':checked')) {
-                        wgfFunnelData['ship-to-different-address-checkbox'] = 'true';
+                        wgfFunnelData['{{ shipping_first_name }}'] = jQuery('#{{ billing_first_name }}').val();
+                        wgfFunnelData['{{ shipping_last_name }}'] = jQuery('#{{ billing_last_name }}').val();
+                        wgfFunnelData['{{ shipping_country }}'] = jQuery('#{{ billing_country }}').val();
+                        wgfFunnelData['{{ shipping_address_1 }}'] = jQuery('#{{ billing_address_1 }}').val();
+                        wgfFunnelData['{{ shipping_address_2 }}'] = jQuery('#{{ billing_address_2 }}').val();
+                        wgfFunnelData['{{ shipping_city }}'] = jQuery('#{{ billing_city }}').val();
+                        wgfFunnelData['{{ shipping_state }}'] = jQuery('#{{ billing_state }}').val();
+                        wgfFunnelData['{{ shipping_postcode }}'] = jQuery('#{{ billing_postcode }}').val();
+                        wgfFunnelData['{{ shipping_phone }}'] = jQuery('#{{ billing_phone }}').val();
                     } else {
-                        wgfFunnelData['ship-to-different-address-checkbox'] = 'false';
+                        wgfFunnelData['{{ shipping_first_name }}'] = jQuery('#{{ shipping_first_name }}').val();
+                        wgfFunnelData['{{ shipping_last_name }}'] = jQuery('#{{ shipping_last_name }}').val();
+                        wgfFunnelData['{{ shipping_country }}'] = jQuery('#{{ shipping_country }}').val();
+                        wgfFunnelData['{{ shipping_address_1 }}'] = jQuery('#{{ shipping_address_1 }}').val();
+                        wgfFunnelData['{{ shipping_address_2 }}'] = jQuery('#{{ shipping_address_2 }}').val();
+                        wgfFunnelData['{{ shipping_city }}'] = jQuery('#{{ shipping_city }}').val();
+                        wgfFunnelData['{{ shipping_state }}'] = jQuery('#{{ shipping_state }}').val();
+                        wgfFunnelData['{{ shipping_postcode }}'] = jQuery('#{{ shipping_postcode }}').val();
+                        wgfFunnelData['{{ shipping_phone }}'] = jQuery('#{{ shipping_phone }}').val();
                     }
 
                     let requestNewFunnelData = {
@@ -111,14 +127,28 @@
                                     scrollTop: 0
                                 }, 5);
                             } else {
-                                jQuery('#{{ order_inv_id_field_id }}').val(response.invId);
-                                new GetFinancing(
-                                    response.href,
-                                    function() {
-                                        checkoutButton.click();
-                                    }.bind(self),
-                                    function() {}
-                                );
+                                let form = checkoutButton.closest("form"),
+                                    nodeInvId = document.getElementById('wgf_inv_id'),
+                                    nodeHrefElem = document.getElementById('wgf_href');
+
+                                if (!nodeInvId) {
+                                    nodeInvId = document.createElement("input");
+                                    nodeInvId.id = 'wgf_inv_id';
+                                    nodeInvId.name = 'inv_id';
+                                    nodeInvId.type = "hidden";
+                                    form.append(nodeInvId);
+                                }
+                                if (!nodeHrefElem) {
+                                    nodeHrefElem = document.createElement("input");
+                                    nodeHrefElem.id = 'wgf_href';
+                                    nodeHrefElem.name = 'wgf_href';
+                                    nodeHrefElem.type = "hidden";
+                                    form.append(nodeHrefElem);
+                                }
+
+                                nodeInvId.value = response.invId;
+                                nodeHrefElem.value = response.href;
+                                checkoutButton.click();
                             }
                         },
                         error: function(){

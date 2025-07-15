@@ -62,3 +62,11 @@
 * Updated support to WordPress 6.8.1 and WooCommerce 10.x
 * Fixed funnel thank-you page behavior
 * Fixed postback api behavior
+
+= 1.5.1 =
+* Improved logging on Funnel Generation
+
+= 1.6.0 =
+* Fixed new funnel behavior compatibility with old checkout templates
+* Updated node dependencies for security reasons
+* Updated compatibility to WordPress 6.8.2

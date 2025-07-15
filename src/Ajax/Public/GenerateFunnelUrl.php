@@ -132,6 +132,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 200
             );
         } catch (GenerateFunnelUrlException $exception) {
+            Logger::log($exception);
             $violations = [];
             foreach ($exception->getViolations() as $violation) {
                 if (false === array_key_exists($violation['field'], self::GENERATE_FUNNEL_ERROR_TABLE)) {
@@ -361,6 +362,11 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 $category = '';
                 foreach ($terms as $term) {
                     $category = $term->name;
+                }
+
+                if (!isset($item['line_subtotal']) || !isset($item['quantity']) ||
+                    $item['quantity'] <= 0 || ($item['line_subtotal'] / $item['quantity']) <= 0) {
+                    continue; // Skip this item
                 }
 
                 $cartItems[] = [
