@@ -132,6 +132,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 200
             );
         } catch (GenerateFunnelUrlException $exception) {
+            Logger::log($exception);
             $violations = [];
             foreach ($exception->getViolations() as $violation) {
                 if (false === array_key_exists($violation['field'], self::GENERATE_FUNNEL_ERROR_TABLE)) {
