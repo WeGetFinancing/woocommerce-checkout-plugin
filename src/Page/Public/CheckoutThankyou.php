@@ -81,6 +81,21 @@ class CheckoutThankyou implements ActionableInterface
                 'thank_you_order_details_selector' => WeGetFinancing::getOption(
                     WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_ID
                 ),
+                'thank_you_message_order_pending' => WeGetFinancing::getOption(
+                    WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_PENDING_FIELD_ID
+                ),
+                'thank_you_message_order_on_hold' => WeGetFinancing::getOption(
+                    WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_ON_HOLD_FIELD_ID
+                ),
+                'thank_you_message_order_processing' => WeGetFinancing::getOption(
+                    WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_PROCESSING_FIELD_ID
+                ),
+                'thank_you_message_order_failed' => WeGetFinancing::getOption(
+                    WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_FAILED_FIELD_ID
+                ),
+                'thank_you_message_order_error' => WeGetFinancing::getOption(
+                    WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_ERROR_FIELD_ID
+                ),
             ]
         );
     }
