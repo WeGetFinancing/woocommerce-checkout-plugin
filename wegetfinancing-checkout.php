@@ -4,14 +4,14 @@
  *
  * @package           WeGetFinancingPaymentGateway
  * @author            Riccardo De Leo
- * @copyright         2023 Emerging Payments Technologies
+ * @copyright         2025 Emerging Payments Technologies
  * @license           LGPL-3.0-only
  *
  * @wordpress-plugin
  * Plugin Name:       WeGetFinancing Payment Gateway
  * Plugin URI:        https://github.com/WeGetFinancing/woocommerce-checkout-plugin
  * Description:       Integrate WeGetFinancing payment gateway to woocommerce
- * Version:           1.4.2
+ * Version:           1.5.0
  * Requires at least: 5.0
  * Requires PHP:      8.0
  * Author:            Riccardo De Leo
