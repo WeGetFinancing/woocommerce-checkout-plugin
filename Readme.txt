@@ -2,8 +2,8 @@
 Contributors: wegetfinancing
 Tags: WeGetFinancing, Checkout, Payment
 Requires at least: 5.9
-Tested up to: 6.8.1
-Stable tag: 1.5.1
+Tested up to: 6.8.2
+Stable tag: 1.6.0
 Requires PHP: 8.0
 License: LGPL-3.0-only
 License URI: https://www.gnu.org/licenses/gpl-2.0.html

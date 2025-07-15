@@ -364,6 +364,11 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                     $category = $term->name;
                 }
 
+                if (!isset($item['line_subtotal']) || !isset($item['quantity']) ||
+                    $item['quantity'] <= 0 || ($item['line_subtotal'] / $item['quantity']) <= 0) {
+                    continue; // Skip this item
+                }
+
                 $cartItems[] = [
                     'sku' => true === empty($product->get_sku()) ? 'not_defined' : $product->get_sku(),
                     'displayName' => $product->get_name(),
