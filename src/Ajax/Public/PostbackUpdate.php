@@ -245,8 +245,8 @@ class PostbackUpdate implements ActionableInterface
     protected function selectOrderIdWhereInvId(string $invId): array
     {
         $sql = $this->wpdb->prepare(
-            "SELECT post_id FROM {$this->wpdb->prefix} postmeta WHERE meta_key = '" .
-            OrderInvIdValueObject::ORDER_META . "' AND meta_value = %s",
+            "SELECT post_id FROM {$this->wpdb->prefix}postmeta WHERE meta_key = %s AND meta_value = %s",
+            OrderInvIdValueObject::ORDER_META,
             $invId
         );
 
@@ -273,11 +273,16 @@ class PostbackUpdate implements ActionableInterface
 
         if (0 === $found) {
             $orders = wc_get_orders([
-                'meta_key' => OrderInvIdValueObject::ORDER_META,
-                'meta_value' => $invId,
-                'meta_compare' => '=',
-                'return'=> 'objects'
+                'meta_query' => [
+                    [
+                        'key' => OrderInvIdValueObject::ORDER_META,
+                        'value' => $invId,
+                        'compare' => '='
+                    ]
+                ],
+                'return' => 'objects'
             ]);
+
             $found = count($results);
             if (0 === $found) {
                 throw new PostbackUpdateException(
