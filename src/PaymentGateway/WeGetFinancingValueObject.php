@@ -89,4 +89,50 @@ class WeGetFinancingValueObject
     public const THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_LABEL =
         "The selector used to find the order details element that manages the thank you page.";
     public const THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_DEFAULT = '.entry-content .woocommerce-order-details';
+
+    public const THANK_YOU_MESSAGE_ORDER_PENDING_FIELD_ID = "wgf_thank_you_message_order_pending";
+    public const THANK_YOU_MESSAGE_ORDER_PENDING_FIELD_TITLE = "Thank You Page - Message for order status Pending";
+    public const THANK_YOU_MESSAGE_ORDER_PENDING_FIELD_LABEL =
+        "The message displayed in the Thank You Page when the order status is Pending.";
+    public const THANK_YOU_MESSAGE_ORDER_PENDING_FIELD_DEFAULT =
+        "<p>We regret to inform your payment was unsuccessful.</p>" .
+        "<p>Either you closed the funnel before completing it or your order was sent to us, " .
+        "but we are not able to offer you a payment solution at the moment.</p>" .
+        "<p>You can continue to shop and use another payment method.</p>";
+
+    public const THANK_YOU_MESSAGE_ORDER_ON_HOLD_FIELD_ID = "wgf_thank_you_message_order_on_hold";
+    public const THANK_YOU_MESSAGE_ORDER_ON_HOLD_FIELD_TITLE = "Thank You Page - Message for order status On-Hold";
+    public const THANK_YOU_MESSAGE_ORDER_ON_HOLD_FIELD_LABEL =
+        "The message displayed in the Thank You Page when the order status is On-Hold.";
+    public const THANK_YOU_MESSAGE_ORDER_ON_HOLD_FIELD_DEFAULT =
+        "<p>Congratulation! Your order was successfully sent to us and is currently awaiting payment.</p>" .
+        "<p>Once we receive the payment for your order, it will be completed.</p>" .
+        "<p>If you've already provided payment details, " .
+        "then we will process your order manually and email you when it's completed.</p>";
+
+    public const THANK_YOU_MESSAGE_ORDER_PROCESSING_FIELD_ID = "wgf_thank_you_message_order_processing";
+    public const THANK_YOU_MESSAGE_ORDER_PROCESSING_FIELD_TITLE = "Thank You Page - Message for order status Processing";
+    public const THANK_YOU_MESSAGE_ORDER_PROCESSING_FIELD_LABEL =
+        "The message displayed in the Thank You Page when the order status is Processing.";
+    public const THANK_YOU_MESSAGE_ORDER_PROCESSING_FIELD_DEFAULT =
+        "<p>Congratulation! Your payment was successfully received, and now your order is being fulfilled.</p>";
+
+    public const THANK_YOU_MESSAGE_ORDER_FAILED_FIELD_ID = "wgf_thank_you_message_order_failed";
+    public const THANK_YOU_MESSAGE_ORDER_FAILED_FIELD_TITLE = "Thank You Page - Message for order status Failed";
+    public const THANK_YOU_MESSAGE_ORDER_FAILED_FIELD_LABEL =
+        "The message displayed in the Thank You Page when the order status is Failed.";
+    public const THANK_YOU_MESSAGE_ORDER_FAILED_FIELD_DEFAULT =
+        "<p>We regret to inform your payment was unsuccessful.</p>" .
+        "<p>Your order was sent to us, but we are not able to offer you a payment solution at the moment.</p>" .
+        "<p>You can continue to shop and use another payment method.</p>";
+
+    public const THANK_YOU_MESSAGE_ORDER_ERROR_FIELD_ID = "wgf_thank_you_message_order_error";
+    public const THANK_YOU_MESSAGE_ORDER_ERROR_FIELD_TITLE = "Thank You Page - Message for order Error";
+    public const THANK_YOU_MESSAGE_ORDER_ERROR_FIELD_LABEL =
+        "The message displayed in the Thank You Page when the order goes in unexpected error state.";
+    public const THANK_YOU_MESSAGE_ORDER_ERROR_FIELD_DEFAULT =
+        "<p>Your order was sent to us, " .
+        "but we were unable to confirm your order due to an unexpected internal error.</p>" .
+        "<p>Our customer service is being alerted and will review your case promptly.</p>" .
+        "<p>Please save your order number for future review.</p>";
 }

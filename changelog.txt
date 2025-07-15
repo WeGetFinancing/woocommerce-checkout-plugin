@@ -70,3 +70,6 @@
 * Fixed new funnel behavior compatibility with old checkout templates
 * Updated node dependencies for security reasons
 * Updated compatibility to WordPress 6.8.2
+
+= 1.7.0 =
+* Added configurable thank-you page messages

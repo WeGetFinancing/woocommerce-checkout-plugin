@@ -134,33 +134,25 @@
                     }
                     let noticeElement = document.querySelector("{{ thank_you_notice_selector }}");
                     if (noticeElement) {
-                        noticeElement.innerHTML = "<p>We regret to inform your payment was unsuccessful.</p>" +
-                            "<p>Either you closed the funnel before completing it or your order was sent to us, " +
-                            "but we are not able to offer you a payment solution at the moment.</p>" +
-                            "<p>You can continue to shop and use another payment method.</p>";
+                        noticeElement.innerHTML = "{{ thank_you_message_order_pending }}";
                     }
                 } else if (orderStatus === "{{ order_status_on_hold }}") {
                     let entryTitle = document.querySelector("{{ thank_you_title_selector }}");
                     if (entryTitle) {
-                        entryTitle.textContent = "Congratulation!";
+                        entryTitle.textContent = "Order Successful";
                     }
                     let noticeElement = document.querySelector("{{ thank_you_notice_selector }}");
                     if (noticeElement) {
-                        noticeElement.innerHTML = 
-                            "<p>Your order was sent to us but is currently awaiting payment.</p>" +
-                            "<p>Once we receive the payment for your order, it will be completed.</p>" +
-                            "<p>If you've already provided payment details, " +
-                            "then we will process your order manually and email you when it's completed.</p>";
+                        noticeElement.innerHTML = "{{ thank_you_message_order_on_hold }}";
                     }
                 } else if (orderStatus === "{{ order_status_processing }}") {
                     let entryTitle = document.querySelector("{{ thank_you_title_selector }}");
                     if (entryTitle) {
-                        entryTitle.textContent = "Congratulation!";
+                        entryTitle.textContent = "Order Successful";
                     }
                     let noticeElement = document.querySelector("{{ thank_you_notice_selector }}");
                     if (noticeElement) {
-                        noticeElement.innerHTML = 
-                            "<p>Your payment was successfully received, and now your order is being fulfilled.</p>";
+                        noticeElement.innerHTML = "{{ thank_you_message_order_processing }}";
                     }
                 } else if (orderStatus === "{{ order_status_failed }}") {
                     let entryTitle = document.querySelector("{{ thank_you_title_selector }}");
@@ -169,10 +161,7 @@
                     }
                     let noticeElement = document.querySelector("{{ thank_you_notice_selector }}");
                     if (noticeElement) {
-                        noticeElement.innerHTML = "<p>We regret to inform your payment was unsuccessful.</p>" +
-                            "<p>Your order was sent to us, " +
-                            "but we are not able to offer you a payment solution at the moment.</p>" +
-                            "<p>You can continue to shop and use another payment method.</p>";
+                        noticeElement.innerHTML = "{{ thank_you_message_order_failed }}";
                     }
                 } else {
                     let entryTitle = document.querySelector("{{ thank_you_title_selector }}");
@@ -203,10 +192,7 @@
 
                 let noticeElement = document.querySelector("{{ thank_you_notice_selector }}");
                 if (noticeElement) {
-                    noticeElement.innerHTML = "<p>Your order was sent to us, " + 
-                        "but we were unable to confirm your order due to unexpected internal error.</p>" +
-                        "<p>Our customer service is being alerted and will review your case promptly.</p>" +
-                        "<p>Please save your order number <b>{{ order_id }}</b> for future review.</p>";
+                    noticeElement.innerHTML = "{{ thank_you_message_order_error }}";
                 }
 
                 let mainSelector = document.querySelector("{{ thank_you_main_selector }}")

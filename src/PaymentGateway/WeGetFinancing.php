@@ -173,6 +173,41 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                     'default' => WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_DEFAULT,
                     'desc_tip' => true,
                 ],
+                WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_PENDING_FIELD_ID => [
+                    'title' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_PENDING_FIELD_TITLE,
+                    'type' => 'text',
+                    'description' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_PENDING_FIELD_LABEL,
+                    'default' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_PENDING_FIELD_DEFAULT,
+                    'desc_tip' => true,
+                ],
+                WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_ON_HOLD_FIELD_ID => [
+                    'title' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_ON_HOLD_FIELD_TITLE,
+                    'type' => 'text',
+                    'description' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_ON_HOLD_FIELD_LABEL,
+                    'default' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_ON_HOLD_FIELD_DEFAULT,
+                    'desc_tip' => true,
+                ],
+                WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_PROCESSING_FIELD_ID => [
+                    'title' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_PROCESSING_FIELD_TITLE,
+                    'type' => 'text',
+                    'description' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_PROCESSING_FIELD_LABEL,
+                    'default' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_PROCESSING_FIELD_DEFAULT,
+                    'desc_tip' => true,
+                ],
+                WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_FAILED_FIELD_ID => [
+                    'title' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_FAILED_FIELD_TITLE,
+                    'type' => 'text',
+                    'description' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_FAILED_FIELD_LABEL,
+                    'default' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_FAILED_FIELD_DEFAULT,
+                    'desc_tip' => true,
+                ],
+                WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_ERROR_FIELD_ID => [
+                    'title' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_ERROR_FIELD_TITLE,
+                    'type' => 'text',
+                    'description' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_ERROR_FIELD_LABEL,
+                    'default' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_ERROR_FIELD_DEFAULT,
+                    'desc_tip' => true,
+                ],
             ]
         );
     }
