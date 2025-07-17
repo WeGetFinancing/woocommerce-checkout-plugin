@@ -1,7 +1,9 @@
 <script>
-    let mainSelector = document.querySelector("{{ thank_you_main_selector }}")
-    if(mainSelector) {
-        mainSelector.style.display = "none";
+    if ("{{ wgf_href }}" && "{{ wgf_href }}".trim() !== '') {
+        let mainSelector = document.querySelector("{{ thank_you_main_selector }}")
+        if(mainSelector) {
+            mainSelector.style.display = "none";
+        }
     }
 
     function hideOrderAndCustomerDetails() {
@@ -225,10 +227,11 @@
 
     }
 
-    // Check if page is already loaded and ensure all resources are loaded
-    if (document.readyState === 'complete') {
-        initializeFinancing();
-    } else {
-        window.addEventListener('load', initializeFinancing);
+    if ("{{ wgf_href }}" && "{{ wgf_href }}".trim() !== '') {
+        if (document.readyState === 'complete') {
+            initializeFinancing();
+        } else {
+            window.addEventListener('load', initializeFinancing);
+        }
     }
 </script>
