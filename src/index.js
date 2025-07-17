@@ -81,12 +81,12 @@ const Label = () => {
 }
 
 registerPaymentMethod({
-    name: settings.payment_method_id,
+    name: 'wegetfinancing',
     label: <Label />,
     content: <Content />,
     edit: <Content />,
     canMakePayment: () => true,
-    ariaLabel: label,
+    ariaLabel: 'WeGetFinancing',
 });
 
 const wgfBtn = document.createElement("a");
