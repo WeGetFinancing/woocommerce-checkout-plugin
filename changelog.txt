@@ -73,3 +73,6 @@
 
 = 1.7.0 =
 * Added configurable thank-you page messages
+
+= 1.8.0 =
+* Fix error to thank you page with other payment system
