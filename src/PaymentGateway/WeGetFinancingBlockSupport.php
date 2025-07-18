@@ -40,7 +40,7 @@ final class WeGetFinancingBlockSupport extends AbstractPaymentMethodType
                 'wp-element',
                 'wp-html-entities',
             ],
-            null,
+            App::PLUGIN_VERSION,
             true
         );
 

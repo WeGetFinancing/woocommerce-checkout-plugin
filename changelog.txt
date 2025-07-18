@@ -76,3 +76,6 @@
 
 = 1.8.0 =
 * Fix error to thank you page with other payment system
+
+= 1.8.1 =
+* Minor fix: JavaScript plugin loaded with the correct version
