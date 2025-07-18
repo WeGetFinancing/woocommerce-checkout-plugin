@@ -14,7 +14,7 @@ use WeGetFinancing\Checkout\ValueObject\GenerateFunnelUrlRequest;
 
 final class WeGetFinancingBlockSupport extends AbstractPaymentMethodType
 {
-    public const HANDLE = 'wc-wegetfinancing-blocks-integration';
+    public const HANDLE = 'wegetfinancing';
     public const INIT_NAME = 'woocommerce_blocks_payment_method_type_registration';
     private mixed $gateway;
     protected $name = WeGetFinancing::GATEWAY_ID;
@@ -40,7 +40,7 @@ final class WeGetFinancingBlockSupport extends AbstractPaymentMethodType
                 'wp-element',
                 'wp-html-entities',
             ],
-            null,
+            App::PLUGIN_VERSION,
             true
         );
 
@@ -51,6 +51,7 @@ final class WeGetFinancingBlockSupport extends AbstractPaymentMethodType
     public function get_payment_method_data(): array
     {
         return [
+            'name' => $this->name,
             'title' => WeGetFinancing::TITLE,
             'payment_method_id' => WeGetFinancing::GATEWAY_ID,
             'description' => WeGetFinancing::DESCRIPTION,
