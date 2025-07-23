@@ -12,169 +12,220 @@
     }
 </style>
 <script>
-    jQuery(document).ready(function() {
-        jQuery('form[name="checkout"] input[name="payment_method"]')
-            .eq(0)
-            .prop('checked', true)
-            .attr( 'checked', 'checked' );
-        wGF_WC_Gateway();
-    });
+    function wgf_disableCheckoutButton() {
+        const checkoutButton = document.querySelector('form[name="checkout"] #place_order');
+        checkoutButton.disabled = true;
+    }
 
-    jQuery(document).off("change", "form[name='checkout'] input[name='payment_method']");
+    function wgf_enableCheckoutButton() {
+        const checkoutButton = document.querySelector('form[name="checkout"] #place_order');
+        checkoutButton.disabled = false;
+    }
 
-    jQuery(document).on("change", "form[name='checkout'] input[name='payment_method']", function(){
-        if ( 0 === jQuery('form[name="checkout"] input[name="payment_method"]').filter( ':checked' ).size() ) {
-            jQuery(this).prop('checked', true).attr( 'checked', 'checked' );
-        };
-        wGF_WC_Gateway();
-    });
-
-    function wGF_WC_Gateway(){
-        const checkoutButton = jQuery('form[name="checkout"] #place_order');
-
-        if (jQuery('form[name="checkout"] input[name="payment_method"]:checked').val() === '{{ payment_method_id }}') {
-            if ( jQuery(".woocommerce-error").length ) {
-                jQuery(".woocommerce-error").parent().remove();
-            }
-
-            checkoutButton.hide();
-
-            if(jQuery('#wgf_checkout_button').length <= 0) {
-                checkoutButton.parent().append(`
-                            <a id="wgf_checkout_button"  class="wgf_checkout_button" href="#wgf_checkout">
-                                <img src="{{ checkout_button_image_url }}" alt="{{ checkout_button_alt }}" style="max-width: 320px;" class="wgf_checkout_button_img">
-                            </a>
-                        `);
-
-                jQuery('#wgf_checkout_button').click((e) => {
-                    jQuery('#wgf_checkout_button')
-                        .attr('disabled', true)
-                        .addClass('wgf_checkout_button_disabled')
-                        .removeClass('wgf_checkout_button');
-
-                    let wgfFunnelData = {};
-                    wgfFunnelData['{{ billing_first_name }}'] = jQuery('#{{ billing_first_name }}').val();
-                    wgfFunnelData['{{ billing_last_name }}'] = jQuery('#{{ billing_last_name }}').val();
-                    wgfFunnelData['{{ billing_country }}'] = jQuery('#{{ billing_country }}').val();
-                    wgfFunnelData['{{ billing_address_1 }}'] = jQuery('#{{ billing_address_1 }}').val();
-                    wgfFunnelData['{{ billing_address_2 }}'] = jQuery('#{{ billing_address_2 }}').val();
-                    wgfFunnelData['{{ billing_city }}'] = jQuery('#{{ billing_city }}').val();
-                    wgfFunnelData['{{ billing_state }}'] = jQuery('#{{ billing_state }}').val();
-                    wgfFunnelData['{{ billing_postcode }}'] = jQuery('#{{ billing_postcode }}').val();
-                    wgfFunnelData['{{ billing_phone }}'] = jQuery('#{{ billing_phone }}').val();
-                    wgfFunnelData['{{ billing_email }}'] = jQuery('#{{ billing_email }}').val();
-
-                    if (jQuery('#ship-to-different-address-checkbox').is(':checked')) {
-                        wgfFunnelData['{{ shipping_first_name }}'] = jQuery('#{{ billing_first_name }}').val();
-                        wgfFunnelData['{{ shipping_last_name }}'] = jQuery('#{{ billing_last_name }}').val();
-                        wgfFunnelData['{{ shipping_country }}'] = jQuery('#{{ billing_country }}').val();
-                        wgfFunnelData['{{ shipping_address_1 }}'] = jQuery('#{{ billing_address_1 }}').val();
-                        wgfFunnelData['{{ shipping_address_2 }}'] = jQuery('#{{ billing_address_2 }}').val();
-                        wgfFunnelData['{{ shipping_city }}'] = jQuery('#{{ billing_city }}').val();
-                        wgfFunnelData['{{ shipping_state }}'] = jQuery('#{{ billing_state }}').val();
-                        wgfFunnelData['{{ shipping_postcode }}'] = jQuery('#{{ billing_postcode }}').val();
-                        wgfFunnelData['{{ shipping_phone }}'] = jQuery('#{{ billing_phone }}').val();
-                    } else {
-                        wgfFunnelData['{{ shipping_first_name }}'] = jQuery('#{{ shipping_first_name }}').val();
-                        wgfFunnelData['{{ shipping_last_name }}'] = jQuery('#{{ shipping_last_name }}').val();
-                        wgfFunnelData['{{ shipping_country }}'] = jQuery('#{{ shipping_country }}').val();
-                        wgfFunnelData['{{ shipping_address_1 }}'] = jQuery('#{{ shipping_address_1 }}').val();
-                        wgfFunnelData['{{ shipping_address_2 }}'] = jQuery('#{{ shipping_address_2 }}').val();
-                        wgfFunnelData['{{ shipping_city }}'] = jQuery('#{{ shipping_city }}').val();
-                        wgfFunnelData['{{ shipping_state }}'] = jQuery('#{{ shipping_state }}').val();
-                        wgfFunnelData['{{ shipping_postcode }}'] = jQuery('#{{ shipping_postcode }}').val();
-                        wgfFunnelData['{{ shipping_phone }}'] = jQuery('#{{ shipping_phone }}').val();
-                    }
-
-                    let requestNewFunnelData = {
-                        'action': '{{ ajax_action }}',
-                        '_wpnonce': '{{ nonce }}',
-                        'data': wgfFunnelData
-                    };
-
-                    jQuery.ajax({
-                        type: "post",
-                        dataType: "json",
-                        url: "{{ ajax_url }}",
-                        data: requestNewFunnelData,
-                        success: function(response){
-                            if ( jQuery(".woocommerce-error").length ) {
-                                jQuery(".woocommerce-error").parent().remove();
-                            }
-                            if (response.isSuccess === false) {
-                                let error_message = '<div class="woocommerce-notices-wrapper">' +
-                                    '<ul class="woocommerce-error" id="wegetfinancing-woocommerce-error">';
-
-                                if ("message" in response) {
-                                    error_message += "<li>" + response.message + "</li>";
-                                }
-                                if ("violations" in response) {
-                                    jQuery.each(response.violations, function( index, violation ) {
-                                        jQuery.each(violation.messages, function( index, message ) {
-                                            error_message += "<li>" + message + "</li>";
-                                        });
-                                        jQuery.each(violation.fields, function( index, field ) {
-                                            jQuery("#" + field).closest( '.form-row' ).addClass( 'woocommerce-invalid' );
-                                        });
-                                    });
-                                }
-
-                                error_message += "</ul></div>";
-
-                                jQuery("{{ error_display_selector|raw }}").{{ error_display_method }}(error_message);
-
-                                jQuery("html, body").animate({
-                                    scrollTop: 0
-                                }, 5);
-                            } else {
-                                let form = checkoutButton.closest("form"),
-                                    nodeInvId = document.getElementById('wgf_inv_id'),
-                                    nodeHrefElem = document.getElementById('wgf_href');
-
-                                if (!nodeInvId) {
-                                    nodeInvId = document.createElement("input");
-                                    nodeInvId.id = 'wgf_inv_id';
-                                    nodeInvId.name = 'inv_id';
-                                    nodeInvId.type = "hidden";
-                                    form.append(nodeInvId);
-                                }
-                                if (!nodeHrefElem) {
-                                    nodeHrefElem = document.createElement("input");
-                                    nodeHrefElem.id = 'wgf_href';
-                                    nodeHrefElem.name = 'wgf_href';
-                                    nodeHrefElem.type = "hidden";
-                                    form.append(nodeHrefElem);
-                                }
-
-                                nodeInvId.value = response.invId;
-                                nodeHrefElem.value = response.href;
-                                checkoutButton.click();
-                            }
-                        },
-                        error: function(){
-                            if ( jQuery(".woocommerce-error").length ) {
-                                jQuery(".woocommerce-error").parent().remove();
-                            }
-
-                            jQuery("{{ error_display_selector|raw }}").{{ error_display_method }}('<div class="woocommerce-notices-wrapper">' +
-                                '<ul class="woocommerce-error" id="wegetfinancing-woocommerce-error">' +
-                                '<li>Unexpected server error</li>' +
-                                '</ul>' +
-                                '</div>');
-                        },
-                        complete: function (){
-                            jQuery('#wgf_checkout_button')
-                                .attr('disabled', false)
-                                .removeClass('wgf_checkout_button_disabled')
-                                .addClass('wgf_checkout_button');
-                        }
-                    });
-                })
-            }
-        } else {
-            jQuery('#wgf_checkout_button').remove()
-            checkoutButton.show()
-            jQuery('form[name="checkout"]').unbind('submit');
+    function wgf_cleanWooCommerceError() {
+        const wooCommerceError = jQuery(".woocommerce-error");
+        if (wooCommerceError.length) {
+            wooCommerceError.parent().remove();
         }
     }
+
+    function wGFCheckoutButtonFunction() {
+        const checkoutButton = jQuery('form[name="checkout"] #place_order');
+
+        jQuery('#wgf_checkout_button')
+            .attr('disabled', true)
+            .addClass('wgf_checkout_button_disabled')
+            .removeClass('wgf_checkout_button');
+
+        let wgfFunnelData = {};
+        wgfFunnelData['{{ billing_first_name }}'] = jQuery('#{{ billing_first_name }}').val();
+        wgfFunnelData['{{ billing_last_name }}'] = jQuery('#{{ billing_last_name }}').val();
+        wgfFunnelData['{{ billing_country }}'] = jQuery('#{{ billing_country }}').val();
+        wgfFunnelData['{{ billing_address_1 }}'] = jQuery('#{{ billing_address_1 }}').val();
+        wgfFunnelData['{{ billing_address_2 }}'] = jQuery('#{{ billing_address_2 }}').val();
+        wgfFunnelData['{{ billing_city }}'] = jQuery('#{{ billing_city }}').val();
+        wgfFunnelData['{{ billing_state }}'] = jQuery('#{{ billing_state }}').val();
+        wgfFunnelData['{{ billing_postcode }}'] = jQuery('#{{ billing_postcode }}').val();
+        wgfFunnelData['{{ billing_phone }}'] = jQuery('#{{ billing_phone }}').val();
+        wgfFunnelData['{{ billing_email }}'] = jQuery('#{{ billing_email }}').val();
+
+        if (jQuery('#ship-to-different-address-checkbox').is(':checked')) {
+            wgfFunnelData['{{ shipping_first_name }}'] = jQuery('#{{ billing_first_name }}').val();
+            wgfFunnelData['{{ shipping_last_name }}'] = jQuery('#{{ billing_last_name }}').val();
+            wgfFunnelData['{{ shipping_country }}'] = jQuery('#{{ billing_country }}').val();
+            wgfFunnelData['{{ shipping_address_1 }}'] = jQuery('#{{ billing_address_1 }}').val();
+            wgfFunnelData['{{ shipping_address_2 }}'] = jQuery('#{{ billing_address_2 }}').val();
+            wgfFunnelData['{{ shipping_city }}'] = jQuery('#{{ billing_city }}').val();
+            wgfFunnelData['{{ shipping_state }}'] = jQuery('#{{ billing_state }}').val();
+            wgfFunnelData['{{ shipping_postcode }}'] = jQuery('#{{ billing_postcode }}').val();
+            wgfFunnelData['{{ shipping_phone }}'] = jQuery('#{{ billing_phone }}').val();
+        } else {
+            wgfFunnelData['{{ shipping_first_name }}'] = jQuery('#{{ shipping_first_name }}').val();
+            wgfFunnelData['{{ shipping_last_name }}'] = jQuery('#{{ shipping_last_name }}').val();
+            wgfFunnelData['{{ shipping_country }}'] = jQuery('#{{ shipping_country }}').val();
+            wgfFunnelData['{{ shipping_address_1 }}'] = jQuery('#{{ shipping_address_1 }}').val();
+            wgfFunnelData['{{ shipping_address_2 }}'] = jQuery('#{{ shipping_address_2 }}').val();
+            wgfFunnelData['{{ shipping_city }}'] = jQuery('#{{ shipping_city }}').val();
+            wgfFunnelData['{{ shipping_state }}'] = jQuery('#{{ shipping_state }}').val();
+            wgfFunnelData['{{ shipping_postcode }}'] = jQuery('#{{ shipping_postcode }}').val();
+            wgfFunnelData['{{ shipping_phone }}'] = jQuery('#{{ shipping_phone }}').val();
+        }
+
+        let requestNewFunnelData = {
+            'action': '{{ ajax_action }}',
+            '_wpnonce': '{{ nonce }}',
+            'data': wgfFunnelData
+        };
+
+        jQuery.ajax({
+            type: "post",
+            dataType: "json",
+            url: "{{ ajax_url }}",
+            data: requestNewFunnelData,
+            success: function(response){
+                wgf_cleanWooCommerceError();
+                if (response.isSuccess === false) {
+                    let error_message = '<div class="woocommerce-notices-wrapper">' +
+                        '<ul class="woocommerce-error" id="wegetfinancing-woocommerce-error">';
+
+                    if ("message" in response) {
+                        error_message += "<li>" + response.message + "</li>";
+                    }
+                    if ("violations" in response) {
+                        jQuery.each(response.violations, function( index, violation ) {
+                            jQuery.each(violation.messages, function( index, message ) {
+                                error_message += "<li>" + message + "</li>";
+                            });
+                            jQuery.each(violation.fields, function( index, field ) {
+                                jQuery("#" + field).closest( '.form-row' ).addClass( 'woocommerce-invalid' );
+                            });
+                        });
+                    }
+
+                    error_message += "</ul></div>";
+
+                    jQuery("{{ error_display_selector|raw }}").{{ error_display_method }}(error_message);
+
+                    jQuery("html, body").animate({
+                        scrollTop: 0
+                    }, 5);
+                } else {
+                    let form = checkoutButton.closest("form"),
+                        nodeInvId = document.getElementById('wgf_inv_id'),
+                        nodeHrefElem = document.getElementById('wgf_href');
+
+                    if (!nodeInvId) {
+                        nodeInvId = document.createElement("input");
+                        nodeInvId.id = 'wgf_inv_id';
+                        nodeInvId.name = 'inv_id';
+                        nodeInvId.type = "hidden";
+                        form.append(nodeInvId);
+                    }
+                    if (!nodeHrefElem) {
+                        nodeHrefElem = document.createElement("input");
+                        nodeHrefElem.id = 'wgf_href';
+                        nodeHrefElem.name = 'wgf_href';
+                        nodeHrefElem.type = "hidden";
+                        form.append(nodeHrefElem);
+                    }
+
+                    nodeInvId.value = response.invId;
+                    nodeHrefElem.value = response.href;
+                    checkoutButton.click();
+                }
+            },
+            error: function(){
+                wgf_cleanWooCommerceError();
+
+                jQuery("{{ error_display_selector|raw }}").{{ error_display_method }}('<div class="woocommerce-notices-wrapper">' +
+                    '<ul class="woocommerce-error" id="wegetfinancing-woocommerce-error">' +
+                    '<li>Unexpected server error</li>' +
+                    '</ul>' +
+                    '</div>');
+            },
+            complete: function (){
+                jQuery('#wgf_checkout_button')
+                    .attr('disabled', false)
+                    .removeClass('wgf_checkout_button_disabled')
+                    .addClass('wgf_checkout_button');
+            }
+        });
+    }
+
+    function wGF_WC_Gateway() {
+        wgf_disableCheckoutButton();
+        setTimeout(() => {
+            const checkoutButton = jQuery('form[name="checkout"] #place_order'),
+                checkoutPaymentMethodChecked = jQuery('form[name="checkout"] input[name="payment_method"]:checked');
+
+            if (checkoutPaymentMethodChecked.val() === '{{ payment_method_id }}') {
+                const wooCommerceError = jQuery(".woocommerce-error");
+                if (wooCommerceError.length) {
+                    wooCommerceError.parent().remove();
+                }
+
+                checkoutButton.hide();
+
+                const wgfCheckoutBtn = jQuery('#wgf_checkout_button');
+
+                if (wgfCheckoutBtn.length <= 0) {
+                    checkoutButton.parent().append(`
+                        <a id="wgf_checkout_button"  class="wgf_checkout_button" href="#wgf_checkout">
+                            <img src="{{ checkout_button_image_url }}" alt="{{ checkout_button_alt }}" style="max-width: 320px;" class="wgf_checkout_button_img">
+                        </a>
+                    `);
+
+                    wgfCheckoutBtn.click((e) => {
+                        wGFCheckoutButtonFunction();
+                    })
+                }
+
+                wgf_enableCheckoutButton();
+            } else {
+                jQuery('#wgf_checkout_button').remove();
+                if (checkoutPaymentMethodChecked.val() !== 'wpg_paypal_checkout') {
+                    checkoutButton.show()
+                }
+                wgf_enableCheckoutButton();
+            }
+        }, 700);
+    }
+
+    jQuery(document).ready(function() {
+        {# Check if the checkout form exists #}
+        const checkoutForm = jQuery('form[name="checkout"]');
+        if (checkoutForm.length === 0) {
+            {# Exit if the checkout form doesn't exist #}
+            return;
+        }
+
+        {# Check if payment method inputs exist #}
+        const paymentMethods = checkoutForm.find('input[name="payment_method"]');
+        if (paymentMethods.length === 0) {
+            {# Exit if no payment methods exist #}
+            return;
+        }
+
+        {# Check if any payment method is already checked #}
+        const checkedPaymentMethod = paymentMethods.filter(':checked');
+
+        {# If no payment method is checked, select the first one #}
+        if (checkedPaymentMethod.length === 0) {
+            paymentMethods
+                .eq(0)
+                .prop('checked', true)
+                .attr('checked', 'checked');
+        }
+
+        {# Set up the change event handler for payment methods #}
+        jQuery(document).on("change", "form[name='checkout'] input[name='payment_method']", function(){
+            if ( 0 === jQuery('form[name="checkout"] input[name="payment_method"]').filter( ':checked' ).size() ) {
+                jQuery(this).prop('checked', true).attr( 'checked', 'checked' );
+            }
+            wGF_WC_Gateway();
+        });
+
+        {# Call the gateway function #}
+        wGF_WC_Gateway();
+    });
 </script>
