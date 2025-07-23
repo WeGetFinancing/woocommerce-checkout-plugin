@@ -1,15 +1,11 @@
 import { decodeEntities } from "@wordpress/html-entities";
 import {useEffect} from "@wordpress/element";
 
-let sheet = document.createElement('style')
+let sheet = document.createElement('style');
 sheet.innerHTML = ".wgf_checkout_button:hover {opacity: 0.85;}";
 sheet.innerHTML += ".wgf_checkout_button_disabled { opacity: 0.5; cursor: wait; }";
 sheet.innerHTML += ".wgf_checkout_button_img { width: 100%; max-width: 320px; }";
 document.head.appendChild(sheet);
-
-// const script = document.createElement('script');
-// script.src = "https://cdn.wegetfinancing.com/libs/1.0/getfinancing.js";
-// document.head.appendChild(script)
 
 let billData = null, shipData = null;
 
@@ -18,7 +14,6 @@ const { getSetting } = window.wc.wcSettings;
 
 const settings = getSetting("wegetfinancing_data", {});
 
-const label = settings.title;
 const description = settings.description;
 
 const Content = (props) => {
@@ -98,7 +93,8 @@ wgfBtn.style.width = "250px";
 wgfBtn.onclick = () => {
     const wgfBtnElement = document.querySelector("#wgf_checkout_button");
     wgfBtnElement.classList.add("wgf_checkout_button_disabled");
-    wgfBtnElement.disabled = true;
+    wgfBtnElement.style.pointerEvents = "none"; // Prevents clicking
+    wgfBtnElement.setAttribute("aria-disabled", "true"); // For accessibility
     wgfFetch();
 }
 
@@ -107,55 +103,99 @@ wgfBtnImage.src = settings.checkout_button_image_url;
 wgfBtnImage.alt = settings.checkout_button_alt;
 wgfBtnImage.style.maxWidth = "320px";
 wgfBtnImage.className = "wgf_checkout_button_img";
-
 wgfBtn.append(wgfBtnImage);
-
-document.addEventListener('input',(e)=> {
-    const placeOrderBtn = document.querySelector(".wc-block-components-checkout-place-order-button");
-
-    placeOrderBtn.closest("div").append(wgfBtn);
-    const wgfBtnElement = document.querySelector("#wgf_checkout_button");
-    if(e.target.getAttribute('name') === "radio-control-wc-payment-method-options") {
-        const isWgfActive = e.target.value === settings.payment_method_id;
-        placeOrderBtn.style.display = isWgfActive ? 'none' : 'block';
-        wgfBtnElement.style.display = isWgfActive ? 'block' : 'none';
-    } else {
-        // Check if radio-control-wc-payment-method-options do not exist
-        const radioElement = document.querySelector('input[name="radio-control-wc-payment-method-options"]');
-        if (!radioElement) {
-            const isWgfActive = true; // or whatever logic you want when the element doesn't exist
-            placeOrderBtn.style.display = isWgfActive ? 'none' : 'block';
-            wgfBtnElement.style.display = isWgfActive ? 'block' : 'none';
-        }
-    }
-})
 
 window.onload = (event) => {
     OnLoadFn();
 };
 
+function appendWgfBtn(placeOrderBtn) {
+    placeOrderBtn.closest("div").append(wgfBtn);
+    placeOrderBtn.style.display = 'none';
+    wgfBtn.style.display = 'block';
+}
+
+let notFoundPlaceOrderCounter = 0;
 const OnLoadFn = function () {
     const placeOrderBtn = document.querySelector(".wc-block-components-checkout-place-order-button");
-
     // Check if the place order button exists before proceeding
     if (!placeOrderBtn) {
-        setTimeout(OnLoadFn, 50);
+        if (notFoundPlaceOrderCounter < 5) {
+            notFoundPlaceOrderCounter++;
+            setTimeout(OnLoadFn, 50);
+            return;
+        }
+        return;
+    }
+
+    const radioElements = document.querySelectorAll('input[name="radio-control-wc-payment-method-options"]');
+    if (!(radioElements.length > 0)) {
+        return;
+    }
+
+    const wgfRadioElement = document.querySelector('input[name="radio-control-wc-payment-method-options"][id="radio-control-wc-payment-method-options-wegetfinancing"]'),
+        wgfBtnElement = document.querySelector("#wgf_checkout_button");
+
+    if (radioElements.length === 1) {
+        if (wgfRadioElement && wgfRadioElement.checked) {
+            if (!wgfBtnElement) {
+                appendWgfBtn(placeOrderBtn);
+                return;
+            }
+            placeOrderBtn.style.display = 'none';
+            wgfBtnElement.style.display = 'block';
+        }
         return;
     }
 
 
-    placeOrderBtn.closest("div").append(wgfBtn);
-    const wgfBtnElement = document.querySelector("#wgf_checkout_button");
-    const radioSelected = document.querySelector('input[name="radio-control-wc-payment-method-options"]:checked');
-
-    radioSelected ? ShowHideButtons(radioSelected, placeOrderBtn, wgfBtnElement) : setTimeout(OnLoadFn, 50);
-}
-
-const ShowHideButtons = function (radioSelected, placeOrderBtn, wgfBtnElement) {
-    if(radioSelected && "value" in radioSelected && radioSelected.value === settings.payment_method_id) {
-        placeOrderBtn.style.display = 'none';
-        wgfBtnElement.style.display = 'block';
+    if (wgfRadioElement && wgfRadioElement.checked) {
+        setTimeout(() => {
+            if (!wgfBtnElement) {
+                appendWgfBtn(placeOrderBtn);
+                return;
+            }
+            placeOrderBtn.style.display = 'none';
+            wgfBtnElement.style.display = 'block';
+        }, 1000);
+    } else {
+        placeOrderBtn.style.display = 'block';
+        if (wgfBtnElement) {
+            wgfBtnElement.style.display = 'none';
+        }
     }
+
+    document.addEventListener('input',(e)=> {
+        if(e.target.getAttribute('name') === "radio-control-wc-payment-method-options") {
+            const isWgfActive = e.target.value === settings.payment_method_id;
+            if (isWgfActive) {
+                placeOrderBtn.disabled = true;
+                setTimeout(() => {
+                    placeOrderBtn.disabled = false;
+                    if (placeOrderBtn.style.display !== 'none') {
+                        placeOrderBtn.style.display = 'none';
+                    }
+                    const wgfBtnElement = document.querySelector("#wgf_checkout_button");
+                    if (!wgfBtnElement) {
+                        placeOrderBtn.closest("div").append(wgfBtn);
+                        wgfBtn.style.display = 'block';
+                        return;
+                    }
+                    if (wgfBtnElement.style.display !== 'block') {
+                        wgfBtnElement.style.display = 'block';
+                    }
+                }, 700);
+            } else {
+                const wgfBtnElement = document.querySelector("#wgf_checkout_button");
+                if (wgfBtnElement) {
+                    wgfBtnElement.style.display = 'none';
+                }
+                if (placeOrderBtn.style.display !== 'block') {
+                    placeOrderBtn.style.display = 'block';
+                }
+            }
+        }
+    })
 }
 
 const matrixField = {
@@ -218,7 +258,8 @@ const wgfFetch = () => {
         .then(resp => {
             const wgfBtnElement = document.querySelector("#wgf_checkout_button");
             wgfBtnElement.classList.remove("wgf_checkout_button_disabled");
-            wgfBtnElement.disabled = false;
+            wgfBtnElement.style.pointerEvents = "auto"; // Re-enable clicking
+            wgfBtnElement.removeAttribute("aria-disabled");
 
             let checkWgfErrorsBlockContent = document.getElementById("wgf-errors-block-content");
             if (checkWgfErrorsBlockContent) {

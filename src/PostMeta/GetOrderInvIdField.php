@@ -27,7 +27,7 @@ class GetOrderInvIdField implements ActionableInterface
         $fields[OrderInvIdValueObject::EXTRA_FIELDS_ID] = [
             OrderInvIdValueObject::ORDER_INV_ID_FIELD_ID => [
                 'type' => 'text',
-                'required' => true,
+                'required' => false,
                 'label' => OrderInvIdValueObject::ORDER_INV_ID_FIELD_LABEL,
             ],
         ];
