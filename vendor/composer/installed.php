@@ -1,8 +1,8 @@
 <?php return array(
     'root' => array(
         'name' => 'wegetfinancing/woocommerce-checkout-plugin',
-        'pretty_version' => '1.8.1',
-        'version' => '1.8.1.0',
+        'pretty_version' => '1.9.0',
+        'version' => '1.9.0.0',
         'reference' => null,
         'type' => 'software',
         'install_path' => __DIR__ . '/../../',
@@ -492,8 +492,8 @@
             'dev_requirement' => false,
         ),
         'wegetfinancing/woocommerce-checkout-plugin' => array(
-            'pretty_version' => '1.8.1',
-            'version' => '1.8.1.0',
+            'pretty_version' => '1.9.0',
+            'version' => '1.9.0.0',
             'reference' => null,
             'type' => 'software',
             'install_path' => __DIR__ . '/../../',

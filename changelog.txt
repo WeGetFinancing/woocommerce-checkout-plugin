@@ -79,3 +79,6 @@
 
 = 1.8.1 =
 * Minor fix: JavaScript plugin loaded with the correct version
+
+= 1.9.0 =
+* Enhanced javascript compatibility with other checkout plugin in Gutenberg and legacy
