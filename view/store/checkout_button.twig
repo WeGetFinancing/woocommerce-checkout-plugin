@@ -166,16 +166,14 @@
 
                 checkoutButton.hide();
 
-                const wgfCheckoutBtn = jQuery('#wgf_checkout_button');
-
-                if (wgfCheckoutBtn.length <= 0) {
+                if (jQuery('#wgf_checkout_button').length <= 0) {
                     checkoutButton.parent().append(`
                         <a id="wgf_checkout_button"  class="wgf_checkout_button" href="#wgf_checkout">
                             <img src="{{ checkout_button_image_url }}" alt="{{ checkout_button_alt }}" style="max-width: 320px;" class="wgf_checkout_button_img">
                         </a>
                     `);
 
-                    wgfCheckoutBtn.click((e) => {
+                    jQuery('#wgf_checkout_button').click((e) => {
                         wGFCheckoutButtonFunction();
                     })
                 }
