@@ -7,6 +7,7 @@ namespace WeGetFinancing\Checkout\Ajax\Public;
 if (!defined( 'ABSPATH' )) exit;
 
 use Throwable;
+use WC_Product_Variation;
 use WeGetFinancing\Checkout\AbstractActionableWithClient;
 use WeGetFinancing\Checkout\App;
 use WeGetFinancing\Checkout\Exception\AbstractActionableWithClientException;
@@ -364,19 +365,36 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                     $category = $term->name;
                 }
 
-                if (!isset($item['line_subtotal']) || !isset($item['quantity']) ||
-                    $item['quantity'] <= 0 || ($item['line_subtotal'] / $item['quantity']) <= 0) {
-                    continue; // Skip this item
+                if (!isset($item['line_subtotal']) || empty($item['line_subtotal'])) {
+                    $item['line_subtotal'] = 0;
+                }
+                if (!isset($item['line_subtotal_tax']) || empty($item['line_subtotal_tax'])) {
+                    $item['line_subtotal_tax'] = 0;
+                }
+                if (!isset($item['quantity']) || empty($item['quantity'])) {
+                    continue;
+                }
+
+                $name = wp_strip_all_tags($product->get_name());
+                if ('variation' === $product->get_type() && !empty($item['variation_id'])) {
+                    $variation = new WC_Product_Variation($item['variation_id']);
+                    $name .= " - " . wp_strip_all_tags($variation->get_name());
                 }
 
                 $cartItems[] = [
-                    'sku' => true === empty($product->get_sku()) ? 'not_defined' : $product->get_sku(),
-                    'displayName' => $product->get_name(),
+                    'sku' => true === empty($product->get_sku()) ? 'None' : wp_strip_all_tags($product->get_sku()),
+                    'displayName' => $name,
                     'unitPrice' => (string) $item['line_subtotal'] / $item['quantity'],
                     'quantity' => (int) $item['quantity'],
                     'unitTax' => (string) $item['line_subtotal_tax'] / $item['quantity'],
-                    'category' => $category,
+                    'category' => wp_strip_all_tags($category),
                 ];
+            }
+
+            $hash = WC()->cart->get_cart_hash();
+            $txId = time();
+            if (isset($hash) || !empty($hash)) {
+                $txId .= "-" . $hash;
             }
 
             $requestArray = [
@@ -386,7 +404,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 'version' => $this->apiVersion,
                 'email' => $request[GenerateFunnelUrlRequest::BILLING_EMAIL_ID],
                 'phone' => $request[GenerateFunnelUrlRequest::BILLING_PHONE_ID],
-                'merchant_transaction_id' => '**',
+                'merchant_transaction_id' => (string) $txId,
                 'success_url' => '',
                 'failure_url' => '',
                 'postback_url' => PostbackUpdate::getPostbackUpdateUrl(),
