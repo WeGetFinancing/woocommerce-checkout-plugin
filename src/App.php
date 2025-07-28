@@ -21,7 +21,7 @@ class App implements ActionableInterface
     use AddableTrait;
 
     public const ID = 'wegetfinancing';
-    public const PLUGIN_VERSION = '1.9.0';
+    public const PLUGIN_VERSION = '1.9.1';
     public const INTEGRATION_NAME = 'WordPress-WooCommerce';
     public const CONFIG_DIR = 'etc';
     public const DEFAULT_SERVICE_XML_FILE = 'services.xml';
