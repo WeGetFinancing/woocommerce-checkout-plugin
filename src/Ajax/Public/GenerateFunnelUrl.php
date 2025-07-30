@@ -382,7 +382,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 }
 
                 $cartItems[] = [
-                    'sku' => true === empty($product->get_sku()) ? null : wp_strip_all_tags($product->get_sku()),
+                    'sku' => true === empty($product->get_sku()) ? 'null' : wp_strip_all_tags($product->get_sku()),
                     'displayName' => $name,
                     'unitPrice' => (string) $item['line_subtotal'] / $item['quantity'],
                     'quantity' => (int) $item['quantity'],
@@ -398,7 +398,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 'version' => $this->apiVersion,
                 'email' => $request[GenerateFunnelUrlRequest::BILLING_EMAIL_ID],
                 'phone' => $request[GenerateFunnelUrlRequest::BILLING_PHONE_ID],
-                'merchant_transaction_id' => null,
+                'merchant_transaction_id' => 'null',
                 'success_url' => '',
                 'failure_url' => '',
                 'postback_url' => PostbackUpdate::getPostbackUpdateUrl(),

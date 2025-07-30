@@ -89,3 +89,6 @@
 = 1.9.2 =
 * Image on legacy checkout
 * Funnel product data sanitization and compatibility
+
+= 1.9.3 =
+* Null cart hotfix
