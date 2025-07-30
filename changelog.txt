@@ -85,3 +85,7 @@
 
 = 1.9.1 =
 * Hotfix for legacy checkout
+
+= 1.9.2 =
+* Image on legacy checkout
+* Funnel product data sanitization and compatibility
