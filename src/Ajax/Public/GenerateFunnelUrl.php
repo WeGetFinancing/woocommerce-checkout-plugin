@@ -382,19 +382,13 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 }
 
                 $cartItems[] = [
-                    'sku' => true === empty($product->get_sku()) ? 'None' : wp_strip_all_tags($product->get_sku()),
+                    'sku' => true === empty($product->get_sku()) ? null : wp_strip_all_tags($product->get_sku()),
                     'displayName' => $name,
                     'unitPrice' => (string) $item['line_subtotal'] / $item['quantity'],
                     'quantity' => (int) $item['quantity'],
                     'unitTax' => (string) $item['line_subtotal_tax'] / $item['quantity'],
                     'category' => wp_strip_all_tags($category),
                 ];
-            }
-
-            $hash = WC()->cart->get_cart_hash();
-            $txId = time();
-            if (isset($hash) || !empty($hash)) {
-                $txId .= "-" . $hash;
             }
 
             $requestArray = [
@@ -404,7 +398,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 'version' => $this->apiVersion,
                 'email' => $request[GenerateFunnelUrlRequest::BILLING_EMAIL_ID],
                 'phone' => $request[GenerateFunnelUrlRequest::BILLING_PHONE_ID],
-                'merchant_transaction_id' => (string) $txId,
+                'merchant_transaction_id' => null,
                 'success_url' => '',
                 'failure_url' => '',
                 'postback_url' => PostbackUpdate::getPostbackUpdateUrl(),

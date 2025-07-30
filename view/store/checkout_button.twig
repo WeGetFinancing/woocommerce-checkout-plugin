@@ -204,6 +204,23 @@
             return;
         }
 
+        {# Find the label associated with the payment method #}
+        jQuery('label[for*="payment_method_wegetfinancing"]').each(function() {
+            {# Clear existing content #}
+            jQuery(this).empty();
+
+            {# Create the image element #}
+            const wgfLogoImage = jQuery("<img>", {
+                src: "{{ wgf_checkout_logo }}",
+                alt: "Payment Method WeGetFinancing",
+                style: "float: 'left';"
+            });
+
+            {# Append the image to the label #}
+            jQuery(this).append(wgfLogoImage);
+        });
+
+
         {# Check if any payment method is already checked #}
         const checkedPaymentMethod = paymentMethods.filter(':checked');
 
