@@ -26,9 +26,8 @@
 
         <parameter key="app.init_list" type="collection">
             <parameter>addPaymentGateway</parameter>
-            <parameter>getOrderInvIdField</parameter>
-            <parameter>printToCheckoutOrderInvIdField</parameter>
-            <parameter>saveOrUpdateOrderInvIdField</parameter>
+            <parameter>printToCheckoutOrderHiddenFields</parameter>
+            <parameter>saveOrUpdateOrderHiddenFields</parameter>
             <parameter>printToAdminOrderInvIdInField</parameter>
             <parameter>generateFunnelUrl</parameter>
             <parameter>postbackUpdate</parameter>
@@ -52,11 +51,10 @@
         </service>
 
         <service id="addPaymentGateway" class="WeGetFinancing\Checkout\PaymentGateway\AddWeGetFinancingPaymentMethod"/>
-        <service id="getOrderInvIdField" class="WeGetFinancing\Checkout\PostMeta\GetOrderInvIdField"/>
-        <service id="printToCheckoutOrderInvIdField" class="WeGetFinancing\Checkout\PostMeta\PrintToCheckoutOrderInvIdField">
+        <service id="printToCheckoutOrderHiddenFields" class="WeGetFinancing\Checkout\PostMeta\PrintToCheckoutOrderHiddenFields">
             <argument type="service" id="twig"/>
         </service>
-        <service id="saveOrUpdateOrderInvIdField" class="WeGetFinancing\Checkout\PostMeta\SaveOrUpdateOrderInvIdField"/>
+        <service id="saveOrUpdateOrderHiddenFields" class="WeGetFinancing\Checkout\PostMeta\SaveOrUpdateOrderHiddenFields"/>
         <service id="printToAdminOrderInvIdInField" class="WeGetFinancing\Checkout\PostMeta\PrintToAdminOrderInvIdInField">
             <argument type="service" id="twig"/>
         </service>

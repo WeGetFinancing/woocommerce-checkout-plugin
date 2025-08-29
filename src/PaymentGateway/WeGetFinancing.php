@@ -16,6 +16,7 @@ use WeGetFinancing\Checkout\Ajax\Public\GenerateFunnelUrl;
 use WeGetFinancing\Checkout\App;
 use WeGetFinancing\Checkout\Exception\PaymentGateway\WeGetFinancingException;
 use WeGetFinancing\Checkout\Repository\GetOptionRepositoryTrait;
+use WeGetFinancing\Checkout\ScheduledEvent\AutoCompleteOrder;
 use WeGetFinancing\Checkout\Service\Logger;
 use WeGetFinancing\Checkout\ValueObject\GenerateFunnelUrlRequest;
 use WeGetFinancing\Checkout\ValueObject\PostMeta\FieldVO;
@@ -124,7 +125,7 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                     'title' => WeGetFinancingValueObject::ORDER_HOLD_PERIOD_FIELD_TITLE,
                     'type' => 'text',
                     'description' => WeGetFinancingValueObject::ORDER_HOLD_PERIOD_FIELD_LABEL,
-                    'default' => '',
+                    'default' => WeGetFinancingValueObject::ORDER_HOLD_PERIOD_FIELD_DEFAULT,
                     'desc_tip' => true,
                 ],
                 WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_ID => [
@@ -308,6 +309,14 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
             wc_reduce_stock_levels($order->get_id());
 
             WC()->cart->empty_cart();
+
+            $holdOrderHours = (int) self::getOption(WeGetFinancingValueObject::ORDER_HOLD_PERIOD_FIELD_ID);
+
+            wp_schedule_single_event(
+                time() + $holdOrderHours * 60 * 60, // time is in seconds
+                AutoCompleteOrder::INIT_NAME,
+                [ $order_id ],
+            );
 
             return [
                 'result' => WeGetFinancingValueObject::PROCESS_PAYMENT_SUCCESS_ID,

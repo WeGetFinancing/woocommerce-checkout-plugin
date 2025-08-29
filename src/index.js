@@ -288,6 +288,11 @@ const wgfFetch = () => {
 }
 
 const WgfUnSuccess = (resp) => {
+    if (resp && typeof resp === 'object' && 'message' in resp) {
+        WgfErrorList(resp.message);
+        return;
+    }
+
     if ("violations" in resp) {
         const violations = resp.violations;
         for (let prop in violations) {

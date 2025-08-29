@@ -28,8 +28,12 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
     public const ACTION_NAME = 'generateWeGetFinancingFunnelAction';
     public const INIT_NAME = 'wp_ajax_nopriv_' . self::ACTION_NAME;
     public const FUNCTION_NAME = 'execute';
-    public const REMOTE_SERVER_ERROR_HTML_MESSAGE = '<strong>Remote server error</strong>';
-    public const INTERNAL_SERVER_ERROR_HTML_MESSAGE = '<strong>Internal server error</strong>';
+    public const REMOTE_SERVER_ERROR_HTML_MESSAGE =
+        "We're having trouble connecting to our partner's service right now. " .
+        "Please try again in a few minutes. <br/>If the issue persists, contact support for assistance";
+    public const INTERNAL_SERVER_ERROR_HTML_MESSAGE =
+        "We're experiencing a problem on our end. Please try again in a few minutes. " .
+        "<br/>If the issue continues, contact support for help.";
     public const GENERATE_FUNNEL_ERROR_TABLE = [
         'general' => [
             'fields' => [GeneralDataRequest::DATA],
@@ -137,10 +141,8 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
             $violations = [];
             foreach ($exception->getViolations() as $violation) {
                 if (false === array_key_exists($violation['field'], self::GENERATE_FUNNEL_ERROR_TABLE)) {
-                    $violations['generic'] = [
-                        'fields' => [],
-                        'messages' => self::INTERNAL_SERVER_ERROR_HTML_MESSAGE,
-                    ];
+                    $violations['generic']['fields'] = ['generic'];
+                    $violations['generic']['messages'] = [self::INTERNAL_SERVER_ERROR_HTML_MESSAGE];
                     continue;
                 }
                 $violations[$violation['field']]['fields'] =
@@ -382,7 +384,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 }
 
                 $cartItems[] = [
-                    'sku' => true === empty($product->get_sku()) ? null : wp_strip_all_tags($product->get_sku()),
+                    'sku' => true === empty($product->get_sku()) ? 'none' : wp_strip_all_tags($product->get_sku()),
                     'displayName' => $name,
                     'unitPrice' => (string) $item['line_subtotal'] / $item['quantity'],
                     'quantity' => (int) $item['quantity'],
@@ -398,7 +400,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 'version' => $this->apiVersion,
                 'email' => $request[GenerateFunnelUrlRequest::BILLING_EMAIL_ID],
                 'phone' => $request[GenerateFunnelUrlRequest::BILLING_PHONE_ID],
-                'merchant_transaction_id' => null,
+                'merchant_transaction_id' => WC()->cart->get_cart_hash(),
                 'success_url' => '',
                 'failure_url' => '',
                 'postback_url' => PostbackUpdate::getPostbackUpdateUrl(),

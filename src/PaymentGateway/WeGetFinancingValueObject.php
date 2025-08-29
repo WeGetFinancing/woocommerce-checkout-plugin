@@ -140,4 +140,5 @@ class WeGetFinancingValueObject
     public const ORDER_HOLD_PERIOD_FIELD_TITLE = "Order Hold Period";
     public const ORDER_HOLD_PERIOD_FIELD_LABEL =
         "The period of time in hours that the order will be held, default 48hours.";
+    public const ORDER_HOLD_PERIOD_FIELD_DEFAULT = "48";
 }
