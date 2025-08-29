@@ -16,6 +16,8 @@ use WeGetFinancing\Checkout\Ajax\Public\GetOrderStatusByOrderId;
 use WeGetFinancing\Checkout\App;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
+use WeGetFinancing\Checkout\ValueObject\PostMeta\OrderIsWgfFieldVO;
+use WeGetFinancing\Checkout\ValueObject\PostMeta\OrderWgfHrefFieldVO;
 
 class CheckoutThankyou implements ActionableInterface
 {
@@ -48,10 +50,14 @@ class CheckoutThankyou implements ActionableInterface
             true
         );
 
+        $isWgf = get_post_meta($order_id, OrderIsWgfFieldVO::META, true);
+        $wgfHref = get_post_meta($order_id, OrderWgfHrefFieldVO::META, true);
+
         echo $this->twig->render(
             self::PAGE_TEMPLATE,
             [
-                'wgf_href' => get_post_meta($order_id, 'wgf_href', true),
+                'order_is_wgf_value' => ($isWgf === false) ? '' : $isWgf,
+                'order_wgf_href_value' => ($wgfHref === false) ? '' : $wgfHref,
                 'order_id' => $order_id,
                 'nonce' => wp_create_nonce(GetOrderStatusByOrderId::NONCE),
                 'ajax_url' => admin_url('admin-ajax.php'),

@@ -10,13 +10,17 @@ use Exception;
 
 class AbstractActionableWithClientException extends Exception
 {
-    public const VALIDATION_ERROR_CODE = 1;
+    public const GENERATE_CLIENT_ERROR_CODE = 1;
+    public const GENERATE_CLIENT_ERROR_MESSAGE = 'Application not configured, please contact support.';
+    public const GENERATE_CLIENT_ERROR_MESSAGE_GRACEFUL = 'WeGetFinancing is currently unavailable. ' .
+        'We apologize for the inconvenience. The incident has been reported to our technical team.';
+    public const VALIDATION_ERROR_CODE = 2;
     public const VALIDATION_ERROR_MESSAGE = 'Impossible generate WeGetFinancing client with provided data.';
-    public const VALIDATION_JSON_CODE = 2;
-    public const GENERATE_CLIENT_UNEXPECTED_ERROR_CODE = 3;
+    public const VALIDATION_JSON_CODE = 3;
+    public const GENERATE_CLIENT_UNEXPECTED_ERROR_CODE = 4;
     public const GENERATE_CLIENT_UNEXPECTED_ERROR_MESSAGE = 'Unexpected error connecting to WeGetFinancing network.';
     public const GRACEFUL_ERROR_MESSAGE = 'Unexpected network error';
-    public const REMOTE_ERROR_CODE = 3;
+    public const REMOTE_ERROR_CODE = 5;
     public const REMOTE_ERROR_MESSAGE = 'Remote error requesting new loan url.';
-    public const REMOTE_ERROR_REQUEST_CODE = 4;
+    public const REMOTE_ERROR_REQUEST_CODE = 5;
 }

@@ -28,22 +28,7 @@ abstract class AbstractActionableWithClient implements ActionableInterface
     protected function generateClient(): Client
     {
         try {
-            $isSandbox = WeGetFinancing::getOption(WeGetFinancingValueObject::IS_SANDBOX_FIELD_ID);
-            $auth = AuthEntity::make([
-                'username' => WeGetFinancing::getOption(
-                    WeGetFinancingValueObject::USERNAME_FIELD_ID,
-                    ''
-                ),
-                'password'  => WeGetFinancing::getOption(
-                    WeGetFinancingValueObject::PASSWORD_FIELD_ID,
-                ''
-                ),
-                'merchantId' => WeGetFinancing::getOption(
-                    WeGetFinancingValueObject::MERCHANT_ID_FIELD_ID,
-                ''
-                ),
-                'prod' => false === ("yes" === $isSandbox),
-            ]);
+            $auth = AuthEntity::make($this->getClientOptions());
             return Client::Make($auth);
         } catch (EntityValidationException $exception) {
             Logger::log($exception);
@@ -61,6 +46,48 @@ abstract class AbstractActionableWithClient implements ActionableInterface
                 AbstractActionableWithClientException::GENERATE_CLIENT_UNEXPECTED_ERROR_MESSAGE .
                     Logger::getDecorativeData(),
                 AbstractActionableWithClientException::GENERATE_CLIENT_UNEXPECTED_ERROR_CODE
+            );
+        }
+    }
+
+    /**
+     * @throws AbstractActionableWithClientException
+     */
+    protected function getClientOptions(): array
+    {
+        try {
+            $isSandbox = WeGetFinancing::getOption(WeGetFinancingValueObject::IS_SANDBOX_FIELD_ID);
+            $username = WeGetFinancing::getOption(
+                WeGetFinancingValueObject::USERNAME_FIELD_ID,
+                ''
+            );
+            $password = WeGetFinancing::getOption(
+                WeGetFinancingValueObject::PASSWORD_FIELD_ID,
+                ''
+            );
+            $merchantId = WeGetFinancing::getOption(
+                WeGetFinancingValueObject::MERCHANT_ID_FIELD_ID,
+                ''
+            );
+
+            if (empty($username) || empty($password) || empty($merchantId)) {
+                throw new AbstractActionableWithClientException(
+                    AbstractActionableWithClientException::GENERATE_CLIENT_ERROR_MESSAGE . Logger::getDecorativeData(),
+                    AbstractActionableWithClientException::GENERATE_CLIENT_ERROR_CODE
+                );
+            }
+
+            return [
+                'username' => $username,
+                'password'  => $password,
+                'merchantId' => $merchantId,
+                'prod' => false === ("yes" === $isSandbox),
+            ];
+        } catch (AbstractActionableWithClientException $exception) {
+            Logger::log($exception);
+            throw new AbstractActionableWithClientException(
+                AbstractActionableWithClientException::GENERATE_CLIENT_ERROR_MESSAGE_GRACEFUL,
+                AbstractActionableWithClientException::GENERATE_CLIENT_ERROR_CODE
             );
         }
     }

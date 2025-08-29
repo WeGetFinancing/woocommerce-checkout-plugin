@@ -14,10 +14,14 @@ use Twig\Error\SyntaxError;
 use WeGetFinancing\Checkout\ActionableInterface;
 use WeGetFinancing\Checkout\Ajax\Public\GenerateFunnelUrl;
 use WeGetFinancing\Checkout\App;
-use WeGetFinancing\Checkout\PostMeta\OrderInvIdValueObject;
+use WeGetFinancing\Checkout\Exception\PaymentGateway\WeGetFinancingException;
 use WeGetFinancing\Checkout\Repository\GetOptionRepositoryTrait;
 use WeGetFinancing\Checkout\Service\Logger;
 use WeGetFinancing\Checkout\ValueObject\GenerateFunnelUrlRequest;
+use WeGetFinancing\Checkout\ValueObject\PostMeta\FieldVO;
+use WeGetFinancing\Checkout\ValueObject\PostMeta\OrderInvIdFieldVO;
+use WeGetFinancing\Checkout\ValueObject\PostMeta\OrderIsWgfFieldVO;
+use WeGetFinancing\Checkout\ValueObject\PostMeta\OrderWgfHrefFieldVO;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 
 class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
@@ -113,6 +117,13 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                     'title' => WeGetFinancingValueObject::MERCHANT_ID_FIELD_TITLE,
                     'type' => 'text',
                     'description' => WeGetFinancingValueObject::MERCHANT_ID_FIELD_LABEL,
+                    'default' => '',
+                    'desc_tip' => true,
+                ],
+                WeGetFinancingValueObject::ORDER_HOLD_PERIOD_FIELD_ID => [
+                    'title' => WeGetFinancingValueObject::ORDER_HOLD_PERIOD_FIELD_TITLE,
+                    'type' => 'text',
+                    'description' => WeGetFinancingValueObject::ORDER_HOLD_PERIOD_FIELD_LABEL,
                     'default' => '',
                     'desc_tip' => true,
                 ],
@@ -263,7 +274,13 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                 'checkout_button_alt' => WeGetFinancingValueObject::CHECKOUT_BUTTON_ALT,
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'ajax_action' => GenerateFunnelUrl::ACTION_NAME,
-                'order_inv_id_field_id' => OrderInvIdValueObject::ORDER_INV_ID_FIELD_ID,
+                'order_extra_field_type' => FieldVO::HIDDEN_TYPE,
+                'order_inv_id_id' => OrderInvIdFieldVO::FIELD_ID,
+                'order_inv_id_name' => OrderInvIdFieldVO::FIELD_NAME,
+                'order_wgf_href_id' => OrderWgfHrefFieldVO::FIELD_ID,
+                'order_wgf_href_name' => OrderWgfHrefFieldVO::FIELD_NAME,
+                'order_is_wgf_id' => OrderIsWgfFieldVO::FIELD_ID,
+                'order_is_wgf_name' => OrderIsWgfFieldVO::FIELD_NAME,
                 'error_display_method' => self::getOption(WeGetFinancingValueObject::ERROR_ATTACH_FIELD_ID),
                 'error_display_selector' => htmlspecialchars_decode(
                     self::getOption(WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_ID),
@@ -281,46 +298,94 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
      */
     public function process_payment($order_id): array
     {
-        $this->setOrderInvIdAndHref($order_id);
+        try {
+            $this->setOrderExtraFields($order_id);
 
-        $order = wc_get_order($order_id);
+            $order = wc_get_order($order_id);
 
-        $order->update_status(OrderInternalStatus::PENDING);
+            $order->update_status(OrderInternalStatus::PENDING);
 
-        wc_reduce_stock_levels($order->get_id());
+            wc_reduce_stock_levels($order->get_id());
 
-        WC()->cart->empty_cart();
+            WC()->cart->empty_cart();
 
-        return [
-            'result' => WeGetFinancingValueObject::PROCESS_PAYMENT_SUCCESS_ID,
-            'redirect' => $this->get_return_url($order),
-        ];
+            return [
+                'result' => WeGetFinancingValueObject::PROCESS_PAYMENT_SUCCESS_ID,
+                'redirect' => $this->get_return_url($order),
+            ];
+        } catch (\Throwable $exception) {
+            Logger::log($exception);
+            $message = sprintf(
+                'We couldn’t complete your payment due to an unexpected error. ' .
+                    'No charge was made. Please try again or choose a different payment method. ' .
+                    'If the problem persists, contact support and reference order %s.',
+                (string) $order_id
+            );
+            wc_add_notice($message, 'error');
+            return [
+                'result' => WeGetFinancingValueObject::PROCESS_PAYMENT_FAILURE_ID
+            ];
+        }
     }
 
-    protected function setOrderInvIdAndHref(int $orderId): void
+    /**
+     * @throws WeGetFinancingException
+     */
+    protected function setOrderExtraFields(int $orderId): void
     {
-        if (false === array_key_exists("inv_id", $_POST)) {
-            Logger::log(new \Exception("Payment process error: Inv Id not set for order id " . $orderId));
-            return;
+        $orderExtraFields = [
+            [
+                'name' => OrderInvIdFieldVO::FIELD_NAME,
+                'meta' => OrderInvIdFieldVO::META,
+            ],
+            [
+                'name' => OrderWgfHrefFieldVO::FIELD_NAME,
+                'meta' => OrderWgfHrefFieldVO::META,
+            ],
+            [
+                'name' => OrderIsWgfFieldVO::FIELD_NAME,
+                'meta' => OrderIsWgfFieldVO::META,
+            ],
+        ];
+        foreach ($orderExtraFields as $orderExtraField) {
+            $value = $this->getSanitizedOrderExtraFieldValue($orderExtraField['name'], $orderId);
+            $this->setOrderExtraFieldMeta($orderId, $orderExtraField['meta'], $value);
         }
-        $invId = sanitize_text_field($_POST["inv_id"]);
-        $updateInvId = update_post_meta($orderId, OrderInvIdValueObject::ORDER_META, $invId);
-        if (false === $updateInvId) {
-            Logger::log(new \Exception(
-                "Payment process error updating Inv Id post meta for order id " . $orderId . " - " . $invId
-            ));
-        }
+    }
 
-        if (false === array_key_exists("wgf_href", $_POST)) {
-            Logger::log(new \Exception("Payment process error: HREF not set for order id " . $orderId));
-            return;
+    /**
+     * @throws WeGetFinancingException
+     */
+    protected function getSanitizedOrderExtraFieldValue(string $fieldName, int $orderId): string
+    {
+        if (false === array_key_exists($fieldName, $_POST)) {
+            throw new WeGetFinancingException(
+                sprintf(
+                    WeGetFinancingException::ORDER_EXTRA_FIELD_NOT_SET_MESSAGE,
+                    $fieldName,
+                    (string) $orderId
+                ),
+                WeGetFinancingException::ORDER_EXTRA_FIELD_NOT_SET_CODE
+            );
         }
-        $href = sanitize_text_field($_POST["wgf_href"]);
-        $updateHref = update_post_meta($orderId, "wgf_href", $href);
-        if (false === $updateHref) {
-            Logger::log(new \Exception(
-                "Payment process error updating HREF post meta for order id " . $orderId . " - " . $href
-            ));
+        return sanitize_text_field($_POST[$fieldName]);
+    }
+
+    /**
+     * @throws WeGetFinancingException
+     */
+    protected function setOrderExtraFieldMeta(int $orderId, string $meta, string $value): void
+    {
+        $result = update_post_meta($orderId, $meta, $value);
+        if (false === $result) {
+            throw new WeGetFinancingException(
+                sprintf(
+                    WeGetFinancingException::UPDATE_ORDER_EXTRA_FIELD_META_ERROR_MESSAGE,
+                    $meta,
+                    (string) $orderId
+                ),
+                WeGetFinancingException::UPDATE_ORDER_EXTRA_FIELD_META_ERROR_CODE
+            );
         }
     }
 

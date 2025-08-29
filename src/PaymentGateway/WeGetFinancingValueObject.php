@@ -30,6 +30,7 @@ class WeGetFinancingValueObject
     public const ON_HOLD_STATUS_ID = OrderInternalStatus::ON_HOLD;
     public const ON_HOLD_STATUS_LABEL = "Awaiting WeGetFinancing payment";
     public const PROCESS_PAYMENT_SUCCESS_ID = "success";
+    public const PROCESS_PAYMENT_FAILURE_ID = "failure";
     public const HANDLE_FUNNEL_SCRIPT = "wgf-checkout-funnel";
     public const CHECKOUT_BUTTON_ALT = "WeGetFinancing Checkout Button";
     public const ERROR_SELECTOR_FIELD_ID = "wgf_error_selector";
@@ -135,4 +136,8 @@ class WeGetFinancingValueObject
         "but we were unable to confirm your order due to an unexpected internal error.</p>" .
         "<p>Our customer service is being alerted and will review your case promptly.</p>" .
         "<p>Please save your order number for future review.</p>";
+    public const ORDER_HOLD_PERIOD_FIELD_ID = "wgf_order_hold_period";
+    public const ORDER_HOLD_PERIOD_FIELD_TITLE = "Order Hold Period";
+    public const ORDER_HOLD_PERIOD_FIELD_LABEL =
+        "The period of time in hours that the order will be held, default 48hours.";
 }

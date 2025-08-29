@@ -14,9 +14,9 @@ use WeGetFinancing\Checkout\ActionableInterface;
 use WeGetFinancing\Checkout\Exception\PostbackUpdateException;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
-use WeGetFinancing\Checkout\PostMeta\OrderInvIdValueObject;
 use WeGetFinancing\Checkout\Service\Logger;
 use WeGetFinancing\Checkout\Service\RequestValidatorUtility;
+use WeGetFinancing\Checkout\ValueObject\PostMeta\OrderInvIdFieldVO;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 use WP_REST_Request;
 
@@ -246,7 +246,7 @@ class PostbackUpdate implements ActionableInterface
     {
         $sql = $this->wpdb->prepare(
             "SELECT post_id FROM {$this->wpdb->prefix}postmeta WHERE meta_key = %s AND meta_value = %s",
-            OrderInvIdValueObject::ORDER_META,
+            OrderInvIdFieldVO::META,
             $invId
         );
 
@@ -275,7 +275,7 @@ class PostbackUpdate implements ActionableInterface
             $orders = wc_get_orders([
                 'meta_query' => [
                     [
-                        'key' => OrderInvIdValueObject::ORDER_META,
+                        'key' => OrderInvIdFieldVO::META,
                         'value' => $invId,
                         'compare' => '='
                     ]

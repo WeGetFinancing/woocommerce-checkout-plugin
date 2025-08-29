@@ -7,10 +7,10 @@ namespace WeGetFinancing\Checkout\PostStatus;
 if (!defined( 'ABSPATH' )) exit;
 
 use DateTime;
-use WeGetFinancing\Checkout\Service\Logger;
 use WeGetFinancing\Checkout\AbstractActionableWithClient;
 use WeGetFinancing\Checkout\Exception\OnOrderStatusChangeToShippedException;
-use WeGetFinancing\Checkout\PostMeta\OrderInvIdValueObject;
+use WeGetFinancing\Checkout\Service\Logger;
+use WeGetFinancing\Checkout\ValueObject\PostMeta\OrderInvIdFieldVO;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 use WeGetFinancing\SDK\Entity\Request\UpdateShippingStatusRequestEntity;
 
@@ -35,7 +35,7 @@ class OnOrderStatusChangeToShipped extends AbstractActionableWithClient
                 return;
             }
 
-            $invId = get_post_meta($order_id, '_' . OrderInvIdValueObject::ORDER_INV_ID_FIELD_ID, true);
+            $invId = get_post_meta($order_id, OrderInvIdFieldVO::META, true);
 
             if (true === empty($invId)) {
                 return;

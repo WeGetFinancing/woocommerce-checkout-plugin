@@ -110,27 +110,38 @@
                         scrollTop: 0
                     }, 5);
                 } else {
-                    let form = checkoutButton.closest("form"),
-                        nodeInvId = document.getElementById('wgf_inv_id'),
-                        nodeHrefElem = document.getElementById('wgf_href');
+                    let form = checkoutButton.closest('form'),
+                        nodeInvId = document.getElementById('{{ order_inv_id_id }}'),
+                        nodeWgfHref = document.getElementById('{{ order_wgf_href_id }}'),
+                        nodeIsWfg = document.getElementById('{{ order_is_wgf_id }}');
 
                     if (!nodeInvId) {
-                        nodeInvId = document.createElement("input");
-                        nodeInvId.id = 'wgf_inv_id';
-                        nodeInvId.name = 'inv_id';
-                        nodeInvId.type = "hidden";
+                        nodeInvId = document.createElement('input');
+                        nodeInvId.id = '{{ order_inv_id_id }}';
+                        nodeInvId.name = '{{ order_inv_id_name }}';
+                        nodeInvId.type = '{{ order_extra_field_type }}';
                         form.append(nodeInvId);
                     }
-                    if (!nodeHrefElem) {
-                        nodeHrefElem = document.createElement("input");
-                        nodeHrefElem.id = 'wgf_href';
-                        nodeHrefElem.name = 'wgf_href';
-                        nodeHrefElem.type = "hidden";
-                        form.append(nodeHrefElem);
+
+                    if (!nodeWgfHref) {
+                        nodeWgfHref = document.createElement('input');
+                        nodeWgfHref.id = '{{ order_wgf_href_id }}';
+                        nodeWgfHref.name = '{{ order_wgf_href_name }}';
+                        nodeWgfHref.type = '{{ order_extra_field_type }}';
+                        form.append(nodeWgfHref);
+                    }
+
+                    if (!nodeIsWfg) {
+                        nodeIsWfg = document.createElement('input');
+                        nodeIsWfg.id = '{{ order_is_wgf_id }}';
+                        nodeIsWfg.name = '{{ order_is_wgf_name }}';
+                        nodeIsWfg.type = '{{ order_extra_field_type }}';
+                        form.append(nodeIsWfg);
                     }
 
                     nodeInvId.value = response.invId;
-                    nodeHrefElem.value = response.href;
+                    nodeWgfHref.value = response.href;
+                    nodeIsWfg.value = 'yes';
                     checkoutButton.click();
                 }
             },
