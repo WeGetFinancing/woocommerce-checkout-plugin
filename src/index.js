@@ -34,7 +34,7 @@ const Content = (props) => {
             const inv_id = (nodeInvId?.value ?? '').trim();
             const wgf_href = (nodeWgfHref?.value ?? '').trim();
             const customDataIsValid = inv_id !== '' && wgf_href !== '';
-            const is_wgf = 'yes';
+            const order_is_wgf = 'yes';
 
             if ( customDataIsValid ) {
                 return {
@@ -43,7 +43,7 @@ const Content = (props) => {
                         paymentMethodData: {
                             inv_id,
                             wgf_href,
-                            is_wgf,
+                            order_is_wgf,
                         },
                     },
                 };
