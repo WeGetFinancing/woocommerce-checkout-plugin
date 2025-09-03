@@ -64,7 +64,7 @@ class OnOrderStatusChangeToShipped extends AbstractActionableWithClient
 
             Logger::log(new OnOrderStatusChangeToShippedException(
                 OnOrderStatusChangeToShippedException::REMOTE_ERROR_MESSAGE . $response->getCode() .
-                    print_r($response->getData(), true) . Logger::getDecorativeData(),
+                    json_encode($response->getData()) . Logger::getDecorativeData(),
                 OnOrderStatusChangeToShippedException::REMOTE_ERROR_CODE
             ));
         }
