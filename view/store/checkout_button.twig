@@ -225,7 +225,7 @@
                 }
                 wgf_enableCheckoutButton();
             }
-        }, 700);
+        }, 600);
     }
 
     jQuery(document).ready(function() {
@@ -272,14 +272,24 @@
         }
 
         {# Set up the change event handler for payment methods #}
-        jQuery(document).on("change", "form[name='checkout'] input[name='payment_method']", function(){
+        jQuery(document).on("change", "form[name='checkout'] input[name='payment_method']", function() {
             if ( 0 === jQuery('form[name="checkout"] input[name="payment_method"]').filter( ':checked' ).size() ) {
                 jQuery(this).prop('checked', true).attr( 'checked', 'checked' );
             }
             wGF_WC_Gateway();
         });
 
+
         {# Call the gateway function #}
         wGF_WC_Gateway();
+
+        const eventSelectors = 'updated_cart_totals wc_fragments_refreshed wc_fragment_refresh wc_fragments_loaded updated_checkout ppcp_block_ready ppcp_checkout_updated wc_update_cart wc_cart_emptied wpg_change_method fkwcs_express_button_init';
+        const checkoutSelectors = 'updated_cart_totals wc_fragments_refreshed wc_fragments_loaded updated_checkout ppcp_cc_block_ready ppcp_cc_checkout_updated update_checkout';
+        jQuery(document.body).on(eventSelectors, (event) => {
+            wGF_WC_Gateway();
+        });
+        jQuery(document.body).on(checkoutSelectors, () => {
+            wGF_WC_Gateway();
+        });
     });
 </script>
