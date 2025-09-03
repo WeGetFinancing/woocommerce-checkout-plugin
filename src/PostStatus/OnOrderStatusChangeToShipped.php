@@ -30,43 +30,54 @@ class OnOrderStatusChangeToShipped extends AbstractActionableWithClient
     public function execute($order_id, $old_status, $new_status): void
     {
         if ('shipped' === $new_status) {
-            $hasAlreadyShipped = get_post_meta($order_id, self::STATUS_ALREADY_SHIPPED_META, true);
-            if ('yes' === $hasAlreadyShipped) {
-                return;
+            try {
+                $hasAlreadyShipped = get_post_meta($order_id, self::STATUS_ALREADY_SHIPPED_META, true);
+                if ('yes' === $hasAlreadyShipped) {
+                    return;
+                }
+
+                $invId = get_post_meta($order_id, OrderInvIdFieldVO::META, true);
+
+                if (true === empty($invId)) {
+                    return;
+                }
+
+                $client = $this->generateClient();
+
+                $request = [
+                    'shippingStatus' => UpdateShippingStatusRequestEntity::STATUS_SHIPPED,
+                    'trackingId' => '-',
+                    'trackingCompany' => '-',
+                    'deliveryDate' => (new DateTime())->modify('+1 day')->format('Y-m-d'),
+                    'invId' => $invId,
+                ];
+
+                $updateRequest = UpdateShippingStatusRequestEntity::make($request);
+
+                $response = $client->updateStatus($updateRequest);
+
+                if (true === $response->getIsSuccess()) {
+                    update_post_meta(
+                        $order_id,
+                        self::STATUS_ALREADY_SHIPPED_META,
+                        'yes'
+                    );
+                    return;
+                }
+
+                Logger::log(new OnOrderStatusChangeToShippedException(
+                    sprintf(
+                        OnOrderStatusChangeToShippedException::REMOTE_ERROR_MESSAGE,
+                        $response->getCode(),
+                        json_encode($request),
+                        json_encode($response->getData())
+                    ) . Logger::getDecorativeData(),
+                    OnOrderStatusChangeToShippedException::REMOTE_ERROR_CODE
+                ));
+            } catch (\Throwable $exception) {
+                Logger::log($exception);
             }
 
-            $invId = get_post_meta($order_id, OrderInvIdFieldVO::META, true);
-
-            if (true === empty($invId)) {
-                return;
-            }
-
-            $client = $this->generateClient();
-
-            $updateRequest = UpdateShippingStatusRequestEntity::make([
-                'shippingStatus' => UpdateShippingStatusRequestEntity::STATUS_SHIPPED,
-                'trackingId' => '-',
-                'trackingCompany' => '-',
-                'deliveryDate' => (new DateTime())->modify('+1 day')->format('Y-m-d'),
-                'invId' => $invId,
-            ]);
-
-            $response = $client->updateStatus($updateRequest);
-
-            if (true === $response->getIsSuccess()) {
-                update_post_meta(
-                    $order_id,
-                    self::STATUS_ALREADY_SHIPPED_META,
-                    'yes'
-                );
-                return;
-            }
-
-            Logger::log(new OnOrderStatusChangeToShippedException(
-                OnOrderStatusChangeToShippedException::REMOTE_ERROR_MESSAGE . $response->getCode() .
-                    json_encode($response->getData()) . Logger::getDecorativeData(),
-                OnOrderStatusChangeToShippedException::REMOTE_ERROR_CODE
-            ));
         }
     }
 }
