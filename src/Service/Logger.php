@@ -9,7 +9,7 @@ if (!defined( 'ABSPATH' )) exit;
 use Throwable;
 use WeGetFinancing\Checkout\App;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing;
-use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
+use WeGetFinancing\Checkout\ValueObject\PaymentGateway\WeGetFinancingVO;
 use function Sentry\captureException;
 use function Sentry\init;
 
@@ -22,7 +22,7 @@ class Logger
         self::wpLog($exception);
         if (
             "yes" === WeGetFinancing::getOption(
-            WeGetFinancingValueObject::IS_SENTRY_FIELD_ID,
+            WeGetFinancingVO::IS_SENTRY_FIELD_ID,
             "yes"
             )
         ) {

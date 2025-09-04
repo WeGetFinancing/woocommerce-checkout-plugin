@@ -6,13 +6,13 @@ namespace WeGetFinancing\Checkout;
 
 if (!defined( 'ABSPATH' )) exit;
 
-use  WeGetFinancing\Checkout\Service\Logger;
 use WeGetFinancing\Checkout\Exception\AbstractActionableWithClientException;
 use WeGetFinancing\Checkout\Exception\WpEntityValidationException;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing;
-use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
+use WeGetFinancing\Checkout\Service\Logger;
 use WeGetFinancing\Checkout\Service\RequestValidatorUtility;
 use WeGetFinancing\Checkout\ValueObject\GeneralDataRequest;
+use WeGetFinancing\Checkout\ValueObject\PaymentGateway\WeGetFinancingVO;
 use WeGetFinancing\SDK\Client;
 use WeGetFinancing\SDK\Entity\AuthEntity;
 use WeGetFinancing\SDK\Exception\EntityValidationException;
@@ -56,17 +56,17 @@ abstract class AbstractActionableWithClient implements ActionableInterface
     protected function getClientOptions(): array
     {
         try {
-            $isSandbox = WeGetFinancing::getOption(WeGetFinancingValueObject::IS_SANDBOX_FIELD_ID);
+            $isSandbox = WeGetFinancing::getOption(WeGetFinancingVO::IS_SANDBOX_FIELD_ID);
             $username = WeGetFinancing::getOption(
-                WeGetFinancingValueObject::USERNAME_FIELD_ID,
+                WeGetFinancingVO::USERNAME_FIELD_ID,
                 ''
             );
             $password = WeGetFinancing::getOption(
-                WeGetFinancingValueObject::PASSWORD_FIELD_ID,
+                WeGetFinancingVO::PASSWORD_FIELD_ID,
                 ''
             );
             $merchantId = WeGetFinancing::getOption(
-                WeGetFinancingValueObject::MERCHANT_ID_FIELD_ID,
+                WeGetFinancingVO::MERCHANT_ID_FIELD_ID,
                 ''
             );
 

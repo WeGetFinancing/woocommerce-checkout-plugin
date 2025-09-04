@@ -11,7 +11,7 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use WeGetFinancing\Checkout\ActionableInterface;
-use WeGetFinancing\Checkout\ValueObject\PostMeta\FieldVO;
+use WeGetFinancing\Checkout\ValueObject\FieldVO;
 use WeGetFinancing\Checkout\ValueObject\PostMeta\OrderInvIdFieldVO;
 use WeGetFinancing\Checkout\ValueObject\PostMeta\OrderIsWgfFieldVO;
 use WeGetFinancing\Checkout\ValueObject\PostMeta\OrderWgfHrefFieldVO;

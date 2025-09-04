@@ -12,11 +12,11 @@ use WeGetFinancing\Checkout\AbstractActionableWithClient;
 use WeGetFinancing\Checkout\App;
 use WeGetFinancing\Checkout\Exception\AbstractActionableWithClientException;
 use WeGetFinancing\Checkout\Exception\GenerateFunnelUrlException;
-use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
 use WeGetFinancing\Checkout\Service\Logger;
 use WeGetFinancing\Checkout\Service\RequestValidatorUtility;
 use WeGetFinancing\Checkout\ValueObject\GeneralDataRequest;
 use WeGetFinancing\Checkout\ValueObject\GenerateFunnelUrlRequest;
+use WeGetFinancing\Checkout\ValueObject\PaymentGateway\WeGetFinancingVO;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 use WeGetFinancing\SDK\Entity\Request\LoanRequestEntity;
 use WeGetFinancing\SDK\Exception\EntityValidationException;
@@ -88,7 +88,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
     public function execute(): void
     {
         try {
-            check_ajax_referer(WeGetFinancingValueObject::NONCE);
+            check_ajax_referer(WeGetFinancingVO::NONCE);
 
             $client = $this->generateClient();
             $request = $this->getRequest();

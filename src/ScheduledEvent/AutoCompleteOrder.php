@@ -26,7 +26,7 @@ class AutoCompleteOrder implements ActionableInterface
     {
         try {
             $order = wc_get_order($orderId);
-            if (!($order instanceof \WC_Order)) {
+            if (!($order instanceof WC_Order)) {
                 throw new AutoCompleteOrderException(
                     sprintf(
                         AutoCompleteOrderException::ORDER_NOT_FOUND_MESSAGE,
@@ -35,8 +35,6 @@ class AutoCompleteOrder implements ActionableInterface
                     AutoCompleteOrderException::ORDER_NOT_FOUND_CODE
                 );
             }
-
-            wc_increase_stock_levels($order);
 
             if( OrderInternalStatus::PENDING === $order->get_status() ) {
                 $order->update_status(

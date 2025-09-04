@@ -9,10 +9,10 @@ if (!defined( 'ABSPATH' )) exit;
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
 use WeGetFinancing\Checkout\Ajax\Public\GenerateFunnelUrl;
 use WeGetFinancing\Checkout\App;
+use WeGetFinancing\Checkout\ValueObject\FieldVO;
 use WeGetFinancing\Checkout\ValueObject\GenerateFunnelUrlRequest;
-use WeGetFinancing\Checkout\ValueObject\PostMeta\FieldVO;
+use WeGetFinancing\Checkout\ValueObject\PaymentGateway\WeGetFinancingVO;
 use WeGetFinancing\Checkout\ValueObject\PostMeta\OrderInvIdFieldVO;
-use WeGetFinancing\Checkout\ValueObject\PostMeta\OrderIsWgfFieldVO;
 use WeGetFinancing\Checkout\ValueObject\PostMeta\OrderWgfHrefFieldVO;
 
 final class WeGetFinancingBlockSupport extends AbstractPaymentMethodType
@@ -64,11 +64,11 @@ final class WeGetFinancingBlockSupport extends AbstractPaymentMethodType
             'description' => WeGetFinancing::DESCRIPTION,
             'checkout_logo_image_url' => $GLOBALS[App::ID][App::CHECKOUT_LOGO_URL],
             'checkout_button_image_url' => $GLOBALS[App::ID][App::CHECKOUT_BUTTON_URL],
-            'checkout_button_alt' => WeGetFinancingValueObject::CHECKOUT_BUTTON_ALT,
+            'checkout_button_alt' => WeGetFinancingVO::CHECKOUT_BUTTON_ALT,
             'supports' => WeGetFinancing::SUPPORTS,
             'ajax_action' => GenerateFunnelUrl::ACTION_NAME,
             'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce(WeGetFinancingValueObject::NONCE),
+            'nonce' => wp_create_nonce(WeGetFinancingVO::NONCE),
             'order_extra_field_type' => FieldVO::HIDDEN_TYPE,
             'order_inv_id_id' => OrderInvIdFieldVO::FIELD_ID,
             'order_inv_id_name' => OrderInvIdFieldVO::FIELD_NAME,

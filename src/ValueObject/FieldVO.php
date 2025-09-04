@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace WeGetFinancing\Checkout\ValueObject\PostMeta;
+namespace WeGetFinancing\Checkout\ValueObject;
 
 if (!defined( 'ABSPATH' )) exit;
 
 class FieldVO
 {
     public const TEXT_TYPE = 'text';
+    public const PASSWORD_TYPE = 'password';
     public const HIDDEN_TYPE = 'hidden';
     public const TEXTAREA_TYPE = 'textarea';
     public const SELECT_TYPE = 'select';
