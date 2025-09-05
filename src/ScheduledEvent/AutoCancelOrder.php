@@ -36,9 +36,7 @@ class AutoCancelOrder implements ActionableInterface
                 );
             }
 
-            $order->add_order_note("Called WGF AutoCancelOrder for status: " . $order->get_status(), false);
-
-            if( OrderInternalStatus::PENDING === $order->get_status() ) {
+            if( OrderInternalStatus::PENDING === "wc-" . $order->get_status() ) {
                 $order->update_status(
                     OrderInternalStatus::CANCELLED,
                     'Order auto-canceled by scheduled event due to expiration.'
