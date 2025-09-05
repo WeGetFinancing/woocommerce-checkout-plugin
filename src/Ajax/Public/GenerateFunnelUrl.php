@@ -383,12 +383,14 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                     $name .= " - " . wp_strip_all_tags($variation->get_name());
                 }
 
+                $unitTax = $item['line_subtotal_tax'] / $item['quantity'];
+
                 $cartItems[] = [
                     'sku' => true === empty($product->get_sku()) ? 'none' : wp_strip_all_tags($product->get_sku()),
                     'displayName' => $name,
-                    'unitPrice' => (string) $item['line_subtotal'] / $item['quantity'],
+                    'unitPrice' => (string) ($unitTax + ($item['line_subtotal'] / $item['quantity'])) ,
                     'quantity' => (int) $item['quantity'],
-                    'unitTax' => (string) $item['line_subtotal_tax'] / $item['quantity'],
+                    'unitTax' => (string) $unitTax,
                     'category' => wp_strip_all_tags($category),
                 ];
             }
