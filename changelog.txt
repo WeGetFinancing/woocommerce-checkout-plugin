@@ -89,3 +89,13 @@
 = 1.9.2 =
 * Image on legacy checkout
 * Funnel product data sanitization and compatibility
+
+= 1.9.3 =
+* Null cart hotfi
+
+= 1.10.0 =
+* Added restocking when an order is canceled
+* Added restocking if an order is not completed within a configurable time period
+* Improved process payment behavior
+* Improved legacy and block JavaScript checkout compatibility
+* Improved thank-you page behavior

@@ -59,6 +59,7 @@ echo -e "${YELLOW}🗑️  Step 8: Removing var/wp contents...${NC}"
 if [ -d "trunk/var/wp" ]; then
     echo -e "${RED}   Removing contents of trunk/var/wp/...${NC}"
     rm -rf trunk/var/wp/*
+    rm -rf trunk/var/wp/.well-known
     echo -e "${GREEN}   var/wp contents removed${NC}"
 else
     echo -e "${BLUE}   No trunk/var/wp directory found${NC}"

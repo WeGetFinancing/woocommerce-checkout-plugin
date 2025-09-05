@@ -52,9 +52,9 @@ class WeGetFinancingVO
     public const MERCHANT_ID_FIELD_DEFAULT = '';
 
     public const IS_ORDER_AUTO_COMPLETE_FIELD_ID = "wgf_is_order_auto_complete_id";
-    public const IS_ORDER_AUTO_COMPLETE_FIELD_TITLE = "Activate Auto Complete Order";
+    public const IS_ORDER_AUTO_COMPLETE_FIELD_TITLE = "Activate Auto Cancel Order";
     public const IS_ORDER_AUTO_COMPLETE_FIELD_TYPE = FieldVO::CHECKBOX_TYPE;
-    public const IS_ORDER_AUTO_COMPLETE_FIELD_LABEL = "When enabled, the order will be automatically completed if " .
+    public const IS_ORDER_AUTO_COMPLETE_FIELD_LABEL = "When enabled, the order will be automatically cancelled if " .
         "the payment is not successful within the time specified by the Order Hold Period.";
     public const IS_ORDER_AUTO_COMPLETE_FIELD_DEFAULT = YesNoVO::NO_VALUE;
 
@@ -62,7 +62,7 @@ class WeGetFinancingVO
     public const ORDER_HOLD_PERIOD_FIELD_TITLE = "Order Hold Period";
     public const ORDER_HOLD_PERIOD_FIELD_TYPE = FieldVO::TEXT_TYPE;
     public const ORDER_HOLD_PERIOD_FIELD_LABEL =
-        "The period of time in hours that the order will be held, default 48hours.";
+        "The period of time in hours that the order will be held, default 48 hours.";
     public const ORDER_HOLD_PERIOD_FIELD_DEFAULT = "48";
 
     public const ERROR_SELECTOR_FIELD_ID = "wgf_error_selector";
