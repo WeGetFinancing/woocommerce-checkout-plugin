@@ -10,11 +10,11 @@ use WeGetFinancing\Checkout\Service\Logger;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 
 
-class AutoCompleteOrder implements ActionableInterface
+class AutoCancelOrder implements ActionableInterface
 {
     use AddableTrait;
 
-    public const INIT_NAME = 'wegetfinancing_auto_complete_order';
+    public const INIT_NAME = 'wegetfinancing_auto_cancel_order';
     public const FUNCTION_NAME = 'execute';
 
     public function init(): void
@@ -35,6 +35,8 @@ class AutoCompleteOrder implements ActionableInterface
                     AutoCompleteOrderException::ORDER_NOT_FOUND_CODE
                 );
             }
+
+            $order->add_order_note("Called WGF AutoCancelOrder for order id: " . $orderId, false);
 
             if( OrderInternalStatus::PENDING === $order->get_status() ) {
                 $order->update_status(

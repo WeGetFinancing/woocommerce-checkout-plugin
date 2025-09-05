@@ -17,7 +17,7 @@ use WeGetFinancing\Checkout\Ajax\Public\GenerateFunnelUrl;
 use WeGetFinancing\Checkout\App;
 use WeGetFinancing\Checkout\Exception\PaymentGateway\WeGetFinancingException;
 use WeGetFinancing\Checkout\Repository\GetOptionRepositoryTrait;
-use WeGetFinancing\Checkout\ScheduledEvent\AutoCompleteOrder;
+use WeGetFinancing\Checkout\ScheduledEvent\AutoCancelOrder;
 use WeGetFinancing\Checkout\Service\Logger;
 use WeGetFinancing\Checkout\ValueObject\FieldVO;
 use WeGetFinancing\Checkout\ValueObject\GenerateFunnelUrlRequest;
@@ -335,8 +335,8 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                 $holdOrderHours = (int) self::getOption(WeGetFinancingVO::ORDER_HOLD_PERIOD_FIELD_ID);
 
                 wp_schedule_single_event(
-                    time() + $holdOrderHours * 60 * 60, // time is in seconds
-                    AutoCompleteOrder::INIT_NAME,
+                    time() + $holdOrderHours * 60 ,// todo: remove the comment after the test!!!!* 60, // time is in seconds
+                    AutoCancelOrder::INIT_NAME,
                     [ $order_id ],
                 );
 
