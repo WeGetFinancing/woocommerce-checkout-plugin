@@ -37,6 +37,7 @@ class AutoCancelOrder implements ActionableInterface
             }
 
             if( OrderInternalStatus::PENDING === "wc-" . $order->get_status() ) {
+                wc_increase_stock_levels($order);
                 $order->update_status(
                     OrderInternalStatus::CANCELLED,
                     'Order auto-canceled by scheduled event due to expiration.'

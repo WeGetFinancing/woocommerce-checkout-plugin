@@ -97,6 +97,9 @@ class PostbackUpdate implements ActionableInterface
             if (self::WC_REFUNDED_STATUS === $status) {
                 $this->refundOrder($order, $raw);
             } else {
+                if (self::WC_CANCELLED_STATUS === $status) {
+                    wc_increase_stock_levels($order);
+                }
                 $order->update_status($status);
             }
 
