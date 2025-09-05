@@ -36,7 +36,7 @@ class AutoCancelOrder implements ActionableInterface
                 );
             }
 
-            $order->add_order_note("Called WGF AutoCancelOrder for order id: " . $orderId, false);
+            $order->add_order_note("Called WGF AutoCancelOrder for status: " . $order->get_status(), false);
 
             if( OrderInternalStatus::PENDING === $order->get_status() ) {
                 $order->update_status(
