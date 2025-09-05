@@ -335,7 +335,7 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                 $holdOrderHours = (int) self::getOption(WeGetFinancingVO::ORDER_HOLD_PERIOD_FIELD_ID);
 
                 wp_schedule_single_event(
-                    time() + $holdOrderHours * 60 * 5,// todo: put back after the test!!!!* 60, // time is in seconds
+                    time() + $holdOrderHours * 60 * 60, // time is in seconds
                     AutoCancelOrder::INIT_NAME,
                     [ $order_id ],
                 );
