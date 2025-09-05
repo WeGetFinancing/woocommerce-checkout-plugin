@@ -40,7 +40,7 @@ class AutoCancelOrder implements ActionableInterface
                 wc_increase_stock_levels($order);
                 $order->update_status(
                     OrderInternalStatus::CANCELLED,
-                    'Order auto-canceled by scheduled event due to expiration.'
+                    'Expired holding period.'
                 );
             }
         } catch (\Throwable $exception) {
