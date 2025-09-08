@@ -7,16 +7,11 @@ namespace WeGetFinancing\Checkout\PostMeta;
 if (!defined( 'ABSPATH' )) exit;
 
 use Throwable;
-use Twig\Environment;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
 use WeGetFinancing\Checkout\ActionableInterface;
 use WeGetFinancing\Checkout\Exception\PostMeta\SetWgfOptionsDefaultsException;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing;
 use WeGetFinancing\Checkout\Service\Logger;
 use WeGetFinancing\Checkout\ValueObject\PaymentGateway\WeGetFinancingVO;
-use WeGetFinancing\Checkout\ValueObject\PostMeta\OrderInvIdFieldVO;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 
 class SetWgfOptionsDefaults implements ActionableInterface

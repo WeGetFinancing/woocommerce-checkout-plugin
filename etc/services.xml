@@ -63,7 +63,7 @@
         <service id="generateFunnelUrl" class="WeGetFinancing\Checkout\Ajax\Public\GenerateFunnelUrl">
             <argument>%app.api.version%</argument>
         </service>
-        <service id="setWgfOptionsDefaults" class="WeGetFinancing\PostMeta\SetWgfOptionsDefaults"/>
+        <service id="setWgfOptionsDefaults" class="WeGetFinancing\Checkout\PostMeta\SetWgfOptionsDefaults"/>
         <service id="autoCancelOrder" class="WeGetFinancing\Checkout\ScheduledEvent\AutoCancelOrder"/>
         <service id="postbackUpdate" class="WeGetFinancing\Checkout\Ajax\Public\PostbackUpdate"/>
         <service id="getOrderStatusByOrderId" class="WeGetFinancing\Checkout\Ajax\Public\GetOrderStatusByOrderId"/>
