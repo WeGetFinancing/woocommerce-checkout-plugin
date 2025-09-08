@@ -348,13 +348,15 @@ class PostbackUpdate implements ActionableInterface
         }
         $amount = sanitize_text_field($raw[self::UPDATES_FIELD][self::AMOUNT_FIELD]);
 
+	wc_increase_stock_levels($order);
+
         wc_create_refund([
             'amount'         => wc_format_decimal($amount),
             'reason'         => self::REFUND_REASON,
             'order_id'       => $order->get_id(),
             'line_items'     => [],
             'refund_payment' => false,
-            'restock_items'  => true,
+            'restock_items'  => false,
         ]);
     }
 }
