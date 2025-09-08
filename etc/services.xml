@@ -26,6 +26,7 @@
 
         <parameter key="app.init_list" type="collection">
             <parameter>addPaymentGateway</parameter>
+            <parameter>setWgfOptionsDefaults</parameter>
             <parameter>autoCancelOrder</parameter>
             <parameter>printToCheckoutOrderHiddenFields</parameter>
             <parameter>saveOrUpdateOrderHiddenFields</parameter>
@@ -62,6 +63,7 @@
         <service id="generateFunnelUrl" class="WeGetFinancing\Checkout\Ajax\Public\GenerateFunnelUrl">
             <argument>%app.api.version%</argument>
         </service>
+        <service id="setWgfOptionsDefaults" class="WeGetFinancing\PostMeta\SetWgfOptionsDefaults"/>
         <service id="autoCancelOrder" class="WeGetFinancing\Checkout\ScheduledEvent\AutoCancelOrder"/>
         <service id="postbackUpdate" class="WeGetFinancing\Checkout\Ajax\Public\PostbackUpdate"/>
         <service id="getOrderStatusByOrderId" class="WeGetFinancing\Checkout\Ajax\Public\GetOrderStatusByOrderId"/>

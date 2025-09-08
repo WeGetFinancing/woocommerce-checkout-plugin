@@ -17,24 +17,36 @@ trait GetOptionRepositoryTrait
     }
 
     /**
-     * @param string $optionName
+     * @param string $optionId
      * @param mixed|null $default
      * @return mixed
      */
-    public static function getOption(string $optionName, mixed $default = null): mixed
+    public static function getOption(string $optionId, mixed $default = null): mixed
     {
         $options = self::getOptions();
-        if (false === array_key_exists($optionName, $options)) {
+        if (false === array_key_exists($optionId, $options)) {
             return $default;
         }
-        return $options[$optionName];
+        return $options[$optionId];
     }
 
-    public static function getOptionOrDefault($optionName, $defaultValue): int|string|bool
+    public static function getOptionOrDefault($optionId, $defaultValue): int|string|bool
     {
-        $option = self::getOption($optionName);
+        $option = self::getOption($optionId);
         return true === is_null($option)
             ? $defaultValue
             : $option;
+    }
+
+    public static function setOptions(array $options, $autoload = null): bool
+    {
+        return update_option(self::getOptionsName(), $options, $autoload);
+    }
+
+    public static function setOption(string $optionId, mixed $optionValue, $autoload = null): bool
+    {
+        $options = self::getOptions();
+        $options[$optionId] = $optionValue;
+        return self::setOptions($options, $autoload);
     }
 }
