@@ -17,6 +17,7 @@ use WeGetFinancing\Checkout\Service\Logger;
 use WeGetFinancing\Checkout\Service\RequestValidatorUtility;
 use WeGetFinancing\Checkout\ValueObject\PaymentGateway\WeGetFinancingVO;
 use WeGetFinancing\Checkout\ValueObject\PostMeta\OrderInvIdFieldVO;
+use WeGetFinancing\Checkout\ValueObject\YesNoVO;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 use WP_REST_Request;
 
@@ -348,7 +349,10 @@ class PostbackUpdate implements ActionableInterface
         }
         $amount = sanitize_text_field($raw[self::UPDATES_FIELD][self::AMOUNT_FIELD]);
 
-	wc_increase_stock_levels($order);
+        $isRestockOnRefund = WeGetFinancing::getOption(WeGetFinancingVO::IS_RESTOCK_ON_REFUND_FIELD_ID);
+        if (YesNoVO::YES_VALUE === $isRestockOnRefund) {
+            wc_increase_stock_levels($order);
+        }
 
         wc_create_refund([
             'amount'         => wc_format_decimal($amount),

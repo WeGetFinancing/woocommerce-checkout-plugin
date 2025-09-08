@@ -129,7 +129,6 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                     'type' => WeGetFinancingVO::IS_ORDER_AUTO_COMPLETE_FIELD_TYPE,
                     'label' => WeGetFinancingVO::IS_ORDER_AUTO_COMPLETE_FIELD_LABEL,
                     'default' => WeGetFinancingVO::IS_ORDER_AUTO_COMPLETE_FIELD_DEFAULT,
-                    'desc_tip' => true,
                 ],
                 WeGetFinancingVO::ORDER_HOLD_PERIOD_FIELD_ID => [
                     'title' => WeGetFinancingVO::ORDER_HOLD_PERIOD_FIELD_TITLE,
@@ -137,6 +136,12 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                     'description' => WeGetFinancingVO::ORDER_HOLD_PERIOD_FIELD_LABEL,
                     'default' => WeGetFinancingVO::ORDER_HOLD_PERIOD_FIELD_DEFAULT,
                     'desc_tip' => true,
+                ],
+                WeGetFinancingVO::IS_RESTOCK_ON_REFUND_FIELD_ID => [
+                    'title' => WeGetFinancingVO::IS_RESTOCK_ON_REFUND_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::IS_RESTOCK_ON_REFUND_FIELD_TYPE,
+                    'label' => WeGetFinancingVO::IS_RESTOCK_ON_REFUND_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::IS_RESTOCK_ON_REFUND_DEFAULT,
                 ],
                 WeGetFinancingVO::ERROR_SELECTOR_FIELD_ID => [
                     'title' => WeGetFinancingVO::ERROR_SELECTOR_FIELD_TITLE,
