@@ -1,6 +1,6 @@
 {
   "name": "wegetfinancing-payment-block",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "description": "WeGetFinancing Checkout Block Payment Gateway for WooCommerce.",
   "author": "WeGetFinancing",
   "license": "LGPL-3.0-only",

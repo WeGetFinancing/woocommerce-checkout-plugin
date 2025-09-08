@@ -99,3 +99,6 @@
 * Improved process payment behavior
 * Improved legacy and block JavaScript checkout compatibility
 * Improved thank-you page behavior
+
+= 1.11.0 =
+* Improved restock behaviour on refund
