@@ -102,3 +102,6 @@
 
 = 1.11.0 =
 * Improved restock behaviour on refund
+
+= 1.11.1 =
+* Compatibility with Bundled Products
