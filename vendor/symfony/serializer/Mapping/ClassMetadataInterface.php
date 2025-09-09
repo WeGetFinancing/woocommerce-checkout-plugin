@@ -26,6 +26,8 @@ interface ClassMetadataInterface
 {
     /**
      * Returns the name of the backing PHP class.
+     *
+     * @return string The name of the backing class
      */
     public function getName(): string;
 
@@ -53,5 +55,5 @@ interface ClassMetadataInterface
 
     public function getClassDiscriminatorMapping(): ?ClassDiscriminatorMapping;
 
-    public function setClassDiscriminatorMapping(?ClassDiscriminatorMapping $mapping = null);
+    public function setClassDiscriminatorMapping(ClassDiscriminatorMapping $mapping = null);
 }

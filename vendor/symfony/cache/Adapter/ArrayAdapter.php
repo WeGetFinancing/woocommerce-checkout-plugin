@@ -73,7 +73,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
     /**
      * {@inheritdoc}
      */
-    public function get(string $key, callable $callback, ?float $beta = null, ?array &$metadata = null)
+    public function get(string $key, callable $callback, float $beta = null, array &$metadata = null)
     {
         $item = $this->getItem($key);
         $metadata = $item->getMetadata();
@@ -81,10 +81,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
         // ArrayAdapter works in memory, we don't care about stampede protection
         if (\INF === $beta || !$item->isHit()) {
             $save = true;
-            $item->set($callback($item, $save));
-            if ($save) {
-                $this->save($item);
-            }
+            $this->save($item->set($callback($item, $save)));
         }
 
         return $item->get();
@@ -349,7 +346,7 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, LoggerAwareInter
             if ('N;' === $value || (isset($value[2]) && ':' === $value[1])) {
                 return serialize($value);
             }
-        } elseif (!\is_scalar($value)) {
+        } elseif (!is_scalar($value)) {
             try {
                 $serialized = serialize($value);
             } catch (\Exception $e) {

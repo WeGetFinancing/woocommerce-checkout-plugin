@@ -39,7 +39,7 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, ?\Throwable $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         $empty = ['calls' => [], 'config' => [], 'options' => [], 'statistics' => []];
         $this->data = ['instances' => $empty, 'total' => $empty];
@@ -114,7 +114,7 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
             /** @var TraceableAdapterEvent $call */
             foreach ($calls as $call) {
                 ++$statistics[$name]['calls'];
-                $statistics[$name]['time'] += ($call->end ?? microtime(true)) - $call->start;
+                $statistics[$name]['time'] += $call->end - $call->start;
                 if ('get' === $call->name) {
                     ++$statistics[$name]['reads'];
                     if ($call->hits) {
@@ -136,8 +136,10 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
                     $statistics[$name]['misses'] += $call->misses;
                 } elseif ('hasItem' === $call->name) {
                     ++$statistics[$name]['reads'];
-                    foreach ($call->result ?? [] as $result) {
-                        ++$statistics[$name][$result ? 'hits' : 'misses'];
+                    if (false === $call->result) {
+                        ++$statistics[$name]['misses'];
+                    } else {
+                        ++$statistics[$name]['hits'];
                     }
                 } elseif ('save' === $call->name) {
                     ++$statistics[$name]['writes'];

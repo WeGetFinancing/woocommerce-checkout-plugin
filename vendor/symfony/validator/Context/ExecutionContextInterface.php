@@ -123,79 +123,106 @@ interface ExecutionContextInterface
     public function getObject();
 
     /**
-     * Warning: Should not be called by user code, to be used by the validator engine only.
+     * Sets the currently validated value.
      *
      * @param mixed       $value        The validated value
      * @param object|null $object       The currently validated object
      * @param string      $propertyPath The property path to the current value
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
      */
-    public function setNode($value, ?object $object, ?MetadataInterface $metadata, string $propertyPath);
+    public function setNode($value, ?object $object, MetadataInterface $metadata = null, string $propertyPath);
 
     /**
-     * Warning: Should not be called by user code, to be used by the validator engine only.
+     * Sets the currently validated group.
      *
      * @param string|null $group The validated group
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
      */
     public function setGroup(?string $group);
 
     /**
-     * Warning: Should not be called by user code, to be used by the validator engine only.
+     * Sets the currently validated constraint.
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
      */
     public function setConstraint(Constraint $constraint);
 
     /**
-     * Warning: Should not be called by user code, to be used by the validator engine only.
+     * Marks an object as validated in a specific validation group.
      *
      * @param string $cacheKey  The hash of the object
      * @param string $groupHash The group's name or hash, if it is group
      *                          sequence
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
      */
     public function markGroupAsValidated(string $cacheKey, string $groupHash);
 
     /**
-     * Warning: Should not be called by user code, to be used by the validator engine only.
+     * Returns whether an object was validated in a specific validation group.
      *
      * @param string $cacheKey  The hash of the object
      * @param string $groupHash The group's name or hash, if it is group
      *                          sequence
      *
      * @return bool
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
      */
     public function isGroupValidated(string $cacheKey, string $groupHash);
 
     /**
-     * Warning: Should not be called by user code, to be used by the validator engine only.
+     * Marks a constraint as validated for an object.
      *
      * @param string $cacheKey       The hash of the object
      * @param string $constraintHash The hash of the constraint
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
      */
     public function markConstraintAsValidated(string $cacheKey, string $constraintHash);
 
     /**
-     * Warning: Should not be called by user code, to be used by the validator engine only.
+     * Returns whether a constraint was validated for an object.
      *
      * @param string $cacheKey       The hash of the object
      * @param string $constraintHash The hash of the constraint
      *
      * @return bool
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
      */
     public function isConstraintValidated(string $cacheKey, string $constraintHash);
 
     /**
-     * Warning: Should not be called by user code, to be used by the validator engine only.
+     * Marks that an object was initialized.
      *
      * @param string $cacheKey The hash of the object
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
      *
      * @see ObjectInitializerInterface
      */
     public function markObjectAsInitialized(string $cacheKey);
 
     /**
-     * Warning: Should not be called by user code, to be used by the validator engine only.
+     * Returns whether an object was initialized.
      *
      * @param string $cacheKey The hash of the object
      *
      * @return bool
+     *
+     * @internal Used by the validator engine. Should not be called by user
+     *           code.
      *
      * @see ObjectInitializerInterface
      */

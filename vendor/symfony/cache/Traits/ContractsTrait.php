@@ -42,7 +42,7 @@ trait ContractsTrait
     public function setCallbackWrapper(?callable $callbackWrapper): callable
     {
         if (!isset($this->callbackWrapper)) {
-            $this->callbackWrapper = \Closure::fromCallable([LockRegistry::class, 'compute']);
+            $this->callbackWrapper = \Closure::fromCallable([LockRegistry::class, 'compute']);;
 
             if (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
                 $this->setCallbackWrapper(null);
@@ -57,7 +57,7 @@ trait ContractsTrait
         return $previousWrapper;
     }
 
-    private function doGet(AdapterInterface $pool, string $key, callable $callback, ?float $beta, ?array &$metadata = null)
+    private function doGet(AdapterInterface $pool, string $key, callable $callback, ?float $beta, array &$metadata = null)
     {
         if (0 > $beta = $beta ?? 1.0) {
             throw new InvalidArgumentException(sprintf('Argument "$beta" provided to "%s::get()" must be a positive number, %f given.', static::class, $beta));

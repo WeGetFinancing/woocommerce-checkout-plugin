@@ -101,7 +101,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
      *
      * @return AdapterInterface
      */
-    public static function createSystemCache(string $namespace, int $defaultLifetime, string $version, string $directory, ?LoggerInterface $logger = null)
+    public static function createSystemCache(string $namespace, int $defaultLifetime, string $version, string $directory, LoggerInterface $logger = null)
     {
         $opcache = new PhpFilesAdapter($namespace, $defaultLifetime, $directory, true);
         if (null !== $logger) {
@@ -112,7 +112,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
             return $opcache;
         }
 
-        if (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && !filter_var(\ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOLEAN)) {
+        if (\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && !filter_var(ini_get('apc.enable_cli'), \FILTER_VALIDATE_BOOLEAN)) {
             return $opcache;
         }
 
@@ -140,7 +140,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
             return CouchbaseCollectionAdapter::createConnection($dsn, $options);
         }
 
-        throw new InvalidArgumentException('Unsupported DSN: it does not start with "redis[s]:", "memcached:" nor "couchbase:".');
+        throw new InvalidArgumentException(sprintf('Unsupported DSN: "%s".', $dsn));
     }
 
     /**
