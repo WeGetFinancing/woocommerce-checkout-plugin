@@ -20,6 +20,7 @@ use WeGetFinancing\Checkout\ValueObject\PaymentGateway\WeGetFinancingVO;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 use WeGetFinancing\SDK\Entity\Request\LoanRequestEntity;
 use WeGetFinancing\SDK\Exception\EntityValidationException;
+use WP_Term;
 
 class GenerateFunnelUrl extends AbstractActionableWithClient
 {
@@ -359,39 +360,48 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
             $cartItems = [];
 
             foreach (WC()->cart->get_cart() as $item) {
-                $product = $item['data'];
-
-                $terms = get_the_terms($product->get_id(), 'product_cat');
-                $category = '';
-                foreach ($terms as $term) {
-                    $category = $term->name;
-                }
-
-                if (!isset($item['line_subtotal']) || empty($item['line_subtotal'])) {
-                    $item['line_subtotal'] = 0;
-                }
-                if (!isset($item['line_subtotal_tax']) || empty($item['line_subtotal_tax'])) {
-                    $item['line_subtotal_tax'] = 0;
-                }
-                if (!isset($item['quantity']) || empty($item['quantity'])) {
+                $product = $item['data'] ?? null;
+                if (!$product) {
                     continue;
                 }
 
-                $name = wp_strip_all_tags($product->get_name());
-                if ('variation' === $product->get_type() && !empty($item['variation_id'])) {
-                    $variation = new WC_Product_Variation($item['variation_id']);
-                    $name .= " - " . wp_strip_all_tags($variation->get_name());
+                $qty = (int) ($item['quantity'] ?? 0);
+                if ($qty <= 0) {
+                    continue;
                 }
 
-                $unitTax = $item['line_subtotal_tax'] / $item['quantity'];
+                $lineSubtotal = (float) ($item['line_subtotal'] ?? 0);
+                $lineSubtotalTax = (float) ($item['line_subtotal_tax'] ?? 0);
+
+                $category = 'none';
+                $terms = get_the_terms($product->get_id(), 'product_cat');
+                if (!is_wp_error($terms) && is_array($terms) && ! empty($terms)) {
+                    $first = reset($terms); // first WP_Term
+                    if ($first instanceof WP_Term) {
+                        $category = wp_strip_all_tags($first->name);
+                    }
+                }
+
+
+                $name = wp_strip_all_tags($product->get_name());
+                if ('variation' === $product->get_type() && !empty($item['variation_id'])) {
+                    $variation = wc_get_product( $item['variation_id'] );
+                    if ( $variation ) {
+                        $name .= ' - ' . wp_strip_all_tags( $variation->get_name() );
+                    }
+                }
+
+                $unitTax   = $lineSubtotalTax / $qty;
+                $unitPrice = ($lineSubtotal / $qty) + $unitTax;
+
 
                 $cartItems[] = [
                     'sku' => true === empty($product->get_sku()) ? 'none' : wp_strip_all_tags($product->get_sku()),
                     'displayName' => $name,
-                    'unitPrice' => (string) ($unitTax + ($item['line_subtotal'] / $item['quantity'])) ,
-                    'quantity' => (int) $item['quantity'],
+                    'unitPrice' => (string) $unitPrice ,
+                    'quantity' => $qty,
                     'unitTax' => (string) $unitTax,
-                    'category' => wp_strip_all_tags($category),
+                    'category' => $category,
                 ];
             }
 
