@@ -349,7 +349,10 @@ class PostbackUpdate implements ActionableInterface
         }
         $amount = sanitize_text_field($raw[self::UPDATES_FIELD][self::AMOUNT_FIELD]);
 
-        $isRestockOnRefund = WeGetFinancing::getOption(WeGetFinancingVO::IS_RESTOCK_ON_REFUND_FIELD_ID);
+        $isRestockOnRefund = WeGetFinancing::getOptionOrDefault(
+            WeGetFinancingVO::IS_RESTOCK_ON_REFUND_FIELD_ID,
+            WeGetFinancingVO::IS_RESTOCK_ON_REFUND_DEFAULT
+        );
         if (YesNoVO::YES_VALUE === $isRestockOnRefund) {
             wc_increase_stock_levels($order);
         }

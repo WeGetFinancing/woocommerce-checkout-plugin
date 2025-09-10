@@ -47,8 +47,11 @@ class AutoCancelOrder implements ActionableInterface
                 )
             );
 
-            $desiredStatus = WeGetFinancing::getOption(WeGetFinancingVO::ORDER_PENDING_STATUS_FIELD_ID);
-            if ($desiredStatus === $status) {
+            $pendingStatus = WeGetFinancing::getOptionOrDefault(
+                WeGetFinancingVO::ORDER_PENDING_STATUS_FIELD_ID,
+                WeGetFinancingVO::ORDER_PENDING_STATUS_FIELD_DEFAULT
+            );
+            if ($pendingStatus === $status) {
                 wc_increase_stock_levels($order);
                 $order->update_status(
                     OrderInternalStatus::CANCELLED,
@@ -60,7 +63,7 @@ class AutoCancelOrder implements ActionableInterface
             $order->add_order_note(
                 sprintf(
                     "Automated Order Cancellation not executed because status different to %s",
-                    (string) $desiredStatus
+                    (string) $pendingStatus
                 )
             );
         } catch (\Throwable $exception) {

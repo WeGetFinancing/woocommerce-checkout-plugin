@@ -342,9 +342,15 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
 
             WC()->cart->empty_cart();
 
-            $isOrderAutoComplete = self::getOption(WeGetFinancingVO::IS_ORDER_AUTO_COMPLETE_FIELD_ID);
+            $isOrderAutoComplete = self::getOptionOrDefault(
+                WeGetFinancingVO::IS_ORDER_AUTO_COMPLETE_FIELD_ID,
+                WeGetFinancingVO::IS_ORDER_AUTO_COMPLETE_FIELD_DEFAULT
+            );
             if (YesNoVO::YES_VALUE === $isOrderAutoComplete) {
-                $holdOrderHours = (int) self::getOption(WeGetFinancingVO::ORDER_HOLD_PERIOD_FIELD_ID);
+                $holdOrderHours = (int) self::getOptionOrDefault(
+                    WeGetFinancingVO::ORDER_HOLD_PERIOD_FIELD_ID,
+                    WeGetFinancingVO::ORDER_HOLD_PERIOD_FIELD_DEFAULT
+                );
 
                 wp_schedule_single_event(
                     time() + $holdOrderHours * 60 * 60, // time is in seconds
