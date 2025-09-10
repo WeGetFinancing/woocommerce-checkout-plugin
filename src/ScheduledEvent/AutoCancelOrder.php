@@ -40,9 +40,8 @@ class AutoCancelOrder implements ActionableInterface
 
             $order->add_order_note(
                 sprintf(
-                    "Executing Automated Order Cancellation for Order ID: %s with status: %s",
-                    (string) $orderId,
-                    (string) $status
+                    "Executing Automated Order Cancellation for Order ID: %s",
+                    (string) $orderId
                 )
             );
 
@@ -54,6 +53,13 @@ class AutoCancelOrder implements ActionableInterface
                 );
                 return;
             }
+
+            $order->add_order_note(
+                sprintf(
+                    "Order not Cancelled due to status: %s",
+                    (string) $status
+                )
+            );
         } catch (\Throwable $exception) {
             Logger::log($exception);
         }

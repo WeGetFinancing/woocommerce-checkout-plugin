@@ -349,8 +349,7 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                     sprintf(
                         "Pending Payment Order is scheduled to be retained for %s hours.",
                         (string) $holdOrderHours
-                    ),
-                    false
+                    )
                 );
             }
 
