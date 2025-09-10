@@ -58,18 +58,24 @@ class WeGetFinancingVO
         "the payment is not successful within the time specified by the Order Hold Period.";
     public const IS_ORDER_AUTO_COMPLETE_FIELD_DEFAULT = YesNoVO::NO_VALUE;
 
-    public const IS_RESTOCK_ON_REFUND_FIELD_ID = "wgf_is_restock_on_refund_id";
-    public const IS_RESTOCK_ON_REFUND_FIELD_TITLE = "Activate Restock on Refunded Order";
-    public const IS_RESTOCK_ON_REFUND_FIELD_TYPE = FieldVO::CHECKBOX_TYPE;
-    public const IS_RESTOCK_ON_REFUND_FIELD_LABEL = "When enabled, the products sold in the order will be automatically restocked on refund.";
-    public const IS_RESTOCK_ON_REFUND_DEFAULT = YesNoVO::YES_VALUE;
-
     public const ORDER_HOLD_PERIOD_FIELD_ID = "wgf_order_hold_period";
     public const ORDER_HOLD_PERIOD_FIELD_TITLE = "Order Hold Period";
     public const ORDER_HOLD_PERIOD_FIELD_TYPE = FieldVO::TEXT_TYPE;
     public const ORDER_HOLD_PERIOD_FIELD_LABEL =
         "The period of time in hours that the order will be held, default 48 hours.";
     public const ORDER_HOLD_PERIOD_FIELD_DEFAULT = "48";
+
+    public const IS_RESTOCK_ON_REFUND_FIELD_ID = "wgf_is_restock_on_refund_id";
+    public const IS_RESTOCK_ON_REFUND_FIELD_TITLE = "Activate Restock on Refunded Order";
+    public const IS_RESTOCK_ON_REFUND_FIELD_TYPE = FieldVO::CHECKBOX_TYPE;
+    public const IS_RESTOCK_ON_REFUND_FIELD_LABEL = "When enabled, the products sold in the order will be automatically restocked on refund.";
+    public const IS_RESTOCK_ON_REFUND_DEFAULT = YesNoVO::YES_VALUE;
+
+    public const ORDER_PENDING_STATUS_FIELD_ID = "wgf_order_pending_status";
+    public const ORDER_PENDING_STATUS_FIELD_TITLE = "Order Pending Status";
+    public const ORDER_PENDING_STATUS_FIELD_TYPE = FieldVO::TEXT_TYPE;
+    public const ORDER_PENDING_STATUS_FIELD_LABEL = "The status of the order when payment is pending.";
+    public const ORDER_PENDING_STATUS_FIELD_DEFAULT = "pending";
 
     public const ERROR_SELECTOR_FIELD_ID = "wgf_error_selector";
     public const ERROR_SELECTOR_FIELD_TITLE = "Display error selector";

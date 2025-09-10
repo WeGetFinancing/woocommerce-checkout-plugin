@@ -6,7 +6,9 @@ use Automattic\WooCommerce\Enums\OrderInternalStatus;
 use WC_Order;
 use WeGetFinancing\Checkout\ActionableInterface;
 use WeGetFinancing\Checkout\Exception\ScheduledEvent\AutoCompleteOrderException;
+use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing;
 use WeGetFinancing\Checkout\Service\Logger;
+use WeGetFinancing\Checkout\ValueObject\PaymentGateway\WeGetFinancingVO;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 
 
@@ -37,15 +39,16 @@ class AutoCancelOrder implements ActionableInterface
             }
 
             $status = $order->get_status();
-
             $order->add_order_note(
                 sprintf(
-                    "Executing Automated Order Cancellation for Order ID: %s",
-                    (string) $orderId
+                    "Executing Automated Order Cancellation for Order ID: %s with status: %s",
+                    (string) $orderId,
+                    (string) $status
                 )
             );
 
-            if (OrderInternalStatus::PENDING === "wc-" . $status) {
+            $desiredStatus = WeGetFinancing::getOption(WeGetFinancingVO::ORDER_PENDING_STATUS_FIELD_ID);
+            if ($desiredStatus === $status) {
                 wc_increase_stock_levels($order);
                 $order->update_status(
                     OrderInternalStatus::CANCELLED,
@@ -56,8 +59,8 @@ class AutoCancelOrder implements ActionableInterface
 
             $order->add_order_note(
                 sprintf(
-                    "Order not Cancelled due to status: %s",
-                    (string) $status
+                    "Automated Order Cancellation not executed because status different to %s",
+                    (string) $desiredStatus
                 )
             );
         } catch (\Throwable $exception) {

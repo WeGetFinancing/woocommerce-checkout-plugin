@@ -143,6 +143,13 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                     'label' => WeGetFinancingVO::IS_RESTOCK_ON_REFUND_FIELD_LABEL,
                     'default' => WeGetFinancingVO::IS_RESTOCK_ON_REFUND_DEFAULT,
                 ],
+                WeGetFinancingVO::ORDER_PENDING_STATUS_FIELD_ID => [
+                    'title' => WeGetFinancingVO::ORDER_PENDING_STATUS_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::ORDER_PENDING_STATUS_FIELD_TYPE,
+                    'description' => WeGetFinancingVO::ORDER_PENDING_STATUS_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::ORDER_PENDING_STATUS_FIELD_DEFAULT,
+                    'desc_tip' => true,
+                ],
                 WeGetFinancingVO::ERROR_SELECTOR_FIELD_ID => [
                     'title' => WeGetFinancingVO::ERROR_SELECTOR_FIELD_TITLE,
                     'type' => WeGetFinancingVO::ERROR_SELECTOR_FIELD_TYPE,
