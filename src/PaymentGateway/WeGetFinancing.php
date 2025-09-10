@@ -353,7 +353,7 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                 );
 
                 wp_schedule_single_event(
-                    time() + $holdOrderHours * 5 * 60, // time is in seconds
+                    time() + $holdOrderHours * 60 * 60, // time is in seconds
                     AutoCancelOrder::INIT_NAME,
                     [ $order_id ],
                 );
