@@ -36,12 +36,23 @@ class AutoCancelOrder implements ActionableInterface
                 );
             }
 
-            if( OrderInternalStatus::PENDING === "wc-" . $order->get_status() ) {
+            $status = $order->get_status();
+
+            $order->add_order_note(
+                sprintf(
+                    "Executing Automated Order Cancellation for Order ID: %s with status: %s",
+                    (string) $orderId,
+                    (string) $status
+                )
+            );
+
+            if (OrderInternalStatus::PENDING === "wc-" . $status) {
                 wc_increase_stock_levels($order);
                 $order->update_status(
                     OrderInternalStatus::CANCELLED,
                     'Expired holding period.'
                 );
+                return;
             }
         } catch (\Throwable $exception) {
             Logger::log($exception);
