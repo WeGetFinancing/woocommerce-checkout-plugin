@@ -105,3 +105,6 @@
 
 = 1.11.1 =
 * Compatibility with Bundled Products
+
+= 1.12.0
+* Configurable pending status
