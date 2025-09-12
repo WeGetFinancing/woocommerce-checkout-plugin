@@ -85,52 +85,91 @@
             success: function(response){
                 wgf_cleanWooCommerceError();
                 if (response.isSuccess === false) {
-                    let error_message = '<div class="woocommerce-notices-wrapper">' +
-                        '<ul class="woocommerce-error" id="wegetfinancing-woocommerce-error">';
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'woocommerce-notices-wrapper';
 
-                    if ("message" in response) {
-                        error_message += "<li>" + response.message + "</li>";
+                    const list = document.createElement('ul');
+                    list.className = 'woocommerce-error';
+                    list.id = 'wegetfinancing-woocommerce-error';
+
+                    // Helper to append an LI using innerHTML (HTML allowed)
+                    const appendHtmlItem = (html) => {
+                        if (html == null || html === '') return;
+                        const li = document.createElement('li');
+                        li.innerHTML = String(html);
+                        list.appendChild(li);
+                    };
+
+                    // 1) Top-level message (if any)
+                    if (response && typeof response === 'object' && 'message' in response) {
+                        appendHtmlItem(response.message);
                     }
-                    if ("violations" in response) {
-                        jQuery.each(response.violations, function( index, violation ) {
-                            jQuery.each(violation.messages, function( index, message ) {
-                                error_message += "<li>" + message + "</li>";
-                            });
-                            jQuery.each(violation.fields, function( index, field ) {
-                                jQuery("#" + field).closest( '.form-row' ).addClass( 'woocommerce-invalid' );
+
+                    // 2) Violations (if any)
+                    if (response && response.violations && typeof response.violations === 'object') {
+                        Object.keys(response.violations).forEach((key) => {
+                            const violation = response.violations[key] || {};
+
+                            // Messages (HTML allowed)
+                            const messages = Array.isArray(violation.messages) ? violation.messages : [];
+                            messages.forEach((msg) => appendHtmlItem(msg));
+
+                            // Fields to mark invalid
+                            const fields = Array.isArray(violation.fields) ? violation.fields : [];
+                            fields.forEach((fieldId) => {
+                                const $field = jQuery('#' + fieldId);
+                                if ($field.length) {
+                                    $field.closest('.form-row').addClass('woocommerce-invalid');
+                                }
                             });
                         });
                     }
 
-                    error_message += "</ul></div>";
+                    wrapper.appendChild(list);
 
-                    jQuery("{{ error_display_selector|raw }}").{{ error_display_method }}(error_message);
+                    // Remove previous error block to avoid duplicates
+                    jQuery('#wegetfinancing-woocommerce-error').closest('.woocommerce-notices-wrapper').remove();
+
+                    // Inject into the target container using configured method/selector
+                    jQuery("{{ error_display_selector|raw }}").{{ error_display_method }}(wrapper.outerHTML);
+
 
                     jQuery("html, body").animate({
                         scrollTop: 0
                     }, 5);
                 } else {
-                    let form = checkoutButton.closest("form"),
-                        nodeInvId = document.getElementById('wgf_inv_id'),
-                        nodeHrefElem = document.getElementById('wgf_href');
+                    let form = checkoutButton.closest('form'),
+                        nodeInvId = document.getElementById('{{ order_inv_id_id }}'),
+                        nodeWgfHref = document.getElementById('{{ order_wgf_href_id }}'),
+                        nodeIsWfg = document.getElementById('{{ order_is_wgf_id }}');
 
                     if (!nodeInvId) {
-                        nodeInvId = document.createElement("input");
-                        nodeInvId.id = 'wgf_inv_id';
-                        nodeInvId.name = 'inv_id';
-                        nodeInvId.type = "hidden";
+                        nodeInvId = document.createElement('input');
+                        nodeInvId.id = '{{ order_inv_id_id }}';
+                        nodeInvId.name = '{{ order_inv_id_name }}';
+                        nodeInvId.type = '{{ order_extra_field_type }}';
                         form.append(nodeInvId);
                     }
-                    if (!nodeHrefElem) {
-                        nodeHrefElem = document.createElement("input");
-                        nodeHrefElem.id = 'wgf_href';
-                        nodeHrefElem.name = 'wgf_href';
-                        nodeHrefElem.type = "hidden";
-                        form.append(nodeHrefElem);
+
+                    if (!nodeWgfHref) {
+                        nodeWgfHref = document.createElement('input');
+                        nodeWgfHref.id = '{{ order_wgf_href_id }}';
+                        nodeWgfHref.name = '{{ order_wgf_href_name }}';
+                        nodeWgfHref.type = '{{ order_extra_field_type }}';
+                        form.append(nodeWgfHref);
+                    }
+
+                    if (!nodeIsWfg) {
+                        nodeIsWfg = document.createElement('input');
+                        nodeIsWfg.id = '{{ order_is_wgf_id }}';
+                        nodeIsWfg.name = '{{ order_is_wgf_name }}';
+                        nodeIsWfg.type = '{{ order_extra_field_type }}';
+                        form.append(nodeIsWfg);
                     }
 
                     nodeInvId.value = response.invId;
-                    nodeHrefElem.value = response.href;
+                    nodeWgfHref.value = response.href;
+                    nodeIsWfg.value = 'yes';
                     checkoutButton.click();
                 }
             },
@@ -186,7 +225,7 @@
                 }
                 wgf_enableCheckoutButton();
             }
-        }, 700);
+        }, 600);
     }
 
     jQuery(document).ready(function() {
@@ -233,14 +272,24 @@
         }
 
         {# Set up the change event handler for payment methods #}
-        jQuery(document).on("change", "form[name='checkout'] input[name='payment_method']", function(){
+        jQuery(document).on("change", "form[name='checkout'] input[name='payment_method']", function() {
             if ( 0 === jQuery('form[name="checkout"] input[name="payment_method"]').filter( ':checked' ).size() ) {
                 jQuery(this).prop('checked', true).attr( 'checked', 'checked' );
             }
             wGF_WC_Gateway();
         });
 
+
         {# Call the gateway function #}
         wGF_WC_Gateway();
+
+        const eventSelectors = 'updated_cart_totals wc_fragments_refreshed wc_fragment_refresh wc_fragments_loaded updated_checkout ppcp_block_ready ppcp_checkout_updated wc_update_cart wc_cart_emptied wpg_change_method fkwcs_express_button_init';
+        const checkoutSelectors = 'updated_cart_totals wc_fragments_refreshed wc_fragments_loaded updated_checkout ppcp_cc_block_ready ppcp_cc_checkout_updated update_checkout';
+        jQuery(document.body).on(eventSelectors, (event) => {
+            wGF_WC_Gateway();
+        });
+        jQuery(document.body).on(checkoutSelectors, () => {
+            wGF_WC_Gateway();
+        });
     });
 </script>

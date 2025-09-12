@@ -297,7 +297,7 @@ trait AbstractAdapterTrait
      * When versioning is enabled, clearing the cache is atomic and doesn't require listing existing keys to proceed,
      * but old keys may need garbage collection and extra round-trips to the back-end are required.
      *
-     * Calling this method also clears the memoized namespace version and thus forces a resynchronization of it.
+     * Calling this method also clears the memoized namespace version and thus forces a resynchonization of it.
      *
      * @return bool the previous state of versioning
      */
@@ -365,10 +365,7 @@ trait AbstractAdapterTrait
         }
     }
 
-    /**
-     * @internal
-     */
-    protected function getId($key)
+    private function getId($key)
     {
         if ($this->versioningIsEnabled && '' === $this->namespaceVersion) {
             $this->ids = [];
@@ -397,7 +394,7 @@ trait AbstractAdapterTrait
         $this->ids[$key] = $key;
 
         if (\count($this->ids) > 1000) {
-            $this->ids = \array_slice($this->ids, 500, null, true); // stop memory leak if there are many keys
+            array_splice($this->ids, 0, 500); // stop memory leak if there are many keys
         }
 
         if (null === $this->maxIdLength) {

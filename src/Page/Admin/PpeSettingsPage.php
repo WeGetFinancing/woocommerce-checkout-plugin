@@ -10,11 +10,11 @@ use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
-use WeGetFinancing\Checkout\Ajax\Admin\PpeSettingsAjax;
 use WeGetFinancing\Checkout\ActionableInterface;
+use WeGetFinancing\Checkout\Ajax\Admin\PpeSettingsAjax;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing;
-use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
 use WeGetFinancing\Checkout\Repository\PpeSettingsRepository;
+use WeGetFinancing\Checkout\ValueObject\PaymentGateway\WeGetFinancingVO;
 use WeGetFinancing\Checkout\ValueObject\PpeSettings;
 
 class PpeSettingsPage implements ActionableInterface
@@ -67,15 +67,15 @@ class PpeSettingsPage implements ActionableInterface
     {
         $auth = [
             'username' => WeGetFinancing::getOption(
-                WeGetFinancingValueObject::USERNAME_FIELD_ID,
+                WeGetFinancingVO::USERNAME_FIELD_ID,
                 ''
             ),
             'password'  => WeGetFinancing::getOption(
-                WeGetFinancingValueObject::PASSWORD_FIELD_ID,
+                WeGetFinancingVO::PASSWORD_FIELD_ID,
                 ''
             ),
             'merchantId' => WeGetFinancing::getOption(
-                WeGetFinancingValueObject::MERCHANT_ID_FIELD_ID,
+                WeGetFinancingVO::MERCHANT_ID_FIELD_ID,
                 ''
             )
         ];

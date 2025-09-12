@@ -14,6 +14,7 @@ const { getSetting } = window.wc.wcSettings;
 
 const settings = getSetting("wegetfinancing_data", {});
 
+
 const description = settings.description;
 
 const Content = (props) => {
@@ -28,11 +29,12 @@ const Content = (props) => {
         const unsubscribe = onPaymentSetup( async () => {
             // Here we can do any processing we need, and then emit a response.
             // For example, we might validate a custom field, or perform an AJAX request, and then emit a response indicating it is valid or not.
-            let invIdElem = document.getElementById(settings.order_inv_id_field_id),
-                wgfHrefElem = document.getElementById("order_wgf_href");
-            const inv_id = invIdElem ? invIdElem.value : null;
-            const wgf_href = wgfHrefElem ? wgfHrefElem.value : null;
-            const customDataIsValid = !!inv_id.length && !!wgf_href.length;
+            let nodeInvId = document.getElementById(settings.order_inv_id_id),
+                nodeWgfHref = document.getElementById(settings.order_wgf_href_id);
+            const inv_id = (nodeInvId?.value ?? '').trim();
+            const wgf_href = (nodeWgfHref?.value ?? '').trim();
+            const customDataIsValid = inv_id !== '' && wgf_href !== '';
+            const order_is_wgf = 'yes';
 
             if ( customDataIsValid ) {
                 return {
@@ -41,6 +43,7 @@ const Content = (props) => {
                         paymentMethodData: {
                             inv_id,
                             wgf_href,
+                            order_is_wgf,
                         },
                     },
                 };
@@ -48,7 +51,7 @@ const Content = (props) => {
 
             return {
                 type: emitResponse.responseTypes.ERROR,
-                message: 'There was an error',
+                message: 'There was an unexpected error',
             };
         } );
         // Unsubscribes when this component is unmounted.
@@ -270,10 +273,26 @@ const wgfFetch = () => {
                 false === resp.isSuccess ? WgfUnSuccess(resp) : WgfSuccess(resp)
             }
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            console.log(err);
+            // Re-enable the button so the shopper can try again
+            const wgfBtnElement = document.querySelector("#wgf_checkout_button");
+            if (wgfBtnElement) {
+                wgfBtnElement.classList.remove("wgf_checkout_button_disabled");
+                wgfBtnElement.style.pointerEvents = "auto";
+                wgfBtnElement.removeAttribute("aria-disabled");
+            }
+            // Show a generic graceful error in the checkout template
+            WgfErrorList("Unexpected error occurred. Please try again later.");
+        });
 }
 
 const WgfUnSuccess = (resp) => {
+    if (resp && typeof resp === 'object' && 'message' in resp) {
+        WgfErrorList(resp.message);
+        return;
+    }
+
     if ("violations" in resp) {
         const violations = resp.violations;
         for (let prop in violations) {
@@ -316,27 +335,25 @@ const WgfSuccess = (resp) => {
     const placeOrderBtn = document.querySelector(".wc-block-components-checkout-place-order-button");
     const form = placeOrderBtn.closest("form");
 
-    let invIdElem = document.getElementById(settings.order_inv_id_field_id);
-    if (!invIdElem) {
-        invIdElem = document.createElement("input");
-        invIdElem.id = settings.order_inv_id_field_id;
-        invIdElem.name = settings.order_inv_id_field_id;
-        invIdElem.type = "hidden";
-        form.append(invIdElem)
+    let nodeInvId = document.getElementById(settings.order_inv_id_id);
+    if (!nodeInvId) {
+        nodeInvId = document.createElement("input");
+        nodeInvId.id = settings.order_inv_id_id;
+        nodeInvId.name = settings.order_inv_id_name;
+        nodeInvId.type = settings.order_extra_field_type;
+        form.append(nodeInvId)
     }
+    nodeInvId.value = resp.invId;
 
-    invIdElem.value = resp.invId;
-
-    let wgfHrefElem = document.getElementById("order_wgf_href");
-    if (!wgfHrefElem) {
-        wgfHrefElem = document.createElement("input");
-        wgfHrefElem.id = "order_wgf_href";
-        wgfHrefElem.name = "order_wgf_href";
-        wgfHrefElem.type = "hidden";
-        form.append(wgfHrefElem)
+    let nodeWgfHref = document.getElementById(settings.order_wgf_href_id);
+    if (!nodeWgfHref) {
+        nodeWgfHref = document.createElement("input");
+        nodeWgfHref.id = settings.order_wgf_href_id;
+        nodeWgfHref.name = settings.order_wgf_href_name;
+        nodeWgfHref.type = settings.order_extra_field_type;
+        form.append(nodeWgfHref)
     }
-
-    wgfHrefElem.value = resp.href;
+    nodeWgfHref.value = resp.href;
 
     placeOrderBtn.click();
 }

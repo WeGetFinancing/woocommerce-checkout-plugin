@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 /**
@@ -40,9 +39,11 @@ class Collection extends Composite
     /**
      * {@inheritdoc}
      */
-    public function __construct($fields = null, ?array $groups = null, $payload = null, ?bool $allowExtraFields = null, ?bool $allowMissingFields = null, ?string $extraFieldsMessage = null, ?string $missingFieldsMessage = null)
+    public function __construct($fields = null, array $groups = null, $payload = null, bool $allowExtraFields = null, bool $allowMissingFields = null, string $extraFieldsMessage = null, string $missingFieldsMessage = null)
     {
-        if (self::isFieldsOption($fields)) {
+        // no known options set? $fields is the fields array
+        if (\is_array($fields)
+            && !array_intersect(array_keys($fields), ['groups', 'fields', 'allowExtraFields', 'allowMissingFields', 'extraFieldsMessage', 'missingFieldsMessage'])) {
             $fields = ['fields' => $fields];
         }
 
@@ -86,32 +87,5 @@ class Collection extends Composite
     protected function getCompositeOption()
     {
         return 'fields';
-    }
-
-    private static function isFieldsOption($options): bool
-    {
-        if (!\is_array($options)) {
-            return false;
-        }
-
-        foreach ($options as $optionOrField) {
-            if ($optionOrField instanceof Constraint) {
-                return true;
-            }
-
-            if (null === $optionOrField) {
-                continue;
-            }
-
-            if (!\is_array($optionOrField)) {
-                return false;
-            }
-
-            if ($optionOrField && !($optionOrField[0] ?? null) instanceof Constraint) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }

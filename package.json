@@ -1,9 +1,9 @@
 {
-  "name": "my-payment-block",
-  "version": "0.1.0",
-  "description": "Example block scaffolded with Create Block tool.",
-  "author": "The WordPress Contributors",
-  "license": "GPL-2.0-or-later",
+  "name": "wegetfinancing-payment-block",
+  "version": "1.12.0",
+  "description": "WeGetFinancing Checkout Block Payment Gateway for WooCommerce.",
+  "author": "WeGetFinancing",
+  "license": "LGPL-3.0-only",
   "main": "build/index.js",
   "scripts": {
     "build": "wp-scripts build",

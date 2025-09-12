@@ -38,23 +38,24 @@
         "symfony/expression-language": "^5.1|^6.0",
         "symfony/cache": "^4.4|^5.0|^6.0",
         "symfony/mime": "^4.4|^5.0|^6.0",
-        "symfony/property-access": "^5.4|^6.0",
+        "symfony/property-access": "^4.4|^5.0|^6.0",
         "symfony/property-info": "^5.3|^6.0",
-        "symfony/translation": "^5.4.35|~6.3.12|^6.4.3",
-        "doctrine/annotations": "^1.13|^2",
+        "symfony/translation": "^4.4|^5.0|^6.0",
+        "doctrine/annotations": "^1.13",
         "doctrine/cache": "^1.11|^2.0",
-        "egulias/email-validator": "^2.1.10|^3|^4"
+        "egulias/email-validator": "^2.1.10|^3"
     },
     "conflict": {
         "doctrine/annotations": "<1.13",
         "doctrine/cache": "<1.11",
         "doctrine/lexer": "<1.1",
+        "phpunit/phpunit": "<5.4.3",
         "symfony/dependency-injection": "<4.4",
         "symfony/expression-language": "<5.1",
         "symfony/http-kernel": "<4.4",
         "symfony/intl": "<4.4",
         "symfony/property-info": "<5.3",
-        "symfony/translation": "<5.4.35|>=6.0,<6.3.12|>=6.4,<6.4.3",
+        "symfony/translation": "<4.4",
         "symfony/yaml": "<4.4"
     },
     "suggest": {
@@ -72,8 +73,7 @@
     "autoload": {
         "psr-4": { "Symfony\\Component\\Validator\\": "" },
         "exclude-from-classmap": [
-            "/Tests/",
-            "/Resources/bin/"
+            "/Tests/"
         ]
     },
     "minimum-stability": "dev"

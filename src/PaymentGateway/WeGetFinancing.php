@@ -11,13 +11,21 @@ use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
+use WC_Order;
 use WeGetFinancing\Checkout\ActionableInterface;
 use WeGetFinancing\Checkout\Ajax\Public\GenerateFunnelUrl;
 use WeGetFinancing\Checkout\App;
-use WeGetFinancing\Checkout\PostMeta\OrderInvIdValueObject;
+use WeGetFinancing\Checkout\Exception\PaymentGateway\WeGetFinancingException;
 use WeGetFinancing\Checkout\Repository\GetOptionRepositoryTrait;
+use WeGetFinancing\Checkout\ScheduledEvent\AutoCancelOrder;
 use WeGetFinancing\Checkout\Service\Logger;
+use WeGetFinancing\Checkout\ValueObject\FieldVO;
 use WeGetFinancing\Checkout\ValueObject\GenerateFunnelUrlRequest;
+use WeGetFinancing\Checkout\ValueObject\PaymentGateway\WeGetFinancingVO;
+use WeGetFinancing\Checkout\ValueObject\PostMeta\OrderInvIdFieldVO;
+use WeGetFinancing\Checkout\ValueObject\PostMeta\OrderIsWgfFieldVO;
+use WeGetFinancing\Checkout\ValueObject\PostMeta\OrderWgfHrefFieldVO;
+use WeGetFinancing\Checkout\ValueObject\YesNoVO;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 
 class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
@@ -56,14 +64,14 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
         $this->init_form_fields();
         $this->init_settings();
 
-        $this->{WeGetFinancingValueObject::IS_SANDBOX_FIELD_ID} =
-            $this->get_option(WeGetFinancingValueObject::IS_SANDBOX_FIELD_ID, true);
-        $this->{WeGetFinancingValueObject::USERNAME_FIELD_ID} =
-            $this->get_option(WeGetFinancingValueObject::USERNAME_FIELD_ID);
-        $this->{WeGetFinancingValueObject::PASSWORD_FIELD_ID} =
-            $this->get_option(WeGetFinancingValueObject::PASSWORD_FIELD_ID);
-        $this->{WeGetFinancingValueObject::MERCHANT_ID_FIELD_ID} =
-            $this->get_option(WeGetFinancingValueObject::MERCHANT_ID_FIELD_ID);
+        $this->{WeGetFinancingVO::IS_SANDBOX_FIELD_ID} =
+            $this->get_option(WeGetFinancingVO::IS_SANDBOX_FIELD_ID, true);
+        $this->{WeGetFinancingVO::USERNAME_FIELD_ID} =
+            $this->get_option(WeGetFinancingVO::USERNAME_FIELD_ID);
+        $this->{WeGetFinancingVO::PASSWORD_FIELD_ID} =
+            $this->get_option(WeGetFinancingVO::PASSWORD_FIELD_ID);
+        $this->{WeGetFinancingVO::MERCHANT_ID_FIELD_ID} =
+            $this->get_option(WeGetFinancingVO::MERCHANT_ID_FIELD_ID);
 
         $this->init();
     }
@@ -81,131 +89,157 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
     public function init_form_fields(): void
     {
         $this->form_fields = apply_filters(
-            WeGetFinancingValueObject::FIELDSET_ID,
+            WeGetFinancingVO::FIELDSET_ID,
             [
-                WeGetFinancingValueObject::IS_SANDBOX_FIELD_ID => [
-                    'title' => WeGetFinancingValueObject::IS_SANDBOX_FIELD_TITLE,
-                    'type' => 'checkbox',
-                    'label' => WeGetFinancingValueObject::IS_SANDBOX_FIELD_LABEL,
-                    'default' => 'yes',
+                WeGetFinancingVO::IS_SANDBOX_FIELD_ID => [
+                    'title' => WeGetFinancingVO::IS_SANDBOX_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::IS_SANDBOX_FIELD_TYPE,
+                    'label' => WeGetFinancingVO::IS_SANDBOX_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::IS_SANDBOX_FIELD_DEFAULT,
                 ],
-                WeGetFinancingValueObject::IS_SENTRY_FIELD_ID => [
-                    'title' => WeGetFinancingValueObject::IS_SENTRY_FIELD_TITLE,
-                    'type' => 'checkbox',
-                    'label' => WeGetFinancingValueObject::IS_SENTRY_FIELD_LABEL,
-                    'default' => 'yes',
+                WeGetFinancingVO::IS_SENTRY_FIELD_ID => [
+                    'title' => WeGetFinancingVO::IS_SENTRY_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::IS_SENTRY_FIELD_TYPE,
+                    'label' => WeGetFinancingVO::IS_SENTRY_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::IS_SENTRY_FIELD_DEFAULT,
                 ],
-                WeGetFinancingValueObject::USERNAME_FIELD_ID => [
-                    'title' => WeGetFinancingValueObject::USERNAME_FIELD_TITLE,
-                    'type' => 'text',
-                    'description' => WeGetFinancingValueObject::USERNAME_FIELD_LABEL,
-                    'default' => '',
+                WeGetFinancingVO::USERNAME_FIELD_ID => [
+                    'title' => WeGetFinancingVO::USERNAME_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::USERNAME_FIELD_TYPE,
+                    'description' => WeGetFinancingVO::USERNAME_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::USERNAME_FIELD_DEFAULT,
                     'desc_tip' => true,
                 ],
-                WeGetFinancingValueObject::PASSWORD_FIELD_ID => [
-                    'title' => WeGetFinancingValueObject::PASSWORD_FIELD_TITLE,
-                    'type' => 'password',
-                    'description' => WeGetFinancingValueObject::PASSWORD_FIELD_LABEL,
-                    'default' => '',
+                WeGetFinancingVO::PASSWORD_FIELD_ID => [
+                    'title' => WeGetFinancingVO::PASSWORD_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::PASSWORD_FIELD_TYPE,
+                    'description' => WeGetFinancingVO::PASSWORD_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::PASSWORD_FIELD_DEFAULT,
                     'desc_tip' => true,
                 ],
-                WeGetFinancingValueObject::MERCHANT_ID_FIELD_ID => [
-                    'title' => WeGetFinancingValueObject::MERCHANT_ID_FIELD_TITLE,
-                    'type' => 'text',
-                    'description' => WeGetFinancingValueObject::MERCHANT_ID_FIELD_LABEL,
-                    'default' => '',
+                WeGetFinancingVO::MERCHANT_ID_FIELD_ID => [
+                    'title' => WeGetFinancingVO::MERCHANT_ID_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::MERCHANT_ID_FIELD_TYPE,
+                    'description' => WeGetFinancingVO::MERCHANT_ID_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::MERCHANT_ID_FIELD_DEFAULT,
                     'desc_tip' => true,
                 ],
-                WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_ID => [
-                    'title' => WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_TITLE,
-                    'type' => 'text',
-                    'description' => WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_LABEL,
-                    'default' => WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_DEFAULT,
+                WeGetFinancingVO::IS_ORDER_AUTO_COMPLETE_FIELD_ID => [
+                    'title' => WeGetFinancingVO::IS_ORDER_AUTO_COMPLETE_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::IS_ORDER_AUTO_COMPLETE_FIELD_TYPE,
+                    'label' => WeGetFinancingVO::IS_ORDER_AUTO_COMPLETE_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::IS_ORDER_AUTO_COMPLETE_FIELD_DEFAULT,
+                ],
+                WeGetFinancingVO::ORDER_HOLD_PERIOD_FIELD_ID => [
+                    'title' => WeGetFinancingVO::ORDER_HOLD_PERIOD_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::ORDER_HOLD_PERIOD_FIELD_TYPE,
+                    'description' => WeGetFinancingVO::ORDER_HOLD_PERIOD_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::ORDER_HOLD_PERIOD_FIELD_DEFAULT,
                     'desc_tip' => true,
                 ],
-                WeGetFinancingValueObject::ERROR_ATTACH_FIELD_ID => [
-                    'title' => WeGetFinancingValueObject::ERROR_ATTACH_FIELD_TITLE,
-                    'type' => 'select',
-                    'description' => WeGetFinancingValueObject::ERROR_ATTACH_FIELD_LABEL,
-                    'default' => WeGetFinancingValueObject::ERROR_ATTACH_FIELD_DEFAULT,
-                    'options' => WeGetFinancingValueObject::ERROR_ATTACH_FIELD_VALUES,
+                WeGetFinancingVO::IS_RESTOCK_ON_REFUND_FIELD_ID => [
+                    'title' => WeGetFinancingVO::IS_RESTOCK_ON_REFUND_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::IS_RESTOCK_ON_REFUND_FIELD_TYPE,
+                    'label' => WeGetFinancingVO::IS_RESTOCK_ON_REFUND_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::IS_RESTOCK_ON_REFUND_DEFAULT,
+                ],
+                WeGetFinancingVO::ORDER_PENDING_STATUS_FIELD_ID => [
+                    'title' => WeGetFinancingVO::ORDER_PENDING_STATUS_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::ORDER_PENDING_STATUS_FIELD_TYPE,
+                    'description' => WeGetFinancingVO::ORDER_PENDING_STATUS_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::ORDER_PENDING_STATUS_FIELD_DEFAULT,
                     'desc_tip' => true,
                 ],
-                WeGetFinancingValueObject::THANK_YOU_PAGE_MAIN_SELECTOR_FIELD_ID => [
-                    'title' => WeGetFinancingValueObject::THANK_YOU_PAGE_MAIN_SELECTOR_FIELD_TITLE,
-                    'type' => 'text',
-                    'description' => WeGetFinancingValueObject::THANK_YOU_PAGE_MAIN_SELECTOR_FIELD_LABEL,
-                    'default' => WeGetFinancingValueObject::THANK_YOU_PAGE_MAIN_SELECTOR_FIELD_DEFAULT,
+                WeGetFinancingVO::ERROR_SELECTOR_FIELD_ID => [
+                    'title' => WeGetFinancingVO::ERROR_SELECTOR_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::ERROR_SELECTOR_FIELD_TYPE,
+                    'description' => WeGetFinancingVO::ERROR_SELECTOR_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::ERROR_SELECTOR_FIELD_DEFAULT,
                     'desc_tip' => true,
                 ],
-                WeGetFinancingValueObject::THANK_YOU_PAGE_TITLE_SELECTOR_FIELD_ID => [
-                    'title' => WeGetFinancingValueObject::THANK_YOU_PAGE_TITLE_SELECTOR_FIELD_TITLE,
-                    'type' => 'text',
-                    'description' => WeGetFinancingValueObject::THANK_YOU_PAGE_TITLE_SELECTOR_FIELD_LABEL,
-                    'default' => WeGetFinancingValueObject::THANK_YOU_PAGE_TITLE_SELECTOR_FIELD_DEFAULT,
+                WeGetFinancingVO::ERROR_ATTACH_FIELD_ID => [
+                    'title' => WeGetFinancingVO::ERROR_ATTACH_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::ERROR_ATTACH_FIELD_TYPE,
+                    'description' => WeGetFinancingVO::ERROR_ATTACH_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::ERROR_ATTACH_FIELD_DEFAULT,
+                    'options' => WeGetFinancingVO::ERROR_ATTACH_FIELD_VALUES,
                     'desc_tip' => true,
                 ],
-                WeGetFinancingValueObject::THANK_YOU_PAGE_NOTICE_SELECTOR_FIELD_ID => [
-                    'title' => WeGetFinancingValueObject::THANK_YOU_PAGE_NOTICE_SELECTOR_FIELD_TITLE,
-                    'type' => 'text',
-                    'description' => WeGetFinancingValueObject::THANK_YOU_PAGE_NOTICE_SELECTOR_FIELD_LABEL,
-                    'default' => WeGetFinancingValueObject::THANK_YOU_PAGE_NOTICE_SELECTOR_FIELD_DEFAULT,
+                WeGetFinancingVO::THANK_YOU_PAGE_MAIN_SELECTOR_FIELD_ID => [
+                    'title' => WeGetFinancingVO::THANK_YOU_PAGE_MAIN_SELECTOR_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::THANK_YOU_PAGE_MAIN_SELECTOR_FIELD_TYPE,
+                    'description' => WeGetFinancingVO::THANK_YOU_PAGE_MAIN_SELECTOR_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::THANK_YOU_PAGE_MAIN_SELECTOR_FIELD_DEFAULT,
                     'desc_tip' => true,
                 ],
-                WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_OVERVIEW_SELECTOR_FIELD_ID => [
-                    'title' => WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_OVERVIEW_SELECTOR_FIELD_TITLE,
-                    'type' => 'text',
-                    'description' => WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_OVERVIEW_SELECTOR_FIELD_LABEL,
-                    'default' => WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_OVERVIEW_SELECTOR_FIELD_DEFAULT,
+                WeGetFinancingVO::THANK_YOU_PAGE_TITLE_SELECTOR_FIELD_ID => [
+                    'title' => WeGetFinancingVO::THANK_YOU_PAGE_TITLE_SELECTOR_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::THANK_YOU_PAGE_TITLE_SELECTOR_FIELD_TYPE,
+                    'description' => WeGetFinancingVO::THANK_YOU_PAGE_TITLE_SELECTOR_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::THANK_YOU_PAGE_TITLE_SELECTOR_FIELD_DEFAULT,
                     'desc_tip' => true,
                 ],
-                WeGetFinancingValueObject::THANK_YOU_PAGE_CUSTOMER_DETAILS_SELECTOR_FIELD_ID => [
-                    'title' => WeGetFinancingValueObject::THANK_YOU_PAGE_CUSTOMER_DETAILS_SELECTOR_FIELD_TITLE,
-                    'type' => 'text',
-                    'description' => WeGetFinancingValueObject::THANK_YOU_PAGE_CUSTOMER_DETAILS_SELECTOR_FIELD_LABEL,
-                    'default' => WeGetFinancingValueObject::THANK_YOU_PAGE_CUSTOMER_DETAILS_SELECTOR_FIELD_DEFAULT,
+                WeGetFinancingVO::THANK_YOU_PAGE_NOTICE_SELECTOR_FIELD_ID => [
+                    'title' => WeGetFinancingVO::THANK_YOU_PAGE_NOTICE_SELECTOR_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::THANK_YOU_PAGE_NOTICE_SELECTOR_FIELD_TYPE,
+                    'description' => WeGetFinancingVO::THANK_YOU_PAGE_NOTICE_SELECTOR_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::THANK_YOU_PAGE_NOTICE_SELECTOR_FIELD_DEFAULT,
                     'desc_tip' => true,
                 ],
-                WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_ID => [
-                    'title' => WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_TITLE,
-                    'type' => 'text',
-                    'description' => WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_LABEL,
-                    'default' => WeGetFinancingValueObject::THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_DEFAULT,
+                WeGetFinancingVO::THANK_YOU_PAGE_ORDER_OVERVIEW_SELECTOR_FIELD_ID => [
+                    'title' => WeGetFinancingVO::THANK_YOU_PAGE_ORDER_OVERVIEW_SELECTOR_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::THANK_YOU_PAGE_ORDER_OVERVIEW_SELECTOR_FIELD_TYPE,
+                    'description' => WeGetFinancingVO::THANK_YOU_PAGE_ORDER_OVERVIEW_SELECTOR_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::THANK_YOU_PAGE_ORDER_OVERVIEW_SELECTOR_FIELD_DEFAULT,
                     'desc_tip' => true,
                 ],
-                WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_PENDING_FIELD_ID => [
-                    'title' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_PENDING_FIELD_TITLE,
-                    'type' => 'textarea',
-                    'description' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_PENDING_FIELD_LABEL,
-                    'default' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_PENDING_FIELD_DEFAULT,
+                WeGetFinancingVO::THANK_YOU_PAGE_CUSTOMER_DETAILS_SELECTOR_FIELD_ID => [
+                    'title' => WeGetFinancingVO::THANK_YOU_PAGE_CUSTOMER_DETAILS_SELECTOR_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::THANK_YOU_PAGE_CUSTOMER_DETAILS_SELECTOR_FIELD_TYPE,
+                    'description' => WeGetFinancingVO::THANK_YOU_PAGE_CUSTOMER_DETAILS_SELECTOR_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::THANK_YOU_PAGE_CUSTOMER_DETAILS_SELECTOR_FIELD_DEFAULT,
                     'desc_tip' => true,
                 ],
-                WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_ON_HOLD_FIELD_ID => [
-                    'title' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_ON_HOLD_FIELD_TITLE,
-                    'type' => 'textarea',
-                    'description' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_ON_HOLD_FIELD_LABEL,
-                    'default' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_ON_HOLD_FIELD_DEFAULT,
+                WeGetFinancingVO::THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_ID => [
+                    'title' => WeGetFinancingVO::THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_TYPE,
+                    'description' => WeGetFinancingVO::THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::THANK_YOU_PAGE_ORDER_DETAILS_SELECTOR_FIELD_DEFAULT,
                     'desc_tip' => true,
                 ],
-                WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_PROCESSING_FIELD_ID => [
-                    'title' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_PROCESSING_FIELD_TITLE,
-                    'type' => 'textarea',
-                    'description' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_PROCESSING_FIELD_LABEL,
-                    'default' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_PROCESSING_FIELD_DEFAULT,
+                WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_PENDING_FIELD_ID => [
+                    'title' => WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_PENDING_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_PENDING_FIELD_TYPE,
+                    'description' => WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_PENDING_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_PENDING_FIELD_DEFAULT,
                     'desc_tip' => true,
                 ],
-                WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_FAILED_FIELD_ID => [
-                    'title' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_FAILED_FIELD_TITLE,
-                    'type' => 'textarea',
-                    'description' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_FAILED_FIELD_LABEL,
-                    'default' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_FAILED_FIELD_DEFAULT,
+                WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_ON_HOLD_FIELD_ID => [
+                    'title' => WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_ON_HOLD_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_ON_HOLD_FIELD_TYPE,
+                    'description' => WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_ON_HOLD_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_ON_HOLD_FIELD_DEFAULT,
                     'desc_tip' => true,
                 ],
-                WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_ERROR_FIELD_ID => [
-                    'title' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_ERROR_FIELD_TITLE,
-                    'type' => 'textarea',
-                    'description' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_ERROR_FIELD_LABEL,
-                    'default' => WeGetFinancingValueObject::THANK_YOU_MESSAGE_ORDER_ERROR_FIELD_DEFAULT,
+                WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_PROCESSING_FIELD_ID => [
+                    'title' => WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_PROCESSING_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_PROCESSING_FIELD_TYPE,
+                    'description' => WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_PROCESSING_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_PROCESSING_FIELD_DEFAULT,
+                    'desc_tip' => true,
+                ],
+                WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_FAILED_FIELD_ID => [
+                    'title' => WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_FAILED_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_FAILED_FIELD_TYPE,
+                    'description' => WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_FAILED_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_FAILED_FIELD_DEFAULT,
+                    'desc_tip' => true,
+                ],
+                WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_ERROR_FIELD_ID => [
+                    'title' => WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_ERROR_FIELD_TITLE,
+                    'type' => WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_ERROR_FIELD_TYPE,
+                    'description' => WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_ERROR_FIELD_LABEL,
+                    'default' => WeGetFinancingVO::THANK_YOU_MESSAGE_ORDER_ERROR_FIELD_DEFAULT,
                     'desc_tip' => true,
                 ],
             ]
@@ -260,15 +294,21 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
                 'description' => $this->description,
                 'payment_method_id' => $this->id,
                 'checkout_button_image_url' => $GLOBALS[App::ID][App::CHECKOUT_BUTTON_URL],
-                'checkout_button_alt' => WeGetFinancingValueObject::CHECKOUT_BUTTON_ALT,
+                'checkout_button_alt' => WeGetFinancingVO::CHECKOUT_BUTTON_ALT,
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'ajax_action' => GenerateFunnelUrl::ACTION_NAME,
-                'order_inv_id_field_id' => OrderInvIdValueObject::ORDER_INV_ID_FIELD_ID,
-                'error_display_method' => self::getOption(WeGetFinancingValueObject::ERROR_ATTACH_FIELD_ID),
+                'order_extra_field_type' => FieldVO::HIDDEN_TYPE,
+                'order_inv_id_id' => OrderInvIdFieldVO::FIELD_ID,
+                'order_inv_id_name' => OrderInvIdFieldVO::FIELD_NAME,
+                'order_wgf_href_id' => OrderWgfHrefFieldVO::FIELD_ID,
+                'order_wgf_href_name' => OrderWgfHrefFieldVO::FIELD_NAME,
+                'order_is_wgf_id' => OrderIsWgfFieldVO::FIELD_ID,
+                'order_is_wgf_name' => OrderIsWgfFieldVO::FIELD_NAME,
+                'error_display_method' => self::getOption(WeGetFinancingVO::ERROR_ATTACH_FIELD_ID),
                 'error_display_selector' => htmlspecialchars_decode(
-                    self::getOption(WeGetFinancingValueObject::ERROR_SELECTOR_FIELD_ID),
+                    self::getOption(WeGetFinancingVO::ERROR_SELECTOR_FIELD_ID),
                 ),
-                'nonce' => wp_create_nonce(WeGetFinancingValueObject::NONCE)
+                'nonce' => wp_create_nonce(WeGetFinancingVO::NONCE)
             ]
         );
     }
@@ -281,46 +321,128 @@ class WeGetFinancing extends \WC_Payment_Gateway implements ActionableInterface
      */
     public function process_payment($order_id): array
     {
-        $this->setOrderInvIdAndHref($order_id);
+        try {
+            $this->setOrderExtraFields($order_id);
 
-        $order = wc_get_order($order_id);
+            $order = wc_get_order($order_id);
 
-        $order->update_status(OrderInternalStatus::PENDING);
+            if (false === ($order instanceof WC_Order)) {
+                throw new WeGetFinancingException(
+                    sprintf(
+                        WeGetFinancingException::PROCESS_PAYMENT_ORDER_NOT_FOUND_MESSAGE,
+                        (string) $order_id
+                    ),
+                    WeGetFinancingException::PROCESS_PAYMENT_ORDER_NOT_FOUND_CODE,
+                );
+            }
 
-        wc_reduce_stock_levels($order->get_id());
+            $order->update_status(OrderInternalStatus::PENDING);
 
-        WC()->cart->empty_cart();
+            wc_reduce_stock_levels($order->get_id());
 
-        return [
-            'result' => WeGetFinancingValueObject::PROCESS_PAYMENT_SUCCESS_ID,
-            'redirect' => $this->get_return_url($order),
-        ];
+            WC()->cart->empty_cart();
+
+            $isOrderAutoComplete = self::getOptionOrDefault(
+                WeGetFinancingVO::IS_ORDER_AUTO_COMPLETE_FIELD_ID,
+                WeGetFinancingVO::IS_ORDER_AUTO_COMPLETE_FIELD_DEFAULT
+            );
+            if (YesNoVO::YES_VALUE === $isOrderAutoComplete) {
+                $holdOrderHours = (int) self::getOptionOrDefault(
+                    WeGetFinancingVO::ORDER_HOLD_PERIOD_FIELD_ID,
+                    WeGetFinancingVO::ORDER_HOLD_PERIOD_FIELD_DEFAULT
+                );
+
+                wp_schedule_single_event(
+                    time() + $holdOrderHours * 60 * 60, // time is in seconds
+                    AutoCancelOrder::INIT_NAME,
+                    [ $order_id ],
+                );
+
+                $order->add_order_note(
+                    sprintf(
+                        "Pending Payment Order is scheduled to be retained for %s hours.",
+                        (string) $holdOrderHours
+                    )
+                );
+            }
+
+            return [
+                'result' => WeGetFinancingVO::PROCESS_PAYMENT_SUCCESS_ID,
+                'redirect' => $this->get_return_url($order),
+            ];
+        } catch (\Throwable $exception) {
+            Logger::log($exception);
+            $message = sprintf(
+                'We couldn’t complete your payment due to an unexpected error. ' .
+                    'No charge was made. Please try again or choose a different payment method. ' .
+                    'If the problem persists, contact support and reference order %s.',
+                (string) $order_id
+            );
+            wc_add_notice($message, 'error');
+            return [
+                'result' => WeGetFinancingVO::PROCESS_PAYMENT_FAILURE_ID
+            ];
+        }
     }
 
-    protected function setOrderInvIdAndHref(int $orderId): void
+    /**
+     * @throws WeGetFinancingException
+     */
+    protected function setOrderExtraFields(int $orderId): void
     {
-        if (false === array_key_exists("inv_id", $_POST)) {
-            Logger::log(new \Exception("Payment process error: Inv Id not set for order id " . $orderId));
-            return;
+        $orderExtraFields = [
+            [
+                'name' => OrderInvIdFieldVO::FIELD_NAME,
+                'meta' => OrderInvIdFieldVO::META,
+            ],
+            [
+                'name' => OrderWgfHrefFieldVO::FIELD_NAME,
+                'meta' => OrderWgfHrefFieldVO::META,
+            ],
+            [
+                'name' => OrderIsWgfFieldVO::FIELD_NAME,
+                'meta' => OrderIsWgfFieldVO::META,
+            ],
+        ];
+        foreach ($orderExtraFields as $orderExtraField) {
+            $value = $this->getSanitizedOrderExtraFieldValue($orderExtraField['name'], $orderId);
+            $this->setOrderExtraFieldMeta($orderId, $orderExtraField['meta'], $value);
         }
-        $invId = sanitize_text_field($_POST["inv_id"]);
-        $updateInvId = update_post_meta($orderId, OrderInvIdValueObject::ORDER_META, $invId);
-        if (false === $updateInvId) {
-            Logger::log(new \Exception(
-                "Payment process error updating Inv Id post meta for order id " . $orderId . " - " . $invId
-            ));
-        }
+    }
 
-        if (false === array_key_exists("wgf_href", $_POST)) {
-            Logger::log(new \Exception("Payment process error: HREF not set for order id " . $orderId));
-            return;
+    /**
+     * @throws WeGetFinancingException
+     */
+    protected function getSanitizedOrderExtraFieldValue(string $fieldName, int $orderId): string
+    {
+        if (false === array_key_exists($fieldName, $_POST)) {
+            throw new WeGetFinancingException(
+                sprintf(
+                    WeGetFinancingException::ORDER_EXTRA_FIELD_NOT_SET_MESSAGE,
+                    $fieldName,
+                    (string) $orderId
+                ),
+                WeGetFinancingException::ORDER_EXTRA_FIELD_NOT_SET_CODE
+            );
         }
-        $href = sanitize_text_field($_POST["wgf_href"]);
-        $updateHref = update_post_meta($orderId, "wgf_href", $href);
-        if (false === $updateHref) {
-            Logger::log(new \Exception(
-                "Payment process error updating HREF post meta for order id " . $orderId . " - " . $href
-            ));
+        return sanitize_text_field($_POST[$fieldName]);
+    }
+
+    /**
+     * @throws WeGetFinancingException
+     */
+    protected function setOrderExtraFieldMeta(int $orderId, string $meta, string $value): void
+    {
+        $result = update_post_meta($orderId, $meta, $value);
+        if (false === $result) {
+            throw new WeGetFinancingException(
+                sprintf(
+                    WeGetFinancingException::UPDATE_ORDER_EXTRA_FIELD_META_ERROR_MESSAGE,
+                    $meta,
+                    (string) $orderId
+                ),
+                WeGetFinancingException::UPDATE_ORDER_EXTRA_FIELD_META_ERROR_CODE
+            );
         }
     }
 

@@ -11,5 +11,6 @@ use WeGetFinancing\SDK\Exception\EntityValidationException;
 class OnOrderStatusChangeToShippedException extends EntityValidationException
 {
     public const REMOTE_ERROR_CODE = 1;
-    public const REMOTE_ERROR_MESSAGE = 'OnOrderStatusChangeToShipped Remote error: ';
+    public const REMOTE_ERROR_MESSAGE =
+        'OnOrderStatusChangeToShipped Remote error code: < %s >, payload < %s >, response data: < %s >';
 }

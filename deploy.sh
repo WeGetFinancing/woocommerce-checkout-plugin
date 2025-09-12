@@ -9,6 +9,36 @@ PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
+# Helper: usage instructions
+print_help() {
+  echo -e "${BLUE}Usage:${NC} $(basename "$0") [YES|NO]"
+  echo -e "  - If ${YELLOW}YES${NC}, the script will execute Step 1 (prepare SVN folder) and Step 3 (SVN checkout)."
+  echo -e "  - If ${YELLOW}NO${NC} (default), Steps 1 and 3 are skipped. The script expects the SVN folder and plugin directory to already exist."
+  echo -e ""
+  echo -e "${BLUE}Examples:${NC}"
+  echo -e "  $(basename "$0")           # default (NO) - skip Steps 1 and 3"
+  echo -e "  $(basename "$0") YES       # run Steps 1 and 3"
+  echo -e "  $(basename "$0") --help    # show this help"
+}
+
+# Parse parameter (default: NO). Accept --help/-h.
+case "${1:-NO}" in
+  -h|--help)
+    print_help
+    exit 0
+    ;;
+  YES|yes|Yes)
+    DO_PREP_AND_CHECKOUT="true"
+    ;;
+  NO|no|No)
+    DO_PREP_AND_CHECKOUT="false"
+    ;;
+  *)
+    # Any non-YES value is treated as NO
+    DO_PREP_AND_CHECKOUT="false"
+    ;;
+esac
+
 # Define variables
 proj_folder="/home/user/.proj/woocommerce-checkout-plugin"
 svn_folder="/home/user/.proj/svn"
@@ -17,25 +47,43 @@ echo -e "${CYAN}🚀 Starting WordPress plugin deployment to SVN...${NC}"
 
 # Step 1: Delete and recreate SVN folder
 echo -e "${YELLOW}📁 Step 1: Preparing SVN folder...${NC}"
-if [ -d "$svn_folder" ]; then
-    echo -e "${RED}   Deleting existing SVN folder: $svn_folder${NC}"
-    rm -rf "$svn_folder"
+if [ "$DO_PREP_AND_CHECKOUT" = "true" ]; then
+  if [ -d "$svn_folder" ]; then
+      echo -e "${RED}   Deleting existing SVN folder: $svn_folder${NC}"
+      rm -rf "$svn_folder"
+  fi
+  echo -e "${GREEN}   Creating new SVN folder: $svn_folder${NC}"
+  mkdir -p "$svn_folder"
+else
+  echo -e "${BLUE}   Skipping Step 1 (parameter != YES). Expecting existing SVN folder.${NC}"
 fi
-echo -e "${GREEN}   Creating new SVN folder: $svn_folder${NC}"
-mkdir -p "$svn_folder"
 
 # Step 2: Change to SVN folder
 echo -e "${YELLOW}📂 Step 2: Changing to SVN directory...${NC}"
+if [ ! -d "$svn_folder" ]; then
+  echo -e "${RED}   SVN folder not found: $svn_folder${NC}"
+  echo -e "${RED}   Aborting. Run with 'YES' to create it, or create it manually.${NC}"
+  exit 1
+fi
 cd "$svn_folder"
 echo -e "${GREEN}   Current directory: $(pwd)${NC}"
 
 # Step 3: SVN checkout
 echo -e "${YELLOW}⬇️  Step 3: Checking out SVN repository...${NC}"
-svn co https://plugins.svn.wordpress.org/wegetfinancing-payment-gateway
-echo -e "${GREEN}   SVN checkout completed${NC}"
+if [ "$DO_PREP_AND_CHECKOUT" = "true" ]; then
+  svn co https://plugins.svn.wordpress.org/wegetfinancing-payment-gateway
+  echo -e "${GREEN}   SVN checkout completed${NC}"
+else
+  echo -e "${BLUE}   Skipping Step 3 (parameter != YES). Expecting existing working copy.${NC}"
+fi
 
 # Step 4: Change to plugin directory
 echo -e "${YELLOW}📁 Step 4: Entering plugin directory...${NC}"
+if [ ! -d "wegetfinancing-payment-gateway" ]; then
+  echo -e "${RED}   Plugin directory not found: wegetfinancing-payment-gateway${NC}"
+  echo -e "${RED}   Aborting. Run with 'YES' to checkout, or ensure the directory exists.${NC}"
+  exit 1
+fi
 cd wegetfinancing-payment-gateway/
 echo -e "${GREEN}   Current directory: $(pwd)${NC}"
 
@@ -59,6 +107,7 @@ echo -e "${YELLOW}🗑️  Step 8: Removing var/wp contents...${NC}"
 if [ -d "trunk/var/wp" ]; then
     echo -e "${RED}   Removing contents of trunk/var/wp/...${NC}"
     rm -rf trunk/var/wp/*
+    rm -rf trunk/var/wp/.well-known
     echo -e "${GREEN}   var/wp contents removed${NC}"
 else
     echo -e "${BLUE}   No trunk/var/wp directory found${NC}"

@@ -11,7 +11,7 @@
  * Plugin Name:       WeGetFinancing Payment Gateway
  * Plugin URI:        https://github.com/WeGetFinancing/woocommerce-checkout-plugin
  * Description:       Integrate WeGetFinancing payment gateway to woocommerce
- * Version:           1.9.2
+ * Version:           1.12.0
  * Requires at least: 5.0
  * Requires PHP:      8.0
  * Author:            Riccardo De Leo
@@ -40,7 +40,6 @@ add_action('before_woocommerce_init', function () {
         );
     }
 });
-
 
 add_action('woocommerce_blocks_loaded', function () {
     if (true === class_exists(AbstractPaymentMethodType::class)) {

@@ -45,7 +45,7 @@ class UniqueValidator extends ConstraintValidator
 
             if (\in_array($element, $collectionElements, true)) {
                 $this->context->buildViolation($constraint->message)
-                    ->setParameter('{{ value }}', $this->formatValue($element))
+                    ->setParameter('{{ value }}', $this->formatValue($value))
                     ->setCode(Unique::IS_NOT_UNIQUE)
                     ->addViolation();
 

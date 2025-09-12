@@ -50,33 +50,6 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public $serializedName;
 
-    /**
-     * @var bool
-     *
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link isIgnored()} instead.
-     */
-    public $ignore = false;
-
-    /**
-     * @var array[] Normalization contexts per group name ("*" applies to all groups)
-     *
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getNormalizationContexts()} instead.
-     */
-    public $normalizationContexts = [];
-
-    /**
-     * @var array[] Denormalization contexts per group name ("*" applies to all groups)
-     *
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getDenormalizationContexts()} instead.
-     */
-    public $denormalizationContexts = [];
-
     public function __construct(string $name)
     {
         $this->name = $name;
@@ -93,7 +66,7 @@ class AttributeMetadata implements AttributeMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function addGroup(string $group)
+    public function addGroup($group)
     {
         if (!\in_array($group, $this->groups)) {
             $this->groups[] = $group;
@@ -111,7 +84,7 @@ class AttributeMetadata implements AttributeMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function setMaxDepth(?int $maxDepth)
+    public function setMaxDepth($maxDepth)
     {
         $this->maxDepth = $maxDepth;
     }
@@ -127,7 +100,7 @@ class AttributeMetadata implements AttributeMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function setSerializedName(?string $serializedName = null)
+    public function setSerializedName(string $serializedName = null)
     {
         $this->serializedName = $serializedName;
     }
@@ -138,92 +111,6 @@ class AttributeMetadata implements AttributeMetadataInterface
     public function getSerializedName(): ?string
     {
         return $this->serializedName;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setIgnore(bool $ignore)
-    {
-        $this->ignore = $ignore;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isIgnored(): bool
-    {
-        return $this->ignore;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getNormalizationContexts(): array
-    {
-        return $this->normalizationContexts;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getNormalizationContextForGroups(array $groups): array
-    {
-        $contexts = [];
-        foreach ($groups as $group) {
-            $contexts[] = $this->normalizationContexts[$group] ?? [];
-        }
-
-        return array_merge($this->normalizationContexts['*'] ?? [], ...$contexts);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setNormalizationContextForGroups(array $context, array $groups = []): void
-    {
-        if (!$groups) {
-            $this->normalizationContexts['*'] = $context;
-        }
-
-        foreach ($groups as $group) {
-            $this->normalizationContexts[$group] = $context;
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDenormalizationContexts(): array
-    {
-        return $this->denormalizationContexts;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDenormalizationContextForGroups(array $groups): array
-    {
-        $contexts = [];
-        foreach ($groups as $group) {
-            $contexts[] = $this->denormalizationContexts[$group] ?? [];
-        }
-
-        return array_merge($this->denormalizationContexts['*'] ?? [], ...$contexts);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDenormalizationContextForGroups(array $context, array $groups = []): void
-    {
-        if (!$groups) {
-            $this->denormalizationContexts['*'] = $context;
-        }
-
-        foreach ($groups as $group) {
-            $this->denormalizationContexts[$group] = $context;
-        }
     }
 
     /**
@@ -244,16 +131,6 @@ class AttributeMetadata implements AttributeMetadataInterface
         if (null === $this->serializedName) {
             $this->serializedName = $attributeMetadata->getSerializedName();
         }
-
-        // Overwrite only if both contexts are empty
-        if (!$this->normalizationContexts && !$this->denormalizationContexts) {
-            $this->normalizationContexts = $attributeMetadata->getNormalizationContexts();
-            $this->denormalizationContexts = $attributeMetadata->getDenormalizationContexts();
-        }
-
-        if ($ignore = $attributeMetadata->isIgnored()) {
-            $this->ignore = $ignore;
-        }
     }
 
     /**
@@ -263,6 +140,6 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public function __sleep()
     {
-        return ['name', 'groups', 'maxDepth', 'serializedName', 'ignore', 'normalizationContexts', 'denormalizationContexts'];
+        return ['name', 'groups', 'maxDepth', 'serializedName'];
     }
 }

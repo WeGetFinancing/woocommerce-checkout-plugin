@@ -11,7 +11,7 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use WeGetFinancing\Checkout\ActionableInterface;
-use WeGetFinancing\Checkout\App;
+use WeGetFinancing\Checkout\ValueObject\PostMeta\OrderInvIdFieldVO;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 
 class PrintToAdminOrderInvIdInField implements ActionableInterface
@@ -43,9 +43,9 @@ class PrintToAdminOrderInvIdInField implements ActionableInterface
         echo $this->twig->render(
             'admin/order_inv_id.twig',
             [
-                'title' => OrderInvIdValueObject::ORDER_INV_ID_FIELD_ADMIN_TITLE,
-                'label' => OrderInvIdValueObject::ORDER_INV_ID_FIELD_ADMIN_LABEL,
-                'value' => get_post_meta($order->id, '_' . OrderInvIdValueObject::ORDER_INV_ID_FIELD_ID, true),
+                'title' => OrderInvIdFieldVO::ADMIN_TITLE,
+                'label' => OrderInvIdFieldVO::ADMIN_LABEL,
+                'value' => get_post_meta($order->id, '_' . OrderInvIdFieldVO::FIELD_ID, true),
             ]
         );
     }

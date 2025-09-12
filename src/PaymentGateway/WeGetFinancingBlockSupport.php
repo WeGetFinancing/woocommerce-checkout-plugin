@@ -9,13 +9,25 @@ if (!defined( 'ABSPATH' )) exit;
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
 use WeGetFinancing\Checkout\Ajax\Public\GenerateFunnelUrl;
 use WeGetFinancing\Checkout\App;
-use WeGetFinancing\Checkout\PostMeta\OrderInvIdValueObject;
+use WeGetFinancing\Checkout\ValueObject\FieldVO;
 use WeGetFinancing\Checkout\ValueObject\GenerateFunnelUrlRequest;
+use WeGetFinancing\Checkout\ValueObject\PaymentGateway\WeGetFinancingVO;
+use WeGetFinancing\Checkout\ValueObject\PostMeta\OrderInvIdFieldVO;
+use WeGetFinancing\Checkout\ValueObject\PostMeta\OrderWgfHrefFieldVO;
 
 final class WeGetFinancingBlockSupport extends AbstractPaymentMethodType
 {
     public const HANDLE = 'wegetfinancing';
     public const INIT_NAME = 'woocommerce_blocks_payment_method_type_registration';
+    public const ENABLED = 'enabled';
+    public const APP_JS = 'build/index.js';
+    public const ENQUEUE_DEPS = [
+        'wc-blocks-registry',
+        'wc-settings',
+        'wp-element',
+        'wp-html-entities',
+    ];
+
     private mixed $gateway;
     protected $name = WeGetFinancing::GATEWAY_ID;
 
@@ -26,20 +38,15 @@ final class WeGetFinancingBlockSupport extends AbstractPaymentMethodType
 
     public function is_active(): bool
     {
-        return ! empty( $this->settings[ 'enabled' ] ) && 'yes' === $this->settings[ 'enabled' ];
+        return ! empty( $this->settings[ self::ENABLED ] ) && 'yes' === $this->settings[ self::ENABLED ];
     }
 
     public function get_payment_method_script_handles(): array
     {
         wp_enqueue_script(
             self::HANDLE,
-            plugin_dir_url( dirname(__DIR__, 1) ) . 'build/index.js',
-            [
-                'wc-blocks-registry',
-                'wc-settings',
-                'wp-element',
-                'wp-html-entities',
-            ],
+            plugin_dir_url( dirname(__DIR__, 1) ) . self::APP_JS,
+            self::ENQUEUE_DEPS,
             App::PLUGIN_VERSION,
             true
         );
@@ -57,12 +64,17 @@ final class WeGetFinancingBlockSupport extends AbstractPaymentMethodType
             'description' => WeGetFinancing::DESCRIPTION,
             'checkout_logo_image_url' => $GLOBALS[App::ID][App::CHECKOUT_LOGO_URL],
             'checkout_button_image_url' => $GLOBALS[App::ID][App::CHECKOUT_BUTTON_URL],
-            'checkout_button_alt' => WeGetFinancingValueObject::CHECKOUT_BUTTON_ALT,
+            'checkout_button_alt' => WeGetFinancingVO::CHECKOUT_BUTTON_ALT,
             'supports' => WeGetFinancing::SUPPORTS,
             'ajax_action' => GenerateFunnelUrl::ACTION_NAME,
             'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce(WeGetFinancingValueObject::NONCE),
-            'order_inv_id_field_id' => OrderInvIdValueObject::ORDER_INV_ID_FIELD_ID,
+            'nonce' => wp_create_nonce(WeGetFinancingVO::NONCE),
+            'order_extra_field_type' => FieldVO::HIDDEN_TYPE,
+            'order_inv_id_id' => OrderInvIdFieldVO::FIELD_ID,
+            'order_inv_id_name' => OrderInvIdFieldVO::FIELD_NAME,
+            'order_wgf_href_id' => OrderWgfHrefFieldVO::FIELD_ID,
+            'order_wgf_href_name' => OrderWgfHrefFieldVO::FIELD_NAME,
+
 
             GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID => GenerateFunnelUrlRequest::BILLING_FIRST_NAME_ID,
             GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID => GenerateFunnelUrlRequest::BILLING_LAST_NAME_ID,

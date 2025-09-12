@@ -12,8 +12,8 @@ use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use WeGetFinancing\Checkout\ActionableInterface;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing;
-use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
 use WeGetFinancing\Checkout\Repository\PpeSettingsRepository;
+use WeGetFinancing\Checkout\ValueObject\PaymentGateway\WeGetFinancingVO;
 use WeGetFinancing\Checkout\ValueObject\PpeSettings;
 
 class FooterPpe implements ActionableInterface
@@ -32,7 +32,7 @@ class FooterPpe implements ActionableInterface
         protected string $styleProd,
         protected string $styleSandbox
     ) {
-        $this->isSandbox = ("yes" === WeGetFinancing::getOptions()[WeGetFinancingValueObject::IS_SANDBOX_FIELD_ID]);
+        $this->isSandbox = ("yes" === WeGetFinancing::getOptions()[WeGetFinancingVO::IS_SANDBOX_FIELD_ID]);
     }
 
     public function init(): void

@@ -40,8 +40,22 @@ class JsonDecode implements DecoderInterface
         self::RECURSION_DEPTH => 512,
     ];
 
-    public function __construct(array $defaultContext = [])
+    /**
+     * Constructs a new JsonDecode instance.
+     *
+     * @param array $defaultContext
+     */
+    public function __construct($defaultContext = [], int $depth = 512)
     {
+        if (!\is_array($defaultContext)) {
+            @trigger_error(sprintf('Using constructor parameters that are not a default context is deprecated since Symfony 4.2, use the "%s" and "%s" keys of the context instead.', self::ASSOCIATIVE, self::RECURSION_DEPTH), \E_USER_DEPRECATED);
+
+            $defaultContext = [
+                self::ASSOCIATIVE => (bool) $defaultContext,
+                self::RECURSION_DEPTH => $depth,
+            ];
+        }
+
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
@@ -72,7 +86,7 @@ class JsonDecode implements DecoderInterface
      *
      * @see https://php.net/json_decode
      */
-    public function decode(string $data, string $format, array $context = [])
+    public function decode($data, $format, array $context = [])
     {
         $associative = $context[self::ASSOCIATIVE] ?? $this->defaultContext[self::ASSOCIATIVE];
         $recursionDepth = $context[self::RECURSION_DEPTH] ?? $this->defaultContext[self::RECURSION_DEPTH];
@@ -98,7 +112,7 @@ class JsonDecode implements DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDecoding(string $format)
+    public function supportsDecoding($format)
     {
         return JsonEncoder::FORMAT === $format;
     }

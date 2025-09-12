@@ -13,10 +13,11 @@ use WC_Order;
 use WeGetFinancing\Checkout\ActionableInterface;
 use WeGetFinancing\Checkout\Exception\PostbackUpdateException;
 use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancing;
-use WeGetFinancing\Checkout\PaymentGateway\WeGetFinancingValueObject;
-use WeGetFinancing\Checkout\PostMeta\OrderInvIdValueObject;
 use WeGetFinancing\Checkout\Service\Logger;
 use WeGetFinancing\Checkout\Service\RequestValidatorUtility;
+use WeGetFinancing\Checkout\ValueObject\PaymentGateway\WeGetFinancingVO;
+use WeGetFinancing\Checkout\ValueObject\PostMeta\OrderInvIdFieldVO;
+use WeGetFinancing\Checkout\ValueObject\YesNoVO;
 use WeGetFinancing\Checkout\Wp\AddableTrait;
 use WP_REST_Request;
 
@@ -47,8 +48,9 @@ class PostbackUpdate implements ActionableInterface
         self::WGF_REFUND_STATUS,
     ];
     public const WC_PROCESSING_STATUS = OrderInternalStatus::PROCESSING;
-    public const WC_FAILED_STATUS = OrderInternalStatus::FAILED;
+    public const WC_CANCELLED_STATUS = OrderInternalStatus::CANCELLED;
     public const WC_REFUNDED_STATUS = OrderInternalStatus::REFUNDED;
+    public const WC_ON_HOLD_STATUS = OrderInternalStatus::ON_HOLD;
     public const REFUND_REASON = "Order refunded from WeGetFinancing";
     public const SIGNATURE_ALGO = "sha256";
     public const QUERY_COLUMN = 'post_id';
@@ -96,6 +98,9 @@ class PostbackUpdate implements ActionableInterface
             if (self::WC_REFUNDED_STATUS === $status) {
                 $this->refundOrder($order, $raw);
             } else {
+                if (self::WC_CANCELLED_STATUS === $status) {
+                    wc_increase_stock_levels($order);
+                }
                 $order->update_status($status);
             }
 
@@ -214,8 +219,8 @@ class PostbackUpdate implements ActionableInterface
 
     protected function verifySignature(string $signature, string $body, string $timestamp): bool
     {
-        $username = WeGetFinancing::getOption(WeGetFinancingValueObject::USERNAME_FIELD_ID);
-        $password = WeGetFinancing::getOption(WeGetFinancingValueObject::PASSWORD_FIELD_ID);
+        $username = WeGetFinancing::getOption(WeGetFinancingVO::USERNAME_FIELD_ID);
+        $password = WeGetFinancing::getOption(WeGetFinancingVO::PASSWORD_FIELD_ID);
 
         $string = hash(
             self::SIGNATURE_ALGO,
@@ -230,8 +235,8 @@ class PostbackUpdate implements ActionableInterface
     {
         return match ($status) {
             self::WGF_APPROVED_STATUS => self::WC_PROCESSING_STATUS,
-            self::WGF_PREAPPROVED_STATUS => WeGetFinancingValueObject::ON_HOLD_STATUS_ID,
-            self::WGF_REJECTED_STATUS => self::WC_FAILED_STATUS,
+            self::WGF_PREAPPROVED_STATUS => self::WC_ON_HOLD_STATUS,
+            self::WGF_REJECTED_STATUS => self::WC_CANCELLED_STATUS,
             self::WGF_REFUND_STATUS => self::WC_REFUNDED_STATUS,
             default => false,
         };
@@ -246,7 +251,7 @@ class PostbackUpdate implements ActionableInterface
     {
         $sql = $this->wpdb->prepare(
             "SELECT post_id FROM {$this->wpdb->prefix}postmeta WHERE meta_key = %s AND meta_value = %s",
-            OrderInvIdValueObject::ORDER_META,
+            OrderInvIdFieldVO::META,
             $invId
         );
 
@@ -257,8 +262,6 @@ class PostbackUpdate implements ActionableInterface
                 PostbackUpdateException::INVALID_SQL_RESULT_ERROR_CODE
             );
         }
-
-
 
         return $results;
     }
@@ -275,7 +278,7 @@ class PostbackUpdate implements ActionableInterface
             $orders = wc_get_orders([
                 'meta_query' => [
                     [
-                        'key' => OrderInvIdValueObject::ORDER_META,
+                        'key' => OrderInvIdFieldVO::META,
                         'value' => $invId,
                         'compare' => '='
                     ]
@@ -346,13 +349,21 @@ class PostbackUpdate implements ActionableInterface
         }
         $amount = sanitize_text_field($raw[self::UPDATES_FIELD][self::AMOUNT_FIELD]);
 
+        $isRestockOnRefund = WeGetFinancing::getOptionOrDefault(
+            WeGetFinancingVO::IS_RESTOCK_ON_REFUND_FIELD_ID,
+            WeGetFinancingVO::IS_RESTOCK_ON_REFUND_DEFAULT
+        );
+        if (YesNoVO::YES_VALUE === $isRestockOnRefund) {
+            wc_increase_stock_levels($order);
+        }
+
         wc_create_refund([
             'amount'         => wc_format_decimal($amount),
             'reason'         => self::REFUND_REASON,
             'order_id'       => $order->get_id(),
             'line_items'     => [],
             'refund_payment' => false,
-            'restock_items'  => true,
+            'restock_items'  => false,
         ]);
     }
 }

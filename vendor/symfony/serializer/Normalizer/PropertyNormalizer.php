@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
+use Symfony\Component\PropertyAccess\Exception\AccessException;
 
 /**
  * Converts between objects and arrays by mapping properties.
@@ -35,7 +35,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, ?string $format = null)
+    public function supportsNormalization($data, $format = null)
     {
         return parent::supportsNormalization($data, $format) && $this->supports(\get_class($data));
     }
@@ -43,7 +43,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, string $type, ?string $format = null)
+    public function supportsDenormalization($data, $type, $format = null)
     {
         return parent::supportsDenormalization($data, $type, $format) && $this->supports($type);
     }
@@ -61,10 +61,6 @@ class PropertyNormalizer extends AbstractObjectNormalizer
      */
     private function supports(string $class): bool
     {
-        if (null !== $this->classDiscriminatorResolver && $this->classDiscriminatorResolver->getMappingForClass($class)) {
-            return true;
-        }
-
         $class = new \ReflectionClass($class);
 
         // We look for at least one non-static property
@@ -82,7 +78,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = [])
+    protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = [])
     {
         if (!parent::isAllowedAttribute($classOrObject, $attribute, $format, $context)) {
             return false;
@@ -103,7 +99,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function extractAttributes(object $object, ?string $format = null, array $context = [])
+    protected function extractAttributes($object, $format = null, array $context = [])
     {
         $reflectionObject = new \ReflectionObject($object);
         $attributes = [];
@@ -124,7 +120,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = [])
+    protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
     {
         try {
             $reflectionProperty = $this->getReflectionProperty($object, $attribute);
@@ -148,7 +144,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
                 || ($reflectionProperty->isProtected() && !\array_key_exists("\0*\0{$reflectionProperty->name}", $propertyValues))
                 || ($reflectionProperty->isPrivate() && !\array_key_exists("\0{$reflectionProperty->class}\0{$reflectionProperty->name}", $propertyValues))
             ) {
-                throw new UninitializedPropertyException(sprintf('The property "%s::$%s" is not initialized.', \get_class($object), $reflectionProperty->name));
+                throw new AccessException(sprintf('The property "%s::$%s" is not initialized.', \get_class($object), $reflectionProperty->name));
             }
         }
 
@@ -158,7 +154,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function setAttributeValue(object $object, string $attribute, $value, ?string $format = null, array $context = [])
+    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = [])
     {
         try {
             $reflectionProperty = $this->getReflectionProperty($object, $attribute);

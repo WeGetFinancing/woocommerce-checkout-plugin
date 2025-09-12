@@ -19,13 +19,13 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 /**
  * Validates whether the value is a valid UUID (also known as GUID).
  *
- * Strict validation will allow a UUID as specified per RFC 9562/4122.
+ * Strict validation will allow a UUID as specified per RFC 4122.
  * Loose validation will allow any type of UUID.
  *
  * @author Colin O'Dell <colinodell@gmail.com>
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @see https://datatracker.ietf.org/doc/html/rfc9562
+ * @see http://tools.ietf.org/html/rfc4122
  * @see https://en.wikipedia.org/wiki/Universally_unique_identifier
  */
 class UuidValidator extends ConstraintValidator
@@ -72,7 +72,7 @@ class UuidValidator extends ConstraintValidator
             return;
         }
 
-        if (!\is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
             throw new UnexpectedValueException($value, 'string');
         }
 

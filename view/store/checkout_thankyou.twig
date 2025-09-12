@@ -1,5 +1,5 @@
 <script>
-    if ("{{ wgf_href }}" && "{{ wgf_href }}".trim() !== '') {
+    if ("{{ order_is_wgf_value }}" && "{{ order_is_wgf_value }}".trim() === 'yes') {
         let mainSelector = document.querySelector("{{ thank_you_main_selector }}")
         if(mainSelector) {
             mainSelector.style.display = "none";
@@ -210,7 +210,7 @@
         try {
             if (typeof GetFinancing !== 'undefined' && GetFinancing) {
                 new GetFinancing(
-                    "{{ wgf_href }}",
+                    "{{ order_wgf_href_value }}",
                     function () {
                         showClosureMessage();
                     }.bind(self),
@@ -227,11 +227,15 @@
 
     }
 
-    if ("{{ wgf_href }}" && "{{ wgf_href }}".trim() !== '') {
-        if (document.readyState === 'complete') {
-            initializeFinancing();
+    if ("{{ order_is_wgf_value }}" && "{{ order_is_wgf_value }}".trim() === 'yes') {
+        if ("{{ order_wgf_href_value }}" && "{{ order_wgf_href_value }}".trim() !== '') {
+            if (document.readyState === 'complete') {
+                initializeFinancing();
+            } else {
+                window.addEventListener('load', initializeFinancing);
+            }
         } else {
-            window.addEventListener('load', initializeFinancing);
+            mainFallback();
         }
     }
 </script>
