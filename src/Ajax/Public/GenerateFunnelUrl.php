@@ -370,8 +370,11 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                     continue;
                 }
 
-                $lineSubtotal = (float) ($item['line_subtotal'] ?? 0);
-                $lineSubtotalTax = (float) ($item['line_subtotal_tax'] ?? 0);
+                $lineTotal = (float) ($item['line_total'] ?? 0);
+                $lineTotalTax = (float) ($item['line_tax'] ?? 0);
+                $lineTotal += $lineTotalTax;
+                $unitTax = $lineTotalTax / $qty;
+                $unitPrice = $lineTotal / $qty;
 
                 $category = 'none';
                 $terms = get_the_terms($product->get_id(), 'product_cat');
@@ -382,7 +385,6 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                     }
                 }
 
-
                 $name = wp_strip_all_tags($product->get_name());
                 if ('variation' === $product->get_type() && !empty($item['variation_id'])) {
                     $variation = wc_get_product( $item['variation_id'] );
@@ -390,10 +392,6 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                         $name .= ' - ' . wp_strip_all_tags( $variation->get_name() );
                     }
                 }
-
-                $unitTax   = $lineSubtotalTax / $qty;
-                $unitPrice = ($lineSubtotal / $qty) + $unitTax;
-
 
                 $cartItems[] = [
                     'sku' => true === empty($product->get_sku()) ? 'none' : wp_strip_all_tags($product->get_sku()),
