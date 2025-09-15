@@ -121,7 +121,7 @@ class FooterPpe implements ActionableInterface
                     'ppeIsHoverValue' => PpeSettingsRepository::getOptionOrDefault(
                         PpeSettings::IS_HOVER_ID,
                         PpeSettings::IS_HOVER_DEFAULT_VALUE
-                    ),
+                    ) ? "true" : "false",
                     'ppeFontSizeValue' => PpeSettingsRepository::getOptionOrDefault(
                         PpeSettings::FONT_SIZE_ID,
                         PpeSettings::FONT_SIZE_DEFAULT_VALUE
