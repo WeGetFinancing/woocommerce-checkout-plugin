@@ -108,3 +108,7 @@
 
 = 1.12.0
 * Configurable pending status
+
+= 1.13.0
+* Coupon compatibility
+* PPE On Hover
