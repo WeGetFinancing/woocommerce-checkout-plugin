@@ -376,25 +376,25 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 $unitTax = $lineTotalTax / $qty;
                 $unitPrice = $lineTotal / $qty;
 
-                $category = 'none';
+                $category = null;
                 $terms = get_the_terms($product->get_id(), 'product_cat');
                 if (!is_wp_error($terms) && is_array($terms) && ! empty($terms)) {
                     $first = reset($terms); // first WP_Term
                     if ($first instanceof WP_Term) {
-                        $category = wp_strip_all_tags($first->name);
+                        $category = sanitize_text_field($first->name);
                     }
                 }
 
-                $name = wp_strip_all_tags($product->get_name());
+                $name = sanitize_text_field($product->get_name());
                 if ('variation' === $product->get_type() && !empty($item['variation_id'])) {
                     $variation = wc_get_product( $item['variation_id'] );
                     if ( $variation ) {
-                        $name .= ' - ' . wp_strip_all_tags( $variation->get_name() );
+                        $name .= ' - ' . sanitize_text_field( $variation->get_name() );
                     }
                 }
 
                 $cartItems[] = [
-                    'sku' => true === empty($product->get_sku()) ? 'none' : wp_strip_all_tags($product->get_sku()),
+                    'sku' => true === empty($product->get_sku()) ? null : sanitize_text_field($product->get_sku()),
                     'displayName' => $name,
                     'unitPrice' => (string) $unitPrice ,
                     'quantity' => $qty,
