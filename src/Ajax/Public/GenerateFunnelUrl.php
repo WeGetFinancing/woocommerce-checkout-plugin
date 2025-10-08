@@ -376,7 +376,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 $unitTax = $lineTotalTax / $qty;
                 $unitPrice = $lineTotal / $qty;
 
-                $category = null;
+                $category = 'none';
                 $terms = get_the_terms($product->get_id(), 'product_cat');
                 if (!is_wp_error($terms) && is_array($terms) && ! empty($terms)) {
                     $first = reset($terms); // first WP_Term
@@ -394,7 +394,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 }
 
                 $cartItems[] = [
-                    'sku' => true === empty($product->get_sku()) ? null : sanitize_text_field($product->get_sku()),
+                    'sku' => true === empty($product->get_sku()) ? 'none' : sanitize_text_field($product->get_sku()),
                     'displayName' => $name,
                     'unitPrice' => (string) $unitPrice ,
                     'quantity' => $qty,
