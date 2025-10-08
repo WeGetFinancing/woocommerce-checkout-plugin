@@ -25,7 +25,7 @@ Our plugin allows you to offer:
 ### 2.1. Via the WordPress Market
 
 1. Download the plugin, it's called "WeGetFinancing Payment Gateway", from the WordPress Market and install.
-2. Once installed go to Plugins > Installed Plugins.
+2. Once installed, go to Plugins > Installed Plugins.
 3. Find the plugin, and click on the "Activate" button.
    ![Plugin Activation](./assets/install-1.png)
 
@@ -38,7 +38,7 @@ Our plugin allows you to offer:
 4. Click on the button "Upload Plugin", it is positioned nearby the header "Add Plugins"
 5. Click on the button "Choose file" to select the plugin.zip file that you downloaded before
 6. Proceed with Install Now and follow the instructions
-7. Once installed go to Plugins > Installed Plugins
+7. Once installed, go to Plugins > Installed Plugins
 8. Find the plugin, it's called "WeGetFinancing Payment Gateway", and click on  the "Activate" button
    ![Plugin Activation](./assets/install-1.png)
 
@@ -71,8 +71,11 @@ Our plugin allows you to offer:
    2. *Username*: the username from the WeGetFinancing portal.
    3. *Password*: the password from the WeGetFinancing portal.
    4. *Merchant ID*: the merchant ID from the WeGetFinancing portal.
-   5. *Display error selector*: the HTML class of the selector where display the error messaging in the checkout page. The default value works fine with default WooCommerce template.
-   6. *Display error method*: in HTML we can append (after) or prepend (before) the element elected, here you can select the behaviour of the attachment. The default value works fine with default WooCommerce template.
+   5. *Activate Auto Cancel Order*: if enabled, the order will be automatically canceled if the customer doesn't pay in the time configured by the following field.
+   6. *Order Hold Period*: the time in hours after which the order will be automatically canceled if the customer doesn't pay.
+   7. *Activate Restock on Refunded Order*: When enabled, the products sold in the order will be automatically restocked on refund.
+   8. *Display error selector*: the HTML class of the selector where display the error messaging in the checkout page. The default value works fine with default WooCommerce template.
+   9. *Display error method*: in HTML we can append (after) or prepend (before) the element elected, here you can select the behavior of the attachment. The default value works fine with default WooCommerce template.
 9. Click on the "Save Changes" button, if successfully saved, it will show you the following success note:
    ![Plugin Activation](./assets/setup-6.png)
 10. Come back to WooCommerce > Settings > Payments
