@@ -381,7 +381,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 if (!is_wp_error($terms) && is_array($terms) && ! empty($terms)) {
                     $first = reset($terms); // first WP_Term
                     if ($first instanceof WP_Term) {
-                        $category = sanitize_text_field($first->name);
+                        $category = $this->escape(sanitize_text_field($first->name));
                     }
                 }
 
@@ -389,13 +389,15 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 if ('variation' === $product->get_type() && !empty($item['variation_id'])) {
                     $variation = wc_get_product( $item['variation_id'] );
                     if ( $variation ) {
-                        $name .= ' - ' . sanitize_text_field( $variation->get_name() );
+                        $name .= ' ' . sanitize_text_field( $variation->get_name() );
                     }
                 }
 
                 $cartItems[] = [
-                    'sku' => true === empty($product->get_sku()) ? 'none' : sanitize_text_field($product->get_sku()),
-                    'displayName' => $name,
+                    'sku' => true === empty($product->get_sku())
+                        ? 'none'
+                        : $this->escape(sanitize_text_field($product->get_sku())),
+                    'displayName' => $this->escape($name),
                     'unitPrice' => (string) $unitPrice ,
                     'quantity' => $qty,
                     'unitTax' => (string) $unitTax,
@@ -436,5 +438,14 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 $exception->getViolations()
             );
         }
+    }
+
+    /**
+     * Sanitizes the input by removing any characters that are not alphanumeric and periods.
+     *
+     * @*/
+    protected function escape(?string $string): ?string
+    {
+        return is_null($string) ? null : preg_replace('/[^A-Za-z0-9.]/', '', $string);
     }
 }
