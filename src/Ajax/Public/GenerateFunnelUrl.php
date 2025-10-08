@@ -97,7 +97,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
             $response = $client->requestNewLoan($loanRequest);
             $data = $response->getData();
 
-            if (true === $response->getIsSuccess()) {
+            if (true === $response->getIsSuccess() && !empty($data['invId']) && !empty($data['href'])) {
                 wp_send_json(
                     [
                         'isSuccess' => true,
