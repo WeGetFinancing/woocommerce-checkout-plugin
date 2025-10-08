@@ -389,7 +389,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 if ('variation' === $product->get_type() && !empty($item['variation_id'])) {
                     $variation = wc_get_product( $item['variation_id'] );
                     if ( $variation ) {
-                        $name .= ' ' . sanitize_text_field( $variation->get_name() );
+                        $name .= ' - ' . sanitize_text_field( $variation->get_name() );
                     }
                 }
 
@@ -441,11 +441,11 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
     }
 
     /**
-     * Sanitizes the input by removing any characters that are not alphanumeric and periods.
-     *
-     * @*/
+     * Sanitizes the input by removing all characters
+     * except letters, digits, spaces, periods, underscores, and hyphens
+     * */
     protected function escape(?string $string): ?string
     {
-        return is_null($string) ? null : preg_replace('/[^A-Za-z0-9.]/', '', $string);
+        return is_null($string) ? null : preg_replace('/[^A-Za-z0-9._\- ]/', '', $string);
     }
 }
