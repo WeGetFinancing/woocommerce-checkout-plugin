@@ -146,6 +146,7 @@
                 "issues": "https://github.com/doctrine/annotations/issues",
                 "source": "https://github.com/doctrine/annotations/tree/1.14.4"
             },
+            "abandoned": true,
             "install-path": "../doctrine/annotations"
         },
         {
@@ -3370,17 +3371,17 @@
         },
         {
             "name": "wegetfinancing/php-sdk",
-            "version": "2.6",
-            "version_normalized": "2.6.0.0",
+            "version": "2.7",
+            "version_normalized": "2.7.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WeGetFinancing/php-sdk.git",
-                "reference": "c3253c6c7bb1ceb604b9583df9b4ba80f691628f"
+                "reference": "88c246cec4fcc048ba3ad147fb1b38dc23390e26"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WeGetFinancing/php-sdk/zipball/c3253c6c7bb1ceb604b9583df9b4ba80f691628f",
-                "reference": "c3253c6c7bb1ceb604b9583df9b4ba80f691628f",
+                "url": "https://api.github.com/repos/WeGetFinancing/php-sdk/zipball/88c246cec4fcc048ba3ad147fb1b38dc23390e26",
+                "reference": "88c246cec4fcc048ba3ad147fb1b38dc23390e26",
                 "shasum": ""
             },
             "require": {
@@ -3399,7 +3400,7 @@
                 "phpunit/phpunit": "^9",
                 "squizlabs/php_codesniffer": "^3"
             },
-            "time": "2025-09-09T10:18:29+00:00",
+            "time": "2025-10-08T17:12:22+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -3420,7 +3421,7 @@
             "description": "The WeGetFinancing PHP SDK provides convenient access to the WeGetFinancing API from applications written in the PHP language.",
             "support": {
                 "issues": "https://github.com/WeGetFinancing/php-sdk/issues",
-                "source": "https://github.com/WeGetFinancing/php-sdk/tree/v2.6"
+                "source": "https://github.com/WeGetFinancing/php-sdk/tree/v2.7"
             },
             "install-path": "../wegetfinancing/php-sdk"
         }

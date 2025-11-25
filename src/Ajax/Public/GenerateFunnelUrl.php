@@ -97,7 +97,7 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
             $response = $client->requestNewLoan($loanRequest);
             $data = $response->getData();
 
-            if (true === $response->getIsSuccess()) {
+            if (true === $response->getIsSuccess() && !empty($data['invId']) && !empty($data['href'])) {
                 wp_send_json(
                     [
                         'isSuccess' => true,
@@ -381,21 +381,23 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 if (!is_wp_error($terms) && is_array($terms) && ! empty($terms)) {
                     $first = reset($terms); // first WP_Term
                     if ($first instanceof WP_Term) {
-                        $category = wp_strip_all_tags($first->name);
+                        $category = $this->escape(sanitize_text_field($first->name));
                     }
                 }
 
-                $name = wp_strip_all_tags($product->get_name());
+                $name = sanitize_text_field($product->get_name());
                 if ('variation' === $product->get_type() && !empty($item['variation_id'])) {
                     $variation = wc_get_product( $item['variation_id'] );
                     if ( $variation ) {
-                        $name .= ' - ' . wp_strip_all_tags( $variation->get_name() );
+                        $name .= ' - ' . sanitize_text_field( $variation->get_name() );
                     }
                 }
 
                 $cartItems[] = [
-                    'sku' => true === empty($product->get_sku()) ? 'none' : wp_strip_all_tags($product->get_sku()),
-                    'displayName' => $name,
+                    'sku' => true === empty($product->get_sku())
+                        ? 'none'
+                        : $this->escape(sanitize_text_field($product->get_sku())),
+                    'displayName' => $this->escape($name),
                     'unitPrice' => (string) $unitPrice ,
                     'quantity' => $qty,
                     'unitTax' => (string) $unitTax,
@@ -436,5 +438,14 @@ class GenerateFunnelUrl extends AbstractActionableWithClient
                 $exception->getViolations()
             );
         }
+    }
+
+    /**
+     * Sanitizes the input by removing all characters
+     * except letters, digits, spaces, periods, underscores, and hyphens
+     * */
+    protected function escape(?string $string): ?string
+    {
+        return is_null($string) ? null : preg_replace('/[^A-Za-z0-9._\- ]/', '', $string);
     }
 }
