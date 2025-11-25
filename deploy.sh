@@ -40,8 +40,8 @@ case "${1:-NO}" in
 esac
 
 # Define variables
-proj_folder="/home/user/.proj/woocommerce-checkout-plugin"
-svn_folder="/home/user/.proj/svn"
+proj_folder="${PROJ_FOLDER:-"$(pwd)"}"
+svn_folder="${SVN_FOLDER:-"${HOME}/svn"}"
 
 echo -e "${CYAN}🚀 Starting WordPress plugin deployment to SVN...${NC}"
 

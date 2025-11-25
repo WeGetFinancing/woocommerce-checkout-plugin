@@ -1,4 +1,5 @@
 services:
+
   composer:
     build:
       dockerfile: env/composer/Dockerfile
@@ -9,35 +10,6 @@ services:
       - ./:/app
     environment:
       - PHP_CS_FIXER_IGNORE_ENV=1
-
-  db:
-    image: mariadb:10.7.7-focal
-    container_name: db
-    volumes:
-      - db-data:/var/lib/mysql
-    restart: always
-    env_file:
-      - .env
-
-  wp:
-    depends_on:
-      - db
-    image: wordpress:6.8.2-fpm-alpine
-    container_name: wp
-    restart: always
-    user: "root:root"
-    env_file:
-      - .env
-    environment:
-      - WORDPRESS_DB_HOST=db:3306
-      - WORDPRESS_DB_USER=$MYSQL_USER
-      - WORDPRESS_DB_PASSWORD=$MYSQL_PASSWORD
-      - WORDPRESS_DB_NAME=$MYSQL_DATABASE
-    volumes:
-      - ./env/wp/custom.ini:/usr/local/etc/php/conf.d/custom.ini
-      - ./var/wp:/var/www/html
-      - ./:/var/www/html/wp-content/plugins/wegetfinancing-checkout
-      - ./env/empty:/var/www/html/wp-content/plugins/wegetfinancing-checkout/var/wp:ro
 
   lb:
     image: caddy:2.6.2-alpine
@@ -52,6 +24,37 @@ services:
       - ./:/var/www/html/wp-content/plugins/wegetfinancing-checkout
       - ./env/empty:/var/www/html/wp-content/plugins/wegetfinancing-checkout/var/wp:ro
       - ./env/lb/Caddyfile:/etc/caddy/Caddyfile
+
+  db:
+    image: mariadb:10.7.7-focal
+    container_name: db
+    volumes:
+      - db-data:/var/lib/mysql
+    restart: always
+    env_file:
+      - .env
+
+  wp:
+    depends_on:
+      - db
+    image: wordpress:6.8.3-fpm-alpine
+    container_name: wp
+    restart: always
+    user: "root:root"
+    env_file:
+      - .env
+    environment:
+      - WORDPRESS_DB_HOST=db:3306
+      - WORDPRESS_DB_USER=$MYSQL_USER
+      - WORDPRESS_DB_PASSWORD=$MYSQL_PASSWORD
+      - WORDPRESS_DB_NAME=$MYSQL_DATABASE
+    volumes:
+      - ./env/wp/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+      - ./var/wp:/var/www/html
+      #If you need to install and run the local version of the plugin, uncomment the following lines
+#      - ./:/var/www/html/wp-content/plugins/wegetfinancing-checkout
+#      - ./env/empty:/var/www/html/wp-content/plugins/wegetfinancing-checkout/var/wp:ro
+
 
 volumes:
   db-data:
