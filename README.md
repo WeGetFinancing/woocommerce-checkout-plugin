@@ -167,8 +167,9 @@ This part is intent only for skilled technical people.
 1. If this is the first time you've cloned this repository, please ensure that 
    1. You have been installed `docker`, `apg`, `make` and `direnv`, please refer to the relative official documentation to find instruction on how to install on your environment. 
    2. If you need to edit the `.envrc` file, please copy to `.envrc.local` and edit it as per your needs.
-   3. Please read the file compose.yaml and edit at your convenience.
-   4. Copy the file `.env.dist` to `.env` and configure per your needs.`
+   3. Run `direnv allow` to enable the `.envrc` file.
+   4. Please read the file compose.yaml and edit at your convenience.
+   5. Copy the file `.env.dist` to `.env` and configure per your needs.`
 2. Run `make up-d` to initialize and run your environment.
 
 ### 3.2. Re-Install a fresh version of WordPress:
