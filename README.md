@@ -162,7 +162,7 @@ For more information on how to switch between the two, please follow the [Offici
 
 This part is intent only for skilled technical people.
 
-### 4.1 Prepare your development environment
+### 3.1 Prepare your development environment
 
 1. If this is the first time you've cloned this repository, please ensure that 
    1. You have been installed `docker`, `apg`, `make` and `direnv`, please refer to the relative official documentation to find instruction on how to install on your environment. 
@@ -171,7 +171,7 @@ This part is intent only for skilled technical people.
    4. Copy the file `.env.dist` to `.env` and configure per your needs.`
 2. Run `make up-d` to initialize and run your environment.
 
-### 4.2. Re-Install a fresh version of WordPress:
+### 3.2. Re-Install a fresh version of WordPress:
 
 1. Ensure that all the containers are down
    ```
@@ -186,7 +186,7 @@ This part is intent only for skilled technical people.
    make up-d
    ```
    
-### 4.3. Regenerate vendors
+### 3.3. Regenerate vendors
 
 To regenerate optimized vendors for your version of php, use the following command:
 
@@ -194,7 +194,7 @@ To regenerate optimized vendors for your version of php, use the following comma
 docker compose run --rm composer install
 ```
 
-### 4.4. Compile Gutenberg plugin
+### 3.4. Compile Gutenberg plugin
 
 Our plugin requires Gutenberg blocks to work properly. 
 To compile the Gutenberg plugin, you need to install node.js and npm on your local machine.
