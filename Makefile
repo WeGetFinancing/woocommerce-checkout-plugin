@@ -24,6 +24,14 @@ down:
 up-d:
 	@$(CMD_DC_COMPOSE) up -d
 
+.PHONY: up
+up:
+	@$(CMD_DC_COMPOSE) up
+
+.PHONY: stop
+stop:
+	@$(CMD_DC_COMPOSE) stop
+
 .PHONY: deploy-svn
 deploy-svn:
 	@if [ -z "$${COMMIT_MESSAGE:-}" ] || [ -z "$${TAG_MESSAGE:-}" ] || [ -z "$${TAG_VERSION:-}" ]; then \
